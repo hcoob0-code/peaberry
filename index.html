@@ -137,13 +137,11 @@ cursor: pointer;
 transition: all 0.18s;
 background: var(–surface);
 border: 1px solid var(–border);
--webkit-appearance: none;
--webkit-tap-highlight-color: transparent;
-text-decoration: none;
--webkit-text-fill-color: var(–text-secondary);
 }
 .tab.active {
--webkit-text-fill-color: white;
+background: var(–text-primary);
+color: white;
+border-color: var(–text-primary);
 }
 
 /* ── SECTION ── */
@@ -187,11 +185,10 @@ box-shadow: var(–shadow-sm);
 }
 .top-bar select:focus { outline: none; border-color: var(–text-secondary); }
 .top-bar-divider { flex-shrink: 0; width: 1px; height: 18px; background: var(–border); margin: 0 2px; }
-.top-bar-spacer { flex: 1; }
 .top-bar-btn {
 flex-shrink: 0;
-padding: 4px 8px;
-font-size: 10px;
+padding: 6px 12px;
+font-size: 11px;
 font-family: ‘Noto Sans KR’, sans-serif;
 color: var(–text-secondary);
 background: var(–surface);
@@ -324,9 +321,9 @@ color: var(–text-secondary);
 
 .add-btn {
 width: 100%;
-margin-top: 6px;
-padding: 6px 10px;
-font-size: 11px;
+margin-top: 8px;
+padding: 7px;
+font-size: 12px;
 font-family: ‘Noto Sans KR’, sans-serif;
 font-weight: 500;
 color: var(–text-secondary);
@@ -664,18 +661,7 @@ canvas { max-width: 100%; }
     <div class="hdr-title" id="farm-title" onclick="openFarmNameModal()">피크베리 농장</div>
     <div class="hdr-sub">수입·지출 관리</div>
   </div>
-  <div style="
-    position: fixed;
-    top: 1px;
-    right: 10px;
-    font-size: 6pt;
-    color: var(--text-tertiary);
-    opacity: 0.3;
-    text-align: right;
-    line-height: 1;
-    z-index: 9999;">
-    Version 1.0.0 - 20260430
-  </div>
+  <div style="font-size:10px;color:var(--text-tertiary);font-weight:400;letter-spacing:0.3px;">Version 1.0.0</div>
 </div>
 
 <!-- TABS -->
@@ -736,10 +722,10 @@ canvas { max-width: 100%; }
     <select id="inc-year" onchange="renderIncExp()"></select>
     <select id="inc-month" onchange="renderIncExp()"></select>
     <select id="inc-day" style="display:none;" onchange="renderIncExp()"></select>
-    <div class="top-bar-spacer"></div>
+    <div style="flex:1;"></div>
     <div class="top-bar-divider"></div>
-    <button class="top-bar-btn" onclick="collapseAll('income')">All ▲</button>
     <button class="top-bar-btn" onclick="expandAll('income')">All ▼</button>
+    <button class="top-bar-btn" onclick="collapseAll('income')">All ▲</button>
   </div>
   <div id="income-cards">
     <div class="nm-flat card-wrap" data-group="income"><div class="card-hdr" onclick="toggleCard(this)"><span class="c-title">소매 판매<span class="c-arrow">▼</span></span><span class="c-badge c-badge-inc" id="b-retail">0원</span></div><div class="card-body"><div id="l-retail"></div><button class="add-btn" onclick="openModal('retail')">+ 추가</button></div></div>
@@ -758,10 +744,10 @@ canvas { max-width: 100%; }
     <select id="exp-year" onchange="renderIncExp()"></select>
     <select id="exp-month" onchange="renderIncExp()"></select>
     <select id="exp-day" style="display:none;" onchange="renderIncExp()"></select>
-    <div class="top-bar-spacer"></div>
+    <div style="flex:1;"></div>
     <div class="top-bar-divider"></div>
-    <button class="top-bar-btn" onclick="collapseAll('expense')">All ▲</button>
     <button class="top-bar-btn" onclick="expandAll('expense')">All ▼</button>
+    <button class="top-bar-btn" onclick="collapseAll('expense')">All ▲</button>
   </div>
   <div id="expense-cards">
     <div class="nm-flat card-wrap" data-group="expense"><div class="card-hdr" onclick="toggleCard(this)"><span class="c-title">전기세<span class="c-arrow">▼</span></span><span class="c-badge c-badge-exp" id="b-electric">0원</span></div><div class="card-body"><div id="l-electric"></div><button class="add-btn" onclick="openModal('electric')">+ 추가</button></div></div>
@@ -896,7 +882,7 @@ let curModal = null, editIdx = -1, lChart = null, pChart = null, sChart = null;
 const INC = ['retail','wholesale','group','personal','seedling'];
 const EXP = ['electric','labor','fertilizer','parts','repair','seedbuy'];
 const CAT = {retail:'소매',wholesale:'도매',group:'단체체험',personal:'개인체험',seedling:'육묘',electric:'전기세',labor:'인건비',fertilizer:'비료',parts:'비품',repair:'보수',seedbuy:'모종'};
-const ICON = {retail:'🍓',wholesale:'🚚',group:'👥',personal:'🙋',seedling:'🌱',electric:'⚡',labor:'👷',fertilizer:'🌿',parts:'🛒',repair:'🏗',seedbuy:'🪴'};
+const ICON = {retail:'🍓',wholesale:'🚚',group:'👥',personal:'🙋',seedling:'🌱',electric:'⚡',labor:'👷',fertilizer:'🌿',parts:'🔧',repair:'🏗',seedbuy:'🪴'};
 
 function p2(n){return String(n).padStart(2,'0');}
 function gl(k){try{return JSON.parse(localStorage.getItem(k)||'null');}catch{return null;}}
@@ -975,14 +961,13 @@ function renderRow(cat,e,i,ro){
   const acts=ro?'':
     `<div class="erow-acts"><button class="eact" onclick="editEntry('${cat}',${i})">수정</button><button class="eact del" onclick="delEntry('${cat}',${i})">삭제</button></div>`;
   let l1='',lines=[];
-  const noteTag=e.note?` <span style="font-size:10px;color:var(--text-tertiary);font-weight:400;">${e.note}</span>`:'';
-  if(cat==='retail'){l1=`${e.date}${noteTag}`;lines.push(`${e.kg||0}kg · 수량 ${e.qty||0}개 · ${(+e.price||0).toLocaleString()}원`);}
-  else if(cat==='wholesale'){l1=`${e.date}${noteTag}`;for(let k=1;k<=5;k++)if(+e['cnt'+k]>0||+e['kg'+k]>0)lines.push(`${k}번 ${e['kg'+k]||0}kg · ${e['cnt'+k]||0}개 · ${(+e['price'+k]||0).toLocaleString()}원`);}
-  else if(cat==='group'){l1=`${e.date}${e.orgName?' · '+e.orgName:''}${noteTag}`;(e.items||[]).forEach(it=>lines.push(`${it.prog} · ${it.qty}개 · ${(+it.price||0).toLocaleString()}원`));}
-  else if(cat==='personal'){l1=`${e.date}${noteTag}`;(e.items||[]).forEach(it=>lines.push(`${it.prog} · ${it.qty}개 · ${(+it.price||0).toLocaleString()}원`));}
-  else if(cat==='seedling'){l1=`${e.date}${noteTag}`;lines.push(`수량 ${e.qty||0}개 · ${(+e.price||0).toLocaleString()}원`);}
-  else if(cat==='labor'){l1=`${e.date} · ${e.laborType||''} ${e.count||1}명${noteTag}`;if(e.payType==='시급')lines.push(`시급 · ${e.startH}:${p2(e.startM||0)}~${e.endH}:${p2(e.endM||0)}${+e.breakMins>0?` 휴게${e.breakMins}분`:''}`);else lines.push(`${e.payType} · ${(+e.amount||0).toLocaleString()}원`);}
-  else{l1=`${e.date}${e.name?' · '+e.name:''}${noteTag}`;}
+  if(cat==='retail'){l1=`${e.date}${e.note?` <span style="color:var(--text-tertiary);font-size:11px;">· ${e.note}</span>`:''}`;lines.push(`${e.kg||0}kg · 수량 ${e.qty||0} · ${(+e.price||0).toLocaleString()}원`);}
+  else if(cat==='wholesale'){l1=`${e.date}${e.note?` <span style="color:var(--text-tertiary);font-size:11px;">· ${e.note}</span>`:''}`;for(let k=1;k<=5;k++)if(+e['cnt'+k]>0||+e['kg'+k]>0)lines.push(`${k}번 ${e['kg'+k]||0}kg · ${e['cnt'+k]||0}개 · ${(+e['price'+k]||0).toLocaleString()}원`);}
+  else if(cat==='group'){l1=`${e.date}${e.orgName?' · '+e.orgName:''}${e.note?` <span style="color:var(--text-tertiary);font-size:11px;">· ${e.note}</span>`:''}`;(e.items||[]).forEach(it=>lines.push(`${it.prog} · ${it.qty}개 · ${(+it.price||0).toLocaleString()}원`));}
+  else if(cat==='personal'){l1=`${e.date}${e.note?` <span style="color:var(--text-tertiary);font-size:11px;">· ${e.note}</span>`:''}`;(e.items||[]).forEach(it=>lines.push(`${it.prog} · ${it.qty}개 · ${(+it.price||0).toLocaleString()}원`));}
+  else if(cat==='seedling'){l1=`${e.date}${e.note?` <span style="color:var(--text-tertiary);font-size:11px;">· ${e.note}</span>`:''}`;lines.push(`수량 ${e.qty||0} · ${(+e.price||0).toLocaleString()}원`);}
+  else if(cat==='labor'){l1=`${e.date} · ${e.laborType||''} ${e.count||1}명${e.note?` <span style="color:var(--text-tertiary);font-size:11px;">· ${e.note}</span>`:''}`;if(e.payType==='시급')lines.push(`시급 · ${e.startH}:${p2(e.startM||0)}~${e.endH}:${p2(e.endM||0)}${+e.breakMins>0?` 휴게${e.breakMins}분`:''}`);else lines.push(`${e.payType} · ${(+e.amount||0).toLocaleString()}원`);}
+  else{l1=`${e.date}${e.name?' · '+e.name:''}${e.note?` <span style="color:var(--text-tertiary);font-size:11px;">· ${e.note}</span>`:''}`;}
   return `<div class="erow"><div class="erow-top"><div class="erow-left"><div class="erow-line1">${l1}</div>${lines.map(l=>`<div class="erow-line2">${l}</div>`).join('')}</div><div class="erow-right"><span class="erow-amt">${fmt(e.amount||0)}</span>${acts}</div></div></div>`;
 }
 
@@ -1050,16 +1035,15 @@ function openModal(cat,idx){
   if(editIdx>=0){if(cat==='prog')ex=getProgs()[editIdx];else if(cat==='inv-item')ex=getInvItems()[editIdx];else if(cat==='inv-in')ex=getInvIn()[editIdx];else if(tab){const sf=getSaveKey(tab);ex=(JSON.parse(localStorage.getItem(sf(cat))||'[]'))[editIdx];}}
   const v=(k,d='')=>ex?ex[k]??d:d;
   const today=NOW.toISOString().split('T')[0];
-  const R='<span style="color:var(--red);font-size:10px;font-weight:700;"> *</span>';
-  const dateField=`<div class="fg"><label>날짜${R}</label><input type="date" id="mf-date" value="${v('date',today)}"></div>`;
+  const dateField=`<div class="fg"><label>날짜 <span style="color:var(--red);font-size:10px;">*</span></label><input type="date" id="mf-date" value="${v('date',today)}"></div>`;
   const noteField=`<div class="fg"><label>메모</label><input type="text" id="mf-note" placeholder="(선택 사항)" value="${v('note')}"></div>`;
 
-  if(cat==='retail'){T.textContent='소매 판매';F.innerHTML=`${dateField}<div class="fr3"><div class="fg"><label>무게(kg)${R}</label><input type="number" id="mf-kg" placeholder="1" value="${v('kg')}"></div><div class="fg"><label>수량(개)${R}</label><input type="number" id="mf-qty" placeholder="1" value="${v('qty')}"></div><div class="fg"><label>단가(원)${R}</label><input type="number" id="mf-price" placeholder="5000" value="${v('price')}"></div></div>${noteField}`;}
+  if(cat==='retail'){T.textContent='소매 판매';F.innerHTML=`${dateField}<div class="fr3"><div class="fg"><label>무게(kg) <span style="color:var(--red);font-size:10px;">*</span></label><input type="number" id="mf-kg" placeholder="1" value="${v('kg')}"></div><div class="fg"><label>수량(개) <span style="color:var(--red);font-size:10px;">*</span></label><input type="number" id="mf-qty" placeholder="1" value="${v('qty')}"></div><div class="fg"><label>단가(원) <span style="color:var(--red);font-size:10px;">*</span></label><input type="number" id="mf-price" placeholder="5000" value="${v('price')}"></div></div>${noteField}`;}
   else if(cat==='wholesale'){
     T.textContent='도매 판매';
     let rows='';
     for(let i=1;i<=5;i++)rows+=`<div class="ws-row-item"><div class="ws-lbl">${i}번</div><input type="number" id="mf-kg${i}" placeholder="1" value="${v('kg'+i)}"><input type="number" id="mf-cnt${i}" placeholder="1" value="${v('cnt'+i)}"><input type="number" id="mf-price${i}" placeholder="5000" value="${v('price'+i)}"></div>`;
-    F.innerHTML=`${dateField}<div class="ws-hdr"><span></span><span>무게(kg)${R}</span><span>수량(개)${R}</span><span>단가(원)${R}</span></div>${rows}${noteField}`;
+    F.innerHTML=`${dateField}<div class="ws-hdr"><span></span><span>무게(kg) <span style="color:var(--red);font-size:10px;">*</span></span><span>수량(개) <span style="color:var(--red);font-size:10px;">*</span></span><span>단가(원) <span style="color:var(--red);font-size:10px;">*</span></span></div>${rows}${noteField}`;
   }
   else if(cat==='group'||cat==='personal'){
     T.textContent=cat==='group'?'단체 체험':'개인 체험';
@@ -1069,43 +1053,30 @@ function openModal(cat,idx){
     const items=(ex&&ex.items)||[{progId:'',prog:'',qty:1,price:''}];
     piCount=items.length;
     const iHTML=items.map((it,ii)=>piRow(ii,it,dOpt+opts)).join('');
-    const orgField=cat==='group'?`<div class="fg"><label>단체명${R}</label><input type="text" id="mf-orgName" placeholder="예) 남지초등학교" value="${v('orgName')}"></div>`:'';
-    F.innerHTML=`${dateField}${orgField}<div class="sec-label" style="margin:10px 0 6px;">체험 항목${R}</div><div id="prog-items">${iHTML}</div><button type="button" onclick="addPI()" style="width:100%;padding:6px;border:1.5px dashed var(--text-tertiary);border-radius:10px;background:none;font-size:11px;font-family:'Noto Sans KR',sans-serif;color:var(--text-secondary);cursor:pointer;margin-top:6px;">+ 체험 추가</button>${noteField}`;
+    const orgField=cat==='group'?`<div class="fg"><label>단체명 <span style="color:var(--red);font-size:10px;">*</span></label><input type="text" id="mf-orgName" placeholder="예) 남지초등학교" value="${v('orgName')}"></div>`:'';
+    F.innerHTML=`${dateField}${orgField}<div class="sec-label" style="margin:10px 0 6px;">체험 항목</div><div id="prog-items">${iHTML}</div><button type="button" onclick="addPI()" style="width:100%;padding:8px;border:1.5px dashed var(--text-tertiary);border-radius:10px;background:none;font-size:12px;font-family:'Noto Sans KR',sans-serif;color:var(--text-secondary);cursor:pointer;margin-top:6px;">+ 체험 추가</button>${noteField}`;
     if(progs.length&&ex){setTimeout(()=>items.forEach((it,ii)=>{const s=document.getElementById('pi-prog-'+ii);if(s&&it.progId)s.value=it.progId;}),20);}
   }
-  else if(cat==='seedling'){T.textContent='육묘 판매';F.innerHTML=`${dateField}<div class="fr"><div class="fg"><label>수량(개)${R}</label><input type="number" id="mf-qty" placeholder="1" value="${v('qty')}"></div><div class="fg"><label>단가(원)${R}</label><input type="number" id="mf-price" placeholder="5000" value="${v('price')}"></div></div>${noteField}`;}
-  else if(cat==='electric'){T.textContent='전기세';F.innerHTML=`${dateField}<div class="fg"><label>금액(원)${R}</label><input type="number" id="mf-amount" placeholder="150000" value="${v('amount')}"></div>${noteField}`;}
-  else if(cat==='labor'){T.textContent='인건비';const hw=getWageY(NOW.getFullYear());
-    const hOpts=(sel)=>{let h='';for(let i=0;i<24;i++)h+=`<option value="${i}" ${sel==i?'selected':''}>${i}시</option>`;return h;};
-    const mOpts=(sel)=>{let h='';for(let m=0;m<60;m+=10)h+=`<option value="${m}" ${sel==m?'selected':''}>${p2(m)}분</option>`;return h;};
-    F.innerHTML=`${dateField}<div class="fr"><div class="fg"><label>고용 형태${R}</label><select id="mf-laborType"><option ${v('laborType')==='일용직'?'selected':''}>일용직</option><option ${v('laborType')==='고용직'?'selected':''}>고용직</option></select></div><div class="fg"><label>인원 수${R}</label><input type="number" id="mf-count" placeholder="1" value="${v('count',1)}"></div></div><div class="fg"><label>급여 형태${R}</label><select id="mf-payType" onchange="updateLaborF()">${['월급','일급','시급'].map(t=>`<option ${v('payType','')==t?'selected':''}>${t}</option>`).join('')}</select></div><div id="labor-extra"></div>${noteField}`;setTimeout(()=>updateLaborF(ex),30);}
-  else if(['fertilizer','parts','repair','seedbuy'].includes(cat)){
-    const lm={fertilizer:'비료명',parts:'비품명',repair:'정비 내용',seedbuy:'모종 구매처'};
-    T.textContent=CAT[cat];const isS=cat==='seedbuy';
-    F.innerHTML=`${dateField}<div class="fg"><label>${lm[cat]}${R}</label><input type="text" id="mf-name" placeholder="${lm[cat]}" value="${v('name')}"></div>${isS?`<div class="fr"><div class="fg"><label>수량${R}</label><input type="number" id="mf-qty" placeholder="1" value="${v('qty')}"></div><div class="fg"><label>단가(원)${R}</label><input type="number" id="mf-price" placeholder="5000" value="${v('price')}"></div></div>`:`<div class="fg"><label>금액(원)${R}</label><input type="number" id="mf-amount" value="${v('amount')}"></div>`}${noteField}`;}
-  else if(cat==='prog'){T.textContent=editIdx>=0?'프로그램 수정':'프로그램 추가';const ep=ex;const mats=ep?.materials||[];matCount=mats.length;F.innerHTML=`<div class="fr"><div class="fg"><label>프로그램명</label><input type="text" id="mf-pname" placeholder="프로그램명" value="${ep?.name||''}"></div><div class="fg"><label>가격(원)</label><input type="number" id="mf-pprice" placeholder="0" value="${ep?.price||''}"></div></div><div class="sec-label" style="margin:10px 0 5px;">재료 목록</div><div style="display:grid;grid-template-columns:1fr 80px 60px 24px;gap:6px;margin-bottom:4px;"><span style="font-size:10px;color:var(--text-secondary);font-weight:600;">재료명</span><span style="font-size:10px;color:var(--text-secondary);font-weight:600;">비용(원)</span><span style="font-size:10px;color:var(--text-secondary);font-weight:600;">수량</span><span></span></div><div id="mat-list">${mats.map((m,i)=>matHTML(m.name,m.cost,m.qty,i)).join('')}</div><button type="button" onclick="addMat()" style="width:100%;padding:6px;border:1.5px dashed var(--text-tertiary);border-radius:10px;background:none;font-size:11px;font-family:'Noto Sans KR',sans-serif;color:var(--text-secondary);cursor:pointer;margin-top:4px;">+ 재료 추가</button>`;}
+  else if(cat==='seedling'){T.textContent='육묘 판매';F.innerHTML=`${dateField}<div class="fr"><div class="fg"><label>수량(개) <span style="color:var(--red);font-size:10px;">*</span></label><input type="number" id="mf-qty" placeholder="1" value="${v('qty')}"></div><div class="fg"><label>단가(원) <span style="color:var(--red);font-size:10px;">*</span></label><input type="number" id="mf-price" placeholder="5000" value="${v('price')}"></div></div>${noteField}`;}
+  else if(cat==='electric'){T.textContent='전기세';F.innerHTML=`${dateField}<div class="fg"><label>금액(원) <span style="color:var(--red);font-size:10px;">*</span></label><input type="number" id="mf-amount" placeholder="150000" value="${v('amount')}"></div>${noteField}`;}
+  else if(cat==='labor'){T.textContent='인건비';const hw=getWageY(NOW.getFullYear());F.innerHTML=`${dateField}<div class="fr"><div class="fg"><label>고용 형태 <span style="color:var(--red);font-size:10px;">*</span></label><select id="mf-laborType"><option ${v('laborType')==='일용직'?'selected':''}>일용직</option><option ${v('laborType')==='고용직'?'selected':''}>고용직</option></select></div><div class="fg"><label>인원 수 <span style="color:var(--red);font-size:10px;">*</span></label><input type="number" id="mf-count" placeholder="1" value="${v('count',1)}"></div></div><div class="fg"><label>급여 형태 <span style="color:var(--red);font-size:10px;">*</span></label><select id="mf-payType" onchange="updateLaborF()">${['월급','일급','시급'].map(t=>`<option ${v('payType','')==t?'selected':''}>${t}</option>`).join('')}</select></div><div id="labor-extra"></div>${noteField}`;setTimeout(()=>updateLaborF(ex),30);}
+  else if(['fertilizer','parts','repair','seedbuy'].includes(cat)){const lm={fertilizer:'비료명',parts:'비품명',repair:'정비 내용',seedbuy:'모종 구매처'};T.textContent=CAT[cat];const isS=cat==='seedbuy';F.innerHTML=`${dateField}<div class="fg"><label>${lm[cat]} <span style="color:var(--red);font-size:10px;">*</span></label><input type="text" id="mf-name" placeholder="${lm[cat]}" value="${v('name')}"></div>${isS?`<div class="fr"><div class="fg"><label>수량 <span style="color:var(--red);font-size:10px;">*</span></label><input type="number" id="mf-qty" placeholder="1" value="${v('qty')}"></div><div class="fg"><label>단가(원) <span style="color:var(--red);font-size:10px;">*</span></label><input type="number" id="mf-price" placeholder="5000" value="${v('price')}"></div></div>`:`<div class="fg"><label>금액(원) <span style="color:var(--red);font-size:10px;">*</span></label><input type="number" id="mf-amount" value="${v('amount')}"></div>`}${noteField}`;}
+  else if(cat==='prog'){T.textContent=editIdx>=0?'프로그램 수정':'프로그램 추가';const ep=ex;const mats=ep?.materials||[];matCount=mats.length;F.innerHTML=`<div class="fr"><div class="fg"><label>프로그램명</label><input type="text" id="mf-pname" placeholder="프로그램명" value="${ep?.name||''}"></div><div class="fg"><label>가격(원)</label><input type="number" id="mf-pprice" placeholder="0" value="${ep?.price||''}"></div></div><div class="sec-label" style="margin:10px 0 5px;">재료 목록</div><div style="display:grid;grid-template-columns:1fr 80px 60px 24px;gap:6px;margin-bottom:4px;"><span style="font-size:10px;color:var(--text-secondary);font-weight:600;">재료명</span><span style="font-size:10px;color:var(--text-secondary);font-weight:600;">비용(원)</span><span style="font-size:10px;color:var(--text-secondary);font-weight:600;">수량</span><span></span></div><div id="mat-list">${mats.map((m,i)=>matHTML(m.name,m.cost,m.qty,i)).join('')}</div><button type="button" onclick="addMat()" style="width:100%;padding:8px;border:1.5px dashed var(--text-tertiary);border-radius:10px;background:none;font-size:12px;font-family:'Noto Sans KR',sans-serif;color:var(--text-secondary);cursor:pointer;margin-top:4px;">+ 재료 추가</button>`;}
   else if(cat==='wage'){T.textContent='연도별 시급';F.innerHTML=`<div class="fr"><div class="fg"><label>연도</label><input type="number" id="mf-wyear" value="${NOW.getFullYear()}"></div><div class="fg"><label>시급(원)</label><input type="number" id="mf-whourly" placeholder="9860"></div></div>`;}
-  else if(cat==='inv-in'){T.textContent='입고 추가';const items=getInvItems();const opts=items.map(it=>`<option value="${it.id}" ${v('itemId')==it.id?'selected':''}>${it.name}</option>`).join('');F.innerHTML=`<div class="fr"><div class="fg"><label>날짜${R}</label><input type="date" id="mf-date" value="${v('date',today)}"></div><div class="fg"><label>항목</label><select id="mf-invItem">${opts||'<option>항목 먼저 추가</option>'}</select></div></div><div class="fr"><div class="fg"><label>수량${R}</label><input type="number" id="mf-qty" placeholder="1" value="${v('qty')}"></div><div class="fg"><label>메모</label><input type="text" id="mf-note" placeholder="(선택 사항)" value="${v('note')}"></div></div>`;}
+  else if(cat==='inv-in'){T.textContent='입고 추가';const items=getInvItems();const opts=items.map(it=>`<option value="${it.id}" ${v('itemId')==it.id?'selected':''}>${it.name}</option>`).join('');F.innerHTML=`<div class="fr"><div class="fg"><label>날짜</label><input type="date" id="mf-date" value="${v('date',today)}"></div><div class="fg"><label>항목</label><select id="mf-invItem">${opts||'<option>항목 먼저 추가</option>'}</select></div></div><div class="fr"><div class="fg"><label>수량</label><input type="number" id="mf-qty" placeholder="10" value="${v('qty')}"></div><div class="fg"><label>메모 (선택사항)</label><input type="text" id="mf-note" placeholder="메모 (선택사항)" value="${v('note')}"></div></div>`;}
   else if(cat==='inv-item'){T.textContent='재고 항목';F.innerHTML=`<div class="fr"><div class="fg"><label>항목명</label><input type="text" id="mf-iname" placeholder="항목명" value="${v('name')}"></div><div class="fg"><label>수량 단위</label><input type="text" id="mf-iunit" placeholder="개/kg/L" value="${v('unit')}"></div></div>`;}
   document.getElementById('modal').classList.add('open');
 }
 
-function piRow(ii,it,opts){const R='<span style="color:var(--red);font-size:10px;font-weight:700;"> *</span>';return `<div class="pi-block" id="pi-${ii}"><div class="pi-block-hdr"><span>체험 ${ii+1}</span><button type="button" class="pi-xbtn" onclick="document.getElementById('pi-${ii}').remove()">✕</button></div><div class="fg"><label>프로그램</label><select id="pi-prog-${ii}" onchange="fillPP(${ii})">${opts}</select></div><div class="fr"><div class="fg"><label>수량(개)${R}</label><input type="number" id="pi-qty-${ii}" placeholder="1" value="${it.qty||1}"></div><div class="fg"><label>가격(원)</label><input type="number" id="pi-price-${ii}" value="${it.price||''}"></div></div></div>`;}
+function piRow(ii,it,opts){return `<div class="pi-block" id="pi-${ii}"><div class="pi-block-hdr"><span>체험 ${ii+1}</span><button type="button" class="pi-xbtn" onclick="document.getElementById('pi-${ii}').remove()">✕</button></div><div class="fg"><label>프로그램 <span style="color:var(--red);font-size:10px;">*</span></label><select id="pi-prog-${ii}" onchange="fillPP(${ii})">${opts}</select></div><div class="fr"><div class="fg"><label>수량(개) <span style="color:var(--red);font-size:10px;">*</span></label><input type="number" id="pi-qty-${ii}" value="${it.qty||1}"></div><div class="fg"><label>가격(원)</label><input type="number" id="pi-price-${ii}" value="${it.price||''}"></div></div></div>`;}
 function addPI(){const progs=getProgs();const dOpt='<option value="">-- 선택 --</option>';const opts=progs.map(p=>`<option value="${p.id}">${p.name}</option>`).join('');const idx=piCount++;const d=document.createElement('div');d.innerHTML=piRow(idx,{qty:1,price:''},dOpt+opts);document.getElementById('prog-items').appendChild(d.firstChild);}
 function fillPP(ii){const s=document.getElementById('pi-prog-'+ii);if(!s)return;const prog=getProgs().find(p=>p.id==s.value);if(prog){const pe=document.getElementById('pi-price-'+ii);if(pe)pe.value=prog.price;}}
 
 function updateLaborF(ex2){
   const pt=document.getElementById('mf-payType').value;const hw=getWageY(NOW.getFullYear());const ex=ex2||{};
   const extra=document.getElementById('labor-extra');
-  const R='<span style="color:var(--red);font-size:10px;font-weight:700;"> *</span>';
-  const hOpts=(sel)=>{let h='';for(let i=0;i<24;i++)h+=`<option value="${i}" ${sel==i?'selected':''}>${i}시</option>`;return h;};
-  const mOpts=(sel)=>{let h='';for(let m=0;m<60;m+=10)h+=`<option value="${m}" ${sel==m?'selected':''}>${p2(m)}분</option>`;return h;};
-  if(pt==='시급'){
-    const sh=ex.startH!==undefined?ex.startH:8,sm=ex.startM||0,eh=ex.endH!==undefined?ex.endH:17,em=ex.endM||0;
-    extra.innerHTML=`<div class="fr" style="gap:6px;"><div class="fg"><label>출근${R}</label><div style="display:flex;gap:4px;"><select id="mf-startH" style="flex:1;padding:10px 6px;font-size:13px;background:var(--bg);border:1px solid var(--border);border-radius:var(--radius-md);-webkit-appearance:none;">${hOpts(sh)}</select><select id="mf-startM" style="flex:1;padding:10px 6px;font-size:13px;background:var(--bg);border:1px solid var(--border);border-radius:var(--radius-md);-webkit-appearance:none;">${mOpts(sm)}</select></div></div><div class="fg"><label>퇴근${R}</label><div style="display:flex;gap:4px;"><select id="mf-endH" style="flex:1;padding:10px 6px;font-size:13px;background:var(--bg);border:1px solid var(--border);border-radius:var(--radius-md);-webkit-appearance:none;">${hOpts(eh)}</select><select id="mf-endM" style="flex:1;padding:10px 6px;font-size:13px;background:var(--bg);border:1px solid var(--border);border-radius:var(--radius-md);-webkit-appearance:none;">${mOpts(em)}</select></div></div></div><div class="fr"><div class="fg"><label>휴게</label><select id="mf-break">${breakOpts()}</select></div><div class="fg" style="display:flex;align-items:flex-end;padding-bottom:10px;"><label class="chk-row" style="cursor:pointer;"><input type="checkbox" id="mf-breakpaid" ${ex.breakPaid==='yes'?'checked':''}> 시급포함</label></div></div><div class="fg"><label>시급(원)${R} ${hw?'— '+hw.toLocaleString()+'원':''}</label><input type="number" id="mf-hourly" placeholder="${hw||9860}" value="${ex.hourly||hw||''}"></div>`;
-    setTimeout(()=>{const b=document.getElementById('mf-break');if(b)b.value=ex.breakMins||0;},10);
-  }
-  else extra.innerHTML=`<div class="fg"><label>금액(원)${R}</label><input type="number" id="mf-amount" value="${ex.amount||''}"></div>`;
+  if(pt==='시급'){extra.innerHTML=`<div style="margin-bottom:12px;"><label style="font-size:11px;font-weight:600;color:var(--text-secondary);display:block;margin-bottom:5px;">출근 <span style="color:var(--red);font-size:10px;">*</span></label><div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;"><input type="number" id="mf-startH" placeholder="시 (0~23)" min="0" max="23" value="${ex.startH||8}" style="padding:12px 14px;font-size:14px;font-family:'Noto Sans KR',sans-serif;color:var(--text-primary);background:var(--bg);border:1px solid var(--border);border-radius:var(--radius-md);width:100%;"><input type="number" id="mf-startM" placeholder="분 (0~59)" min="0" max="59" value="${ex.startM||0}" style="padding:12px 14px;font-size:14px;font-family:'Noto Sans KR',sans-serif;color:var(--text-primary);background:var(--bg);border:1px solid var(--border);border-radius:var(--radius-md);width:100%;"></div></div><div style="margin-bottom:12px;"><label style="font-size:11px;font-weight:600;color:var(--text-secondary);display:block;margin-bottom:5px;">퇴근 <span style="color:var(--red);font-size:10px;">*</span></label><div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;"><input type="number" id="mf-endH" placeholder="시 (0~23)" min="0" max="23" value="${ex.endH||17}" style="padding:12px 14px;font-size:14px;font-family:'Noto Sans KR',sans-serif;color:var(--text-primary);background:var(--bg);border:1px solid var(--border);border-radius:var(--radius-md);width:100%;"><input type="number" id="mf-endM" placeholder="분 (0~59)" min="0" max="59" value="${ex.endM||0}" style="padding:12px 14px;font-size:14px;font-family:'Noto Sans KR',sans-serif;color:var(--text-primary);background:var(--bg);border:1px solid var(--border);border-radius:var(--radius-md);width:100%;"></div></div><div class="fr"><div class="fg"><label>휴게</label><select id="mf-break">${breakOpts()}</select></div><div class="fg" style="display:flex;align-items:flex-end;padding-bottom:10px;"><label class="chk-row" style="margin:0;"><input type="checkbox" id="mf-breakpaid" ${ex.breakPaid==='yes'?'checked':''}> 시급포함</label></div></div><div class="fg"><label>시급(원) <span style="color:var(--red);font-size:10px;">*</span>${hw?' — '+hw.toLocaleString()+'원':''}</label><input type="number" id="mf-hourly" placeholder="${hw||9860}" value="${ex.hourly||hw||''}"></div>`;setTimeout(()=>{const b=document.getElementById('mf-break');if(b)b.value=ex.breakMins||0;},10);}
+  else extra.innerHTML=`<div class="fg"><label>금액(원) <span style="color:var(--red);font-size:10px;">*</span></label><input type="number" id="mf-amount" value="${ex.amount||''}"></div>`;
 }
 
 function matHTML(name,cost,qty,idx){
@@ -1147,7 +1118,7 @@ function saveEntry(){
   }
   else if(cat==='seedling'){if(!reqCheck(['mf-qty','mf-price','mf-date']))return;entry={date:gv('mf-date'),qty:gv('mf-qty'),price:gv('mf-price'),note:gv('mf-note')};entry.amount=(+entry.qty)*(+entry.price);}
   else if(cat==='electric'){if(!reqCheck(['mf-amount','mf-date']))return;entry={date:gv('mf-date'),amount:gv('mf-amount'),note:gv('mf-note')};}
-  else if(cat==='labor'){if(!reqCheck(['mf-date']))return;const pt=gv('mf-payType','시급');entry={date:gv('mf-date'),laborType:gv('mf-laborType'),count:gv('mf-count'),payType:pt,note:gv('mf-note')};if(pt==='시급'){const s=parseTime('start'),en=parseTime('end');entry.startH=s.h;entry.startM=s.m;entry.endH=en.h;entry.endM=en.m;entry.breakMins=gv('mf-break','0');entry.breakPaid=document.getElementById('mf-breakpaid')?.checked?'yes':'no';entry.hourly=gv('mf-hourly');}else entry.amount=gv('mf-amount');entry.amount=calcLabor(entry);}
+  else if(cat==='labor'){if(!reqCheck(['mf-date']))return;const pt=gv('mf-payType','시급');entry={date:gv('mf-date'),laborType:gv('mf-laborType'),count:gv('mf-count'),payType:pt,note:gv('mf-note')};if(pt==='시급'){if(!reqCheck(['mf-startH','mf-endH','mf-hourly']))return;const s=parseTime('mf-start'),en=parseTime('mf-end');entry.startH=s.h;entry.startM=s.m;entry.endH=en.h;entry.endM=en.m;entry.breakMins=gv('mf-break','0');entry.breakPaid=document.getElementById('mf-breakpaid')?.checked?'yes':'no';entry.hourly=gv('mf-hourly');}else{if(!reqCheck(['mf-amount']))return;entry.amount=gv('mf-amount');}entry.amount=calcLabor(entry);}
   else if(['fertilizer','parts','repair'].includes(cat)){if(!reqCheck(['mf-name','mf-amount','mf-date']))return;entry={date:gv('mf-date'),name:gv('mf-name'),amount:gv('mf-amount'),note:gv('mf-note')};}
   else if(cat==='seedbuy'){if(!reqCheck(['mf-name','mf-qty','mf-price','mf-date']))return;entry={date:gv('mf-date'),name:gv('mf-name'),qty:gv('mf-qty'),price:gv('mf-price'),note:gv('mf-note')};entry.amount=(+entry.qty)*(+entry.price);}
   else if(cat==='prog'){if(!gv('mf-pname')){showAlert('프로그램명을 입력해 주세요.');return;}const progs=getProgs();const mats=[];document.querySelectorAll('[id^="mat-name-"]').forEach(el=>{const idx=el.id.replace('mat-name-','');const ce=document.getElementById('mat-cost-'+idx);const qe=document.getElementById('mat-qty-'+idx);if(el.value)mats.push({name:el.value,cost:parseFloat(ce?.value)||0,qty:parseFloat(qe?.value)||0});});const prog={id:editIdx>=0?(getProgs()[editIdx]?.id||Date.now()):Date.now(),name:gv('mf-pname'),price:parseFloat(gv('mf-pprice'))||0,materials:mats};if(editIdx>=0)progs[editIdx]=prog;else progs.push(prog);sl('pb8_progs',progs);syncInvFromProgs();closeModal();renderSettings();return;}
@@ -1159,7 +1130,7 @@ function saveEntry(){
   closeModal();renderIncExp();renderAll();
 }
 
-function parseTime(prefix){return{h:parseInt(document.getElementById('mf-'+prefix+'H')?.value)||0,m:parseInt(document.getElementById('mf-'+prefix+'M')?.value)||0};}
+function parseTime(prefix){const h=parseInt(document.getElementById(prefix+'H')?.value)||0;const m=parseInt(document.getElementById(prefix+'M')?.value)||0;return{h,m};}
 function calcLabor(e){if(e.payType==='시급'){const sh=+e.startH||0,sm=+e.startM||0,eh=+e.endH||0,em=+e.endM||0;let mins=(eh*60+em)-(sh*60+sm);const bm=+e.breakMins||0;if(e.breakPaid!=='yes')mins=Math.max(0,mins-bm);return(mins/60)*(getWageY(NOW.getFullYear())||+e.hourly||0)*(+e.count||1);}return +e.amount||0;}
 function syncWholesalePrice(entry){const pr=gl('pb8_prices')||{};if(!pr[entry.date])pr[entry.date]={};for(let i=1;i<=5;i++){const p=+entry['price'+i];if(p>0)pr[entry.date]['p'+i]=p;}sl('pb8_prices',pr);}
 function recordInvOut(entry){const out=gl('pb8_inv_out')||[];(entry.items||[]).forEach(it=>{const prog=getProgs().find(p=>p.id==it.progId);if(prog)(prog.materials||[]).forEach(mat=>{if(mat.qty>0){const used=(+mat.qty||0)*(+it.qty||0);out.push({date:entry.date,prog:prog.name,matName:mat.name,used});}});});sl('pb8_inv_out',out);}
