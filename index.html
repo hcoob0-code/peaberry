@@ -199,7 +199,7 @@ white-space: nowrap;
 box-shadow: var(--shadow-sm);
 }
 
-/* ── PERIOD ROW (딸기시세용) ── */
+/* ── PERIOD ROW (시세용) ── */
 .period-row {
 display: flex;
 gap: 8px;
@@ -661,7 +661,18 @@ canvas { max-width: 100%; }
     <div class="hdr-title" id="farm-title" onclick="openFarmNameModal()">피크베리 농장</div>
     <div class="hdr-sub">수입·지출 관리</div>
   </div>
-  <div style="font-size:10px;color:var(--text-tertiary);font-weight:400;letter-spacing:0.3px;">Version 1.0.0</div>
+  <div style="
+    position: fixed;
+    top: 1px;
+    right: 10px;
+    font-size: 6pt;
+    color: var(--text-tertiary);
+    opacity: 0.3;
+    text-align: right;
+    line-height: 1;
+    z-index: 9999;">
+    Version 1.0.0 - 20260430
+  </div>
 </div>
 
 <!-- TABS -->
@@ -671,7 +682,7 @@ canvas { max-width: 100%; }
     <div class="tab active" onclick="showTab('summary')">요약</div>
     <div class="tab" onclick="showTab('income')">수입</div>
     <div class="tab" onclick="showTab('expense')">지출</div>
-    <div class="tab" onclick="showTab('prices')">딸기시세</div>
+    <div class="tab" onclick="showTab('prices')">시세</div>
     <div class="tab" onclick="showTab('inventory')">재고</div>
     <div class="tab" onclick="showTab('loan')">대출</div>
     <div class="tab" onclick="showTab('settings')">기본관리</div>
@@ -759,7 +770,7 @@ canvas { max-width: 100%; }
   </div>
 </div>
 
-<!-- ══ 딸기시세 ══ -->
+<!-- ══ 시세 ══ -->
 
 <div class="sec" id="sec-prices">
   <div class="period-row">
