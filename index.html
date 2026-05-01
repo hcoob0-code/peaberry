@@ -1405,5 +1405,203 @@ function delProg(i){const p=getProgs();p.splice(i,1);sl('pb8_progs',p);renderSet
   }
 })();
 </script>
+
+<!-- Firebase SDK -->
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import { getDatabase, ref, set, get, onValue, remove } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyC0Zc4seMa9YvG70QUgFuczREPdNoof2cU",
+  authDomain: "peakberry.firebaseapp.com",
+  databaseURL: "https://peakberry-default-rtdb.firebaseio.com",
+  projectId: "peakberry",
+  storageBucket: "peakberry.firebasestorage.app",
+  messagingSenderId: "74123358428",
+  appId: "1:74123358428:web:bd23a7d87789b70aad8419"
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getDatabase(app);
+
+// ── localStorage key → Firebase path 변환 ──
+function toFbPath(key) {
+  // pb8_2026_05_01_retail → data/2026/05/01/retail
+  // pb8_2026_05_retail    → data/2026/05/retail
+  // pb8_loans, pb8_progs 등 → meta/loans
+  return key
+    .replace(/^pb8_/, '')
+    .replace(/^(\d{4})_(\d{2})_(\d{2})_/, 'data/$1/$2/$3/')
+    .replace(/^(\d{4})_(\d{2})_/, 'data/$1/$2/')
+    .replace(/^price_(\d{4}-\d{2}-\d{2})$/, 'prices/$1')
+    .replace(/^(loans|progs|inv_in|inv_items|repaid|farmname|farmsub|loan)$/, 'meta/$1');
+}
+
+// ── Firebase에 쓰기 ──
+window.fbSet = async function(key, value) {
+  try {
+    const path = toFbPath(key);
+    await set(ref(db, path), value);
+  } catch(e) {
+    console.warn('Firebase write error:', e);
+  }
+};
+
+// ── Firebase에서 읽기 ──
+window.fbGet = async function(key) {
+  try {
+    const path = toFbPath(key);
+    const snap = await get(ref(db, path));
+    return snap.exists() ? snap.val() : null;
+  } catch(e) {
+    console.warn('Firebase read error:', e);
+    return null;
+  }
+};
+
+// ── 실시간 동기화: Firebase 변경 → localStorage 반영 → 화면 갱신 ──
+function watchPath(path, lsKey) {
+  onValue(ref(db, path), (snap) => {
+    const val = snap.exists() ? snap.val() : null;
+    if (val !== null) {
+      localStorage.setItem(lsKey, JSON.stringify(val));
+    } else {
+      localStorage.removeItem(lsKey);
+    }
+    // 화면 갱신 (쓰로틀링)
+    if (window._fbRefreshTimer) clearTimeout(window._fbRefreshTimer);
+    window._fbRefreshTimer = setTimeout(() => {
+      if (typeof renderAll === 'function') renderAll();
+      if (typeof renderIncExp === 'function') renderIncExp();
+    }, 300);
+  });
+}
+
+// ── 앱 시작 시 Firebase 전체 데이터 로드 ──
+async function loadAllFromFirebase() {
+  try {
+    // 동기화 상태 표시
+    showSyncStatus('loading');
+
+    // data (수입/지출 기록)
+    const dataSnap = await get(ref(db, 'data'));
+    if (dataSnap.exists()) {
+      const data = dataSnap.val();
+      // data/YYYY/MM/DD/cat 또는 data/YYYY/MM/cat 구조
+      function flattenData(obj, prefix) {
+        if (Array.isArray(obj) || (obj !== null && typeof obj === 'object' && !Array.isArray(obj) && Object.keys(obj).length > 0 && !isNaN(Number(Object.keys(obj)[0])))) {
+          // leaf: 배열 데이터
+          const lsKey = 'pb8_' + prefix.replace(/\//g, '_').replace(/^data_/, '');
+          localStorage.setItem(lsKey, JSON.stringify(Array.isArray(obj) ? obj : Object.values(obj)));
+        } else if (obj && typeof obj === 'object') {
+          Object.keys(obj).forEach(k => flattenData(obj[k], prefix + '_' + k));
+        }
+      }
+      flattenData(data, 'data');
+    }
+
+    // meta (설정, 대출 등)
+    const metaSnap = await get(ref(db, 'meta'));
+    if (metaSnap.exists()) {
+      const meta = metaSnap.val();
+      Object.keys(meta).forEach(k => {
+        localStorage.setItem('pb8_' + k, JSON.stringify(meta[k]));
+      });
+      // 농장 이름 즉시 반영
+      if (meta.farmname) {
+        const el = document.getElementById('farm-title');
+        if (el) el.textContent = meta.farmname;
+      }
+      if (meta.farmsub) {
+        const el = document.getElementById('farm-sub');
+        if (el) el.textContent = meta.farmsub;
+      }
+    }
+
+    // prices
+    const pricesSnap = await get(ref(db, 'prices'));
+    if (pricesSnap.exists()) {
+      const prices = pricesSnap.val();
+      Object.keys(prices).forEach(date => {
+        localStorage.setItem('pb8_price_' + date, JSON.stringify(prices[date]));
+      });
+    }
+
+    showSyncStatus('ok');
+
+    // 화면 갱신
+    if (typeof renderAll === 'function') renderAll();
+    if (typeof renderIncExp === 'function') renderIncExp();
+    if (typeof renderLoanList === 'function') renderLoanList();
+    if (typeof renderSettings === 'function') renderSettings();
+
+    // 실시간 리스너 등록
+    watchPath('data', '_data_watch');
+    watchPath('meta', '_meta_watch');
+    watchPath('prices', '_prices_watch');
+
+  } catch(e) {
+    console.warn('Firebase load error:', e);
+    showSyncStatus('error');
+  }
+}
+
+// ── 동기화 상태 표시 ──
+function showSyncStatus(status) {
+  let el = document.getElementById('sync-status');
+  if (!el) {
+    el = document.createElement('div');
+    el.id = 'sync-status';
+    el.style.cssText = "position:fixed;bottom:calc(80px + env(safe-area-inset-bottom,34px) + 8px);right:16px;font-size:10px;padding:4px 10px;border-radius:50px;z-index:200;transition:opacity 0.3s;font-family:'Noto Sans KR',sans-serif;font-weight:500;";
+    document.body.appendChild(el);
+  }
+  if (status === 'loading') {
+    el.style.background = '#F3F4F6';
+    el.style.color = '#6B7280';
+    el.style.opacity = '1';
+    el.textContent = '⟳ 동기화 중...';
+  } else if (status === 'ok') {
+    el.style.background = '#ECFDF5';
+    el.style.color = '#10B981';
+    el.style.opacity = '1';
+    el.textContent = '✓ 동기화됨';
+    setTimeout(() => { el.style.opacity = '0'; }, 2000);
+  } else if (status === 'saving') {
+    el.style.background = '#EEF2FF';
+    el.style.color = '#6366F1';
+    el.style.opacity = '1';
+    el.textContent = '↑ 저장 중...';
+  } else if (status === 'error') {
+    el.style.background = '#FEF2F2';
+    el.style.color = '#EF4444';
+    el.style.opacity = '1';
+    el.textContent = '✕ 오프라인';
+  }
+}
+
+// ── sl() 후킹: localStorage 저장과 동시에 Firebase에도 저장 ──
+const _origSl = window.sl;
+window.sl = async function(key, value) {
+  // localStorage 먼저 저장 (빠른 UI 반영)
+  localStorage.setItem(key, JSON.stringify(value));
+  // Firebase 비동기 저장
+  showSyncStatus('saving');
+  try {
+    await window.fbSet(key, value);
+    showSyncStatus('ok');
+  } catch(e) {
+    showSyncStatus('error');
+  }
+};
+
+// 앱 시작
+loadAllFromFirebase();
+
+// 전역 노출 (디버깅용)
+window._fbDb = db;
+window._fbRef = ref;
+window.showSyncStatus = showSyncStatus;
+</script>
+
 </body>
 </html>
