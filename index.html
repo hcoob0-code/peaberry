@@ -430,8 +430,25 @@ canvas { max-width: 100%; }
   <div class="nm-flat card-wrap"><div class="card-hdr" onclick="toggleCard(this)"><span class="c-title">비료값<span class="c-arrow">▼</span></span><span class="c-badge c-badge-exp" id="sl-b-fertilizer">0원</span></div><div class="card-body"><div id="sl-l-fertilizer"></div><button class="add-btn" onclick="openModal('fertilizer')">+ 추가</button></div></div>
 
   <!-- 환경 그래프 -->
-  <div class="sec-label">📊 환경·물 사용 추이 (최근 30일)</div>
+  <div class="sec-label">📊 환경·물 사용 추이</div>
   <div class="nm-flat" style="padding:12px 16px;margin-bottom:10px;">
+    <!-- 기간 선택 -->
+    <div style="display:flex;gap:6px;margin-bottom:10px;flex-wrap:wrap;align-items:center;">
+      <select id="sg-range" onchange="onSeedlingRangeChange()" style="padding:5px 8px;font-size:11px;font-family:'Noto Sans KR',sans-serif;color:var(--text-primary);background:var(--surface);border:1px solid var(--border);border-radius:50px;appearance:none;-webkit-appearance:none;flex-shrink:0;">
+        <option value="14">최근 14일</option>
+        <option value="30" selected>최근 30일</option>
+        <option value="60">최근 60일</option>
+        <option value="90">최근 90일</option>
+        <option value="custom">직접 선택</option>
+      </select>
+      <div id="sg-custom-range" style="display:none;display:flex;gap:4px;align-items:center;flex-wrap:wrap;">
+        <input type="date" id="sg-from" style="padding:5px 8px;font-size:11px;font-family:'Noto Sans KR',sans-serif;background:var(--surface);border:1px solid var(--border);border-radius:50px;color:var(--text-primary);">
+        <span style="font-size:10px;color:var(--text-tertiary);">~</span>
+        <input type="date" id="sg-to" style="padding:5px 8px;font-size:11px;font-family:'Noto Sans KR',sans-serif;background:var(--surface);border:1px solid var(--border);border-radius:50px;color:var(--text-primary);">
+        <button onclick="renderSeedlingEnvChart();renderSeedlingCorrChart();" style="padding:5px 10px;font-size:11px;font-family:'Noto Sans KR',sans-serif;background:var(--text-primary);color:white;border:none;border-radius:50px;cursor:pointer;">조회</button>
+      </div>
+    </div>
+    <!-- 지표 선택 -->
     <div style="display:flex;gap:6px;margin-bottom:10px;flex-wrap:wrap;">
       <button class="top-bar-btn sl-graph-btn active" onclick="setSeedlingGraphMode('sunlight')" id="sg-btn-sunlight">☀️ 햇빛</button>
       <button class="top-bar-btn sl-graph-btn" onclick="setSeedlingGraphMode('temp')" id="sg-btn-temp">🌡 온도</button>
@@ -452,12 +469,31 @@ canvas { max-width: 100%; }
   <div class="nm-flat" style="padding:14px 18px;margin-bottom:10px;"><div id="prog-list"></div><button class="add-btn" onclick="openModal('prog')" style="margin-top:6px;">+ 추가</button></div>
   <div class="sec-label">데이터 내보내기</div>
   <div class="nm-flat" style="padding:16px 18px;margin-bottom:10px;">
-    <p style="font-size:12px;color:var(--text-secondary);margin-bottom:14px;line-height:1.6;">모든 수입·지출 데이터를 엑셀 파일로 내려받습니다.<br>각 항목별로 시트가 나뉘어 저장됩니다.</p>
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px;">
-      <button class="nm-btn" onclick="downloadExcel('month')" style="padding:12px 8px;font-size:12px;font-family:'Noto Sans KR',sans-serif;font-weight:600;color:var(--text-primary);border-radius:var(--radius-md);">📅 이번 달 다운로드</button>
-      <button class="nm-btn" onclick="downloadExcel('year')" style="padding:12px 8px;font-size:12px;font-family:'Noto Sans KR',sans-serif;font-weight:600;color:var(--text-primary);border-radius:var(--radius-md);">📆 올해 전체 다운로드</button>
+    <p style="font-size:12px;color:var(--text-secondary);margin-bottom:14px;line-height:1.6;">기간을 선택하고 엑셀로 내려받으세요.<br>요약 / 수입 / 지출 / 시세 / 육묘 시트로 구성됩니다.</p>
+    <!-- 기간 유형 -->
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;margin-bottom:10px;">
+      <button id="xl-btn-month" class="nm-btn" onclick="setXlRange('month')" style="padding:9px 4px;font-size:11px;font-family:'Noto Sans KR',sans-serif;font-weight:600;color:var(--text-primary);border-radius:var(--radius-md);background:var(--text-primary);color:white;border-color:var(--text-primary);">월간</button>
+      <button id="xl-btn-year"  class="nm-btn" onclick="setXlRange('year')"  style="padding:9px 4px;font-size:11px;font-family:'Noto Sans KR',sans-serif;font-weight:600;color:var(--text-primary);border-radius:var(--radius-md);">연간</button>
+      <button id="xl-btn-custom" class="nm-btn" onclick="setXlRange('custom')" style="padding:9px 4px;font-size:11px;font-family:'Noto Sans KR',sans-serif;font-weight:600;color:var(--text-primary);border-radius:var(--radius-md);">직접선택</button>
     </div>
-    <button class="nm-btn-primary" onclick="downloadExcel('all')" style="width:100%;padding:13px;font-size:13px;font-family:'Noto Sans KR',sans-serif;font-weight:700;">⬇ 전체 데이터 다운로드</button>
+    <!-- 월간 선택 -->
+    <div id="xl-month-row" style="display:flex;gap:6px;margin-bottom:10px;">
+      <select id="xl-year" style="flex:1;padding:9px 10px;font-size:13px;font-family:'Noto Sans KR',sans-serif;background:var(--bg);border:1px solid var(--border);border-radius:var(--radius-md);color:var(--text-primary);appearance:none;-webkit-appearance:none;"></select>
+      <select id="xl-month" style="flex:1;padding:9px 10px;font-size:13px;font-family:'Noto Sans KR',sans-serif;background:var(--bg);border:1px solid var(--border);border-radius:var(--radius-md);color:var(--text-primary);appearance:none;-webkit-appearance:none;"></select>
+    </div>
+    <!-- 연간 선택 -->
+    <div id="xl-year-row" style="display:none;margin-bottom:10px;">
+      <select id="xl-year2" style="width:100%;padding:9px 10px;font-size:13px;font-family:'Noto Sans KR',sans-serif;background:var(--bg);border:1px solid var(--border);border-radius:var(--radius-md);color:var(--text-primary);appearance:none;-webkit-appearance:none;"></select>
+    </div>
+    <!-- 직접 선택 -->
+    <div id="xl-custom-row" style="display:none;margin-bottom:10px;">
+      <div style="display:flex;gap:6px;align-items:center;">
+        <input type="date" id="xl-from" style="flex:1;padding:9px 10px;font-size:12px;font-family:'Noto Sans KR',sans-serif;background:var(--bg);border:1px solid var(--border);border-radius:var(--radius-md);color:var(--text-primary);">
+        <span style="color:var(--text-tertiary);font-size:12px;flex-shrink:0;">~</span>
+        <input type="date" id="xl-to" style="flex:1;padding:9px 10px;font-size:12px;font-family:'Noto Sans KR',sans-serif;background:var(--bg);border:1px solid var(--border);border-radius:var(--radius-md);color:var(--text-primary);">
+      </div>
+    </div>
+    <button class="nm-btn-primary" onclick="downloadExcelCustom()" style="width:100%;padding:13px;font-size:13px;font-family:'Noto Sans KR',sans-serif;font-weight:700;">⬇ 엑셀 다운로드</button>
   </div>
 </div>
 
@@ -1495,16 +1531,40 @@ function entryToRow(cat, e) {
 }
 
 // 특정 기간의 카테고리 데이터 전체 수집
-function getAllDataForRange(cat, rangeType) {
+function getAllDataForRange(cat, rangeType, extra={}) {
   const cY=NOW.getFullYear(); const cM=NOW.getMonth()+1;
   let rows=[];
-  if(rangeType==='month'){
-    // 이번 달
+  if(rangeType==='custom-month'){
+    const ey=extra.year||cY,em=extra.month||cM;
+    try{rows=JSON.parse(localStorage.getItem(sk(cat,ey,em))||'[]');}catch{rows=[];}
+    const mStr=`${ey}-${p2(em)}`;
+    rows=rows.filter(e=>!e.date||e.date.startsWith(mStr));
+  } else if(rangeType==='custom-year'){
+    const ey=extra.year||cY;
+    for(let m=1;m<=12;m++){
+      try{
+        const arr=JSON.parse(localStorage.getItem(sk(cat,ey,m))||'[]');
+        rows=rows.concat(arr.filter(e=>!e.date||e.date.startsWith(`${ey}-`)));
+      }catch{}
+    }
+  } else if(rangeType==='custom-range'){
+    const f=extra.from,t=extra.to;
+    // 범위 내 모든 월 수집
+    let cur=new Date(f);const end=new Date(t);
+    const months=new Set();
+    while(cur<=end){months.add(`${cur.getFullYear()}_${cur.getMonth()+1}`);cur.setDate(cur.getDate()+1);}
+    months.forEach(mk=>{
+      const[y,m]=mk.split('_').map(Number);
+      try{
+        const arr=JSON.parse(localStorage.getItem(sk(cat,y,m))||'[]');
+        rows=rows.concat(arr.filter(e=>e.date&&e.date>=f&&e.date<=t));
+      }catch{}
+    });
+  } else if(rangeType==='month'){
     try{rows=JSON.parse(localStorage.getItem(sk(cat,cY,cM))||'[]');}catch{rows=[];}
     const mStr=`${cY}-${p2(cM)}`;
     rows=rows.filter(e=>!e.date||e.date.startsWith(mStr));
   } else if(rangeType==='year'){
-    // 올해 전체
     for(let m=1;m<=12;m++){
       try{
         const arr=JSON.parse(localStorage.getItem(sk(cat,cY,m))||'[]');
@@ -1512,123 +1572,184 @@ function getAllDataForRange(cat, rangeType) {
       }catch{}
     }
   } else {
-    // 전체 (최근 5년치)
     for(let y=cY-4;y<=cY;y++){
       for(let m=1;m<=12;m++){
-        try{
-          const arr=JSON.parse(localStorage.getItem(sk(cat,y,m))||'[]');
-          rows=rows.concat(arr);
-        }catch{}
+        try{rows=rows.concat(JSON.parse(localStorage.getItem(sk(cat,y,m))||'[]'));}catch{}
       }
     }
-    // 일간 키도 수집 (일단 월간에 다 있다고 가정)
   }
   return rows;
 }
 
-function downloadExcel(rangeType) {
+function downloadExcel(rangeType, extra={}) {
   if(typeof XLSX === 'undefined'){
     showAlert('엑셀 라이브러리 로딩 중입니다. 잠시 후 다시 시도해주세요.');
     return;
   }
-
   const wb = XLSX.utils.book_new();
   const cY=NOW.getFullYear(); const cM=p2(NOW.getMonth()+1);
 
-  // ── 시트1: 수입 ──
+  // 기간별 날짜 배열 생성 헬퍼
+  function makeDateList(){
+    const dates=[];
+    if(rangeType==='custom-month'){
+      const ey=extra.year, em=extra.month;
+      const days=new Date(ey,em,0).getDate();
+      for(let d=1;d<=days;d++) dates.push(`${ey}-${p2(em)}-${p2(d)}`);
+    } else if(rangeType==='custom-year'){
+      const ey=extra.year;
+      for(let m=1;m<=12;m++) for(let d=1;d<=31;d++){
+        const dt=`${ey}-${p2(m)}-${p2(d)}`;
+        if(new Date(dt).getMonth()+1===m) dates.push(dt);
+      }
+    } else if(rangeType==='custom-range'){
+      let cur=new Date(extra.from);const end=new Date(extra.to);
+      while(cur<=end){
+        dates.push(`${cur.getFullYear()}-${p2(cur.getMonth()+1)}-${p2(cur.getDate())}`);
+        cur.setDate(cur.getDate()+1);
+      }
+    } else if(rangeType==='month'){
+      const days=new Date(cY,parseInt(cM),0).getDate();
+      for(let d=1;d<=days;d++) dates.push(`${cY}-${cM}-${p2(d)}`);
+    } else if(rangeType==='year'){
+      for(let m=1;m<=12;m++) for(let d=1;d<=31;d++){
+        const dt=`${cY}-${p2(m)}-${p2(d)}`;
+        if(new Date(dt).getMonth()+1===m) dates.push(dt);
+      }
+    } else {
+      for(let y=cY-4;y<=cY;y++) for(let m=1;m<=12;m++) for(let d=1;d<=31;d++){
+        const dt=`${y}-${p2(m)}-${p2(d)}`;
+        if(new Date(dt).getMonth()+1===m) dates.push(dt);
+      }
+    }
+    return dates;
+  }
+
+  // ── 시트0: 요약 ──
   {
-    const rows=[['날짜','카테고리','세부항목','수량/중량','단가(원)','금액(원)','출하처/단체명','총판매금액','정산지급액','수수료','메모']];
-    INC.forEach(cat=>{
-      const entries=getAllDataForRange(cat,rangeType);
-      entries.forEach(e=>{
-        if(cat==='retail'){
-          rows.push([e.date,CAT_KR[cat]||cat,'',e.kg||'',e.price||0,e.amount||0,'','','','',e.note||'']);
-        } else if(cat==='wholesale'){
-          const items=[];
-          for(let k=1;k<=5;k++) if(+e['cnt'+k]>0) items.push(`${k}번:${e['cnt'+k]}개×${e['price'+k]}원`);
-          rows.push([e.date,CAT_KR[cat]||cat,items.join(' / '),'','',e.amount||0,e.source||'',e.totalSales||0,e.settlement||0,e.fee||0,e.note||'']);
-        } else if(cat==='group'||cat==='personal'){
-          (e.items||[{}]).forEach(it=>{
-            rows.push([e.date,CAT_KR[cat]||cat,it.prog||'',it.qty||'',it.price||0,e.amount||0,e.orgName||'','','','',e.note||'']);
-          });
-        } else if(cat==='seedling'){
-          rows.push([e.date,CAT_KR[cat]||cat,'',e.qty||'',e.price||0,e.amount||0,'','','','',e.note||'']);
-        }
-      });
-    });
+    // 카테고리별 합계
+    const incTotals={}, expTotals={};
+    INC.forEach(cat=>{ incTotals[cat]=getAllDataForRange(cat,rangeType,extra).reduce((s,e)=>s+(+e.amount||0),0); });
+    EXP.forEach(cat=>{ expTotals[cat]=getAllDataForRange(cat,rangeType,extra).reduce((s,e)=>s+(+e.amount||0),0); });
+    const totalInc=Object.values(incTotals).reduce((a,b)=>a+b,0);
+    const totalExp=Object.values(expTotals).reduce((a,b)=>a+b,0);
+    const label=rangeType==='month'?`${cY}년 ${parseInt(cM)}월`:rangeType==='year'?`${cY}년`:'전체';
+
+    const rows=[
+      ['항목','금액(원)'],
+      ['',''],
+      ['[ 수입 ]',''],
+      ['  소매 판매',     incTotals['retail']||0],
+      ['  도매 판매',     incTotals['wholesale']||0],
+      ['  단체 체험',     incTotals['group']||0],
+      ['  개인 체험',     incTotals['personal']||0],
+      ['  육묘 판매',     incTotals['seedling']||0],
+      ['총 수입',         totalInc],
+      ['',''],
+      ['[ 지출 ]',''],
+      ['  전기세',        expTotals['electric']||0],
+      ['  인건비',        expTotals['labor']||0],
+      ['  비료값',        expTotals['fertilizer']||0],
+      ['  비품 구매',     expTotals['parts']||0],
+      ['  보수 정비비',   expTotals['repair']||0],
+      ['  모종 구입비',   expTotals['seedbuy']||0],
+      ['총 지출',         totalExp],
+      ['',''],
+      ['순수익',          totalInc-totalExp],
+    ];
     const ws=XLSX.utils.aoa_to_sheet(rows);
-    ws['!cols']=[{wch:12},{wch:10},{wch:30},{wch:10},{wch:12},{wch:12},{wch:14},{wch:12},{wch:12},{wch:10},{wch:20}];
-    styleXlsHeader(ws, rows[0].length);
+    ws['!cols']=[{wch:18},{wch:16}];
+    // 제목 행
+    XLSX.utils.sheet_add_aoa(ws,[[[label+' 요약']]], {origin:'A1', skipHeader:true});
+    ws['A1']={v:label+' 요약', t:'s'};
+    styleXlsHeader(ws, 2);
+    XLSX.utils.book_append_sheet(wb, ws, '요약');
+  }
+
+  // ── 시트1: 수입 (소매/도매/단체체험/개인체험/육묘판매 항목별) ──
+  {
+    // 소매 판매
+    const r1=[['[ 소매 판매 ]'],['날짜','중량(kg)','수량','단가(원)','금액(원)','메모']];
+    getAllDataForRange('retail',rangeType,extra).forEach(e=>r1.push([e.date,e.kg||'',e.qty||0,e.price||0,e.amount||0,e.note||'']));
+
+    // 도매 판매
+    const r2=[[''],['[ 도매 판매 ]'],['날짜','출하처','1번_수량','1번_단가','2번_수량','2번_단가','3번_수량','3번_단가','4번_수량','4번_단가','5번_수량','5번_단가','총판매금액','정산지급액','수수료','금액(원)','메모']];
+    getAllDataForRange('wholesale',rangeType,extra).forEach(e=>{
+      const row=[e.date,e.source||''];
+      for(let k=1;k<=5;k++) row.push(e['cnt'+k]||0, e['price'+k]||0);
+      row.push(e.totalSales||0,e.settlement||0,e.fee||0,e.amount||0,e.note||'');
+      r2.push(row);
+    });
+
+    // 단체 체험
+    const r3=[[''],['[ 단체 체험 ]'],['날짜','단체명','프로그램','수량','단가(원)','금액(원)','메모']];
+    getAllDataForRange('group',rangeType,extra).forEach(e=>{
+      (e.items||[{}]).forEach(it=>r3.push([e.date,e.orgName||'',it.prog||'',it.qty||0,it.price||0,e.amount||0,e.note||'']));
+    });
+
+    // 개인 체험
+    const r4=[[''],['[ 개인 체험 ]'],['날짜','프로그램','수량','단가(원)','금액(원)','메모']];
+    getAllDataForRange('personal',rangeType,extra).forEach(e=>{
+      (e.items||[{}]).forEach(it=>r4.push([e.date,it.prog||'',it.qty||0,it.price||0,e.amount||0,e.note||'']));
+    });
+
+    // 육묘 판매
+    const r5=[[''],['[ 육묘 판매 ]'],['날짜','수량','단가(원)','금액(원)','메모']];
+    getAllDataForRange('seedling',rangeType,extra).forEach(e=>r5.push([e.date,e.qty||0,e.price||0,e.amount||0,e.note||'']));
+
+    // 합치기 (최대 열 기준 맞춤)
+    const allRows=[...r1,...r2,...r3,...r4,...r5];
+    const ws=XLSX.utils.aoa_to_sheet(allRows);
+    ws['!cols']=[{wch:12},{wch:14},{wch:10},{wch:10},{wch:10},{wch:10},{wch:10},{wch:10},{wch:10},{wch:10},{wch:10},{wch:10},{wch:12},{wch:12},{wch:10},{wch:12},{wch:20}];
+    styleXlsHeader(ws, 17);
     XLSX.utils.book_append_sheet(wb, ws, '수입');
   }
 
-  // ── 시트2: 지출 ──
+  // ── 시트2: 지출 (전기세/인건비/비료값/비품구매/보수정비비/모종구입비 항목별) ──
   {
-    const rows=[['날짜','카테고리','항목명','인력유형','인원수','금액(원)','메모']];
-    EXP.forEach(cat=>{
-      const entries=getAllDataForRange(cat,rangeType);
+    const sections=[
+      {cat:'electric', label:'전기세',    cols:['날짜','항목명','금액(원)','메모']},
+      {cat:'labor',    label:'인건비',    cols:['날짜','인력유형','인원수','금액(원)','메모']},
+      {cat:'fertilizer',label:'비료값',  cols:['날짜','항목명','금액(원)','메모']},
+      {cat:'parts',    label:'비품 구매', cols:['날짜','항목명','금액(원)','메모']},
+      {cat:'repair',   label:'보수 정비비',cols:['날짜','항목명','금액(원)','메모']},
+      {cat:'seedbuy',  label:'모종 구입비',cols:['날짜','항목명','금액(원)','메모']},
+    ];
+    const allRows=[];
+    sections.forEach((sec,si)=>{
+      if(si>0) allRows.push(['']);
+      allRows.push([`[ ${sec.label} ]`]);
+      allRows.push(sec.cols);
+      const entries=getAllDataForRange(sec.cat,rangeType);
       entries.forEach(e=>{
-        if(cat==='labor'){
-          rows.push([e.date,CAT_KR[cat]||cat,'',e.laborType||'',e.count||1,e.amount||0,e.note||'']);
-        } else {
-          rows.push([e.date,CAT_KR[cat]||cat,e.name||'','','',e.amount||0,e.note||'']);
-        }
+        if(sec.cat==='labor') allRows.push([e.date,e.laborType||'',e.count||1,e.amount||0,e.note||'']);
+        else allRows.push([e.date,e.name||'',e.amount||0,e.note||'']);
       });
+      if(!entries.length) allRows.push(['(내역 없음)']);
     });
-    const ws=XLSX.utils.aoa_to_sheet(rows);
-    ws['!cols']=[{wch:12},{wch:10},{wch:20},{wch:10},{wch:8},{wch:12},{wch:20}];
-    styleXlsHeader(ws, rows[0].length);
+    const ws=XLSX.utils.aoa_to_sheet(allRows);
+    ws['!cols']=[{wch:12},{wch:16},{wch:10},{wch:12},{wch:20}];
+    styleXlsHeader(ws, 5);
     XLSX.utils.book_append_sheet(wb, ws, '지출');
   }
 
   // ── 시트3: 시세 ──
   {
     const rows=[['날짜','1번(원/kg)','2번(원/kg)','3번(원/kg)','4번(원/kg)','5번(원/kg)']];
-    // 기간에 맞는 날짜들 수집
-    const priceDates=[];
-    if(rangeType==='month'){
-      const days=new Date(cY,parseInt(cM),0).getDate();
-      for(let d=1;d<=days;d++) priceDates.push(`${cY}-${cM}-${p2(d)}`);
-    } else if(rangeType==='year'){
-      for(let m=1;m<=12;m++) for(let d=1;d<=31;d++){
-        const dt=`${cY}-${p2(m)}-${p2(d)}`;
-        if(new Date(dt).getMonth()+1===m) priceDates.push(dt);
-      }
-    } else {
-      for(let y=cY-4;y<=cY;y++) for(let m=1;m<=12;m++) for(let d=1;d<=31;d++){
-        const dt=`${y}-${p2(m)}-${p2(d)}`;
-        if(new Date(dt).getMonth()+1===m) priceDates.push(dt);
-      }
-    }
-    priceDates.forEach(dt=>{
+    makeDateList().forEach(dt=>{
       const pr=gl('pb8_price_'+dt)||{};
       if(Object.keys(pr).length) rows.push([dt,pr[1]||'',pr[2]||'',pr[3]||'',pr[4]||'',pr[5]||'']);
     });
     const ws=XLSX.utils.aoa_to_sheet(rows);
     ws['!cols']=[{wch:12},{wch:12},{wch:12},{wch:12},{wch:12},{wch:12}];
-    styleXlsHeader(ws, rows[0].length);
+    styleXlsHeader(ws, 6);
     XLSX.utils.book_append_sheet(wb, ws, '시세');
   }
 
-  // ── 시트4: 육묘(환경) ──
+  // ── 시트4: 육묘 ──
   {
-    const rows=[['날짜','햇빛량(lux)','온도(°C)','습도(%)','총물사용(L)','구역별물사용']];
-    const envDates=[];
-    if(rangeType==='month'){
-      const days=new Date(cY,parseInt(cM),0).getDate();
-      for(let d=1;d<=days;d++) envDates.push(`${cY}-${cM}-${p2(d)}`);
-    } else if(rangeType==='year'){
-      for(let m=1;m<=12;m++) for(let d=1;d<=31;d++){
-        const dt=`${cY}-${p2(m)}-${p2(d)}`;
-        if(new Date(dt).getMonth()+1===m) envDates.push(dt);
-      }
-    } else {
-      for(let y=cY-4;y<=cY;y++) for(let m=1;m<=12;m++) for(let d=1;d<=31;d++){
-        const dt=`${y}-${p2(m)}-${p2(d)}`;
-        if(new Date(dt).getMonth()+1===m) envDates.push(dt);
-      }
-    }
-    envDates.forEach(dt=>{
+    const rows=[['날짜','햇빛량(lux)','온도(°C)','습도(%)','총물사용(L)','구역별상세']];
+    makeDateList().forEach(dt=>{
       const env=gl('pb8_env_'+dt)||{};
       if(!env.sunlight&&!env.temp&&!env.humidity&&!(env.water||[]).length) return;
       const totalW=(env.water||[]).reduce((s,w)=>s+(parseFloat(w.liter)||0),0);
@@ -1636,22 +1757,23 @@ function downloadExcel(rangeType) {
       rows.push([dt,env.sunlight||'',env.temp||'',env.humidity||'',totalW||'',zoneStr]);
     });
     const ws=XLSX.utils.aoa_to_sheet(rows);
-    ws['!cols']=[{wch:12},{wch:12},{wch:10},{wch:10},{wch:12},{wch:30}];
-    styleXlsHeader(ws, rows[0].length);
+    ws['!cols']=[{wch:12},{wch:12},{wch:10},{wch:10},{wch:12},{wch:35}];
+    styleXlsHeader(ws, 6);
     XLSX.utils.book_append_sheet(wb, ws, '육묘');
   }
 
-  if(wb.SheetNames.length===0){
-    showAlert('다운로드할 데이터가 없습니다.');
-    return;
-  }
-
-  const label=rangeType==='month'?`${cY}년${cM}월`:rangeType==='year'?`${cY}년`:'전체';
+  let xlLabel;
+  if(rangeType==='custom-month') xlLabel=`${extra.year}년${p2(extra.month)}월`;
+  else if(rangeType==='custom-year') xlLabel=`${extra.year}년`;
+  else if(rangeType==='custom-range') xlLabel=`${extra.from}_${extra.to}`;
+  else if(rangeType==='month') xlLabel=`${cY}년${cM}월`;
+  else if(rangeType==='year') xlLabel=`${cY}년`;
+  else xlLabel='전체';
+  const label=xlLabel;
   XLSX.writeFile(wb, `피크베리농장_${label}_${cY}${cM}${p2(NOW.getDate())}.xlsx`);
 }
 
 function styleXlsHeader(ws, colCount) {
-  // 헤더 행 볼드 처리 (SheetJS CE에서는 스타일 제한적이므로 행 높이만)
   if(!ws['!rows']) ws['!rows']=[];
   ws['!rows'][0]={hpt:18};
 }
@@ -1664,6 +1786,31 @@ let seedlingGraphMode = 'sunlight';
 let slEnvChart = null;
 let slCorrChart = null;
 let _envAutoSaveTimer = null;
+
+// 육묘 그래프 기간 제어
+function onSeedlingRangeChange(){
+  const v=document.getElementById('sg-range')?.value;
+  const box=document.getElementById('sg-custom-range');
+  if(box) box.style.display=v==='custom'?'flex':'none';
+  if(v!=='custom'){ renderSeedlingEnvChart(); renderSeedlingCorrChart(); }
+}
+
+function getSeedlingGraphDates(){
+  const v=document.getElementById('sg-range')?.value||'30';
+  if(v==='custom'){
+    const f=document.getElementById('sg-from')?.value;
+    const t=document.getElementById('sg-to')?.value;
+    if(!f||!t) return getRecentEnvDates(30);
+    const dates=[];
+    let cur=new Date(f);const end=new Date(t);
+    while(cur<=end){
+      dates.push(`${cur.getFullYear()}-${p2(cur.getMonth()+1)}-${p2(cur.getDate())}`);
+      cur.setDate(cur.getDate()+1);
+    }
+    return dates;
+  }
+  return getRecentEnvDates(parseInt(v)||30);
+}
 
 function getSeedlingDateStr() {
   const el = document.getElementById('sl-date');
@@ -1783,7 +1930,7 @@ function setSeedlingGraphMode(mode) {
 }
 
 function renderSeedlingEnvChart() {
-  const dates = getRecentEnvDates(30);
+  const dates = getSeedlingGraphDates();
   const labels = dates.map(d=>d.slice(5));
   const mode = seedlingGraphMode;
   const modeInfo = {
@@ -1809,7 +1956,7 @@ function renderSeedlingEnvChart() {
 }
 
 function renderSeedlingCorrChart() {
-  const dates = getRecentEnvDates(30);
+  const dates = getSeedlingGraphDates();
   // X축: 온도, Y축: 물 사용량, 점 색: 햇빛(진할수록 밝음)
   const points = dates.map(d=>{
     const env=getEnvData(d);
@@ -1855,7 +2002,66 @@ function renderSeedlingCorrChart() {
   });
 }
 
+// 엑셀 내보내기 기간 제어
+let _xlRange = 'month';
+
+function setXlRange(type){
+  _xlRange = type;
+  // 버튼 활성화
+  ['month','year','custom'].forEach(t=>{
+    const btn=document.getElementById('xl-btn-'+t);
+    if(!btn)return;
+    if(t===type){
+      btn.style.background='var(--text-primary)';
+      btn.style.color='white';
+      btn.style.borderColor='var(--text-primary)';
+    } else {
+      btn.style.background='var(--surface)';
+      btn.style.color='var(--text-primary)';
+      btn.style.borderColor='var(--border)';
+    }
+  });
+  document.getElementById('xl-month-row').style.display  = type==='month'  ? 'flex'  : 'none';
+  document.getElementById('xl-year-row').style.display   = type==='year'   ? 'block' : 'none';
+  document.getElementById('xl-custom-row').style.display = type==='custom' ? 'block' : 'none';
+}
+
+function initXlSelects(){
+  const cY=NOW.getFullYear(); const cM=NOW.getMonth()+1;
+  // 월간: 연도
+  const ys=document.getElementById('xl-year');
+  if(ys){ ys.innerHTML=''; for(let y=cY-4;y<=cY+1;y++){const o=document.createElement('option');o.value=y;o.textContent=y+'년';if(y===cY)o.selected=true;ys.appendChild(o);} }
+  // 월간: 월
+  const ms=document.getElementById('xl-month');
+  if(ms){ ms.innerHTML=''; for(let m=1;m<=12;m++){const o=document.createElement('option');o.value=m;o.textContent=m+'월';if(m===cM)o.selected=true;ms.appendChild(o);} }
+  // 연간
+  const ys2=document.getElementById('xl-year2');
+  if(ys2){ ys2.innerHTML=''; for(let y=cY-4;y<=cY+1;y++){const o=document.createElement('option');o.value=y;o.textContent=y+'년';if(y===cY)o.selected=true;ys2.appendChild(o);} }
+  // 직접선택 기본값
+  const tf=document.getElementById('xl-from');const tt=document.getElementById('xl-to');
+  if(tf)tf.value=`${cY}-01-01`;
+  if(tt)tt.value=`${cY}-${p2(cM)}-${p2(new Date(cY,cM,0).getDate())}`;
+}
+
+function downloadExcelCustom(){
+  const type=_xlRange;
+  if(type==='month'){
+    const y=document.getElementById('xl-year')?.value;
+    const m=document.getElementById('xl-month')?.value;
+    downloadExcel('custom-month', {year:parseInt(y),month:parseInt(m)});
+  } else if(type==='year'){
+    const y=document.getElementById('xl-year2')?.value;
+    downloadExcel('custom-year', {year:parseInt(y)});
+  } else {
+    const f=document.getElementById('xl-from')?.value;
+    const t=document.getElementById('xl-to')?.value;
+    if(!f||!t){showAlert('시작일과 종료일을 선택해주세요.');return;}
+    downloadExcel('custom-range', {from:f,to:t});
+  }
+}
+
 function renderSettings(){
+  initXlSelects();
   const progs=getProgs();
   const pl=document.getElementById('prog-list');
   pl.innerHTML=progs.map((p,i)=>`<div class="prog-item"><div class="prog-item-info"><div class="prog-item-name">${p.name}</div><div class="prog-item-meta">${p.desc||''}</div></div><span class="prog-item-price">${(+p.price).toLocaleString()}원</span><div class="prog-item-acts"><button class="eact" onclick="editProg(${i})">수정</button><button class="eact del" onclick="delProg(${i})">삭제</button></div></div>`).join('')||'<p class="empty-msg">프로그램 없음</p>';
