@@ -358,7 +358,7 @@ canvas { max-width: 100%; }
     <button class="top-bar-btn" onclick="collapseAll('expense')">All ▲</button>
   </div>
   <div id="expense-cards">
-    <div class="nm-flat card-wrap" data-group="expense"><div class="card-hdr" onclick="toggleCard(this)"><span class="c-title">전기세<span class="c-arrow">▼</span></span><span class="c-badge c-badge-exp" id="b-electric">0원</span></div><div class="card-body"><div id="l-electric"></div><button class="add-btn" onclick="openModal('electric')">+ 추가</button></div></div>
+    <div class="nm-flat card-wrap" data-group="expense"><div class="card-hdr" onclick="toggleCard(this)"><span class="c-title">공과금<span class="c-arrow">▼</span></span><span class="c-badge c-badge-exp" id="b-electric">0원</span></div><div class="card-body"><div id="l-electric"></div><button class="add-btn" onclick="openModal('electric')">+ 추가</button></div></div>
     <div class="nm-flat card-wrap" data-group="expense"><div class="card-hdr" onclick="toggleCard(this)"><span class="c-title">인건비<span class="c-arrow">▼</span></span><span class="c-badge c-badge-exp" id="b-labor">0원</span></div><div class="card-body"><div id="l-labor"></div><button class="add-btn" onclick="openModal('labor')">+ 추가</button></div></div>
     <div class="nm-flat card-wrap" data-group="expense"><div class="card-hdr" onclick="toggleCard(this)"><span class="c-title">비료 구매<span class="c-arrow">▼</span></span><span class="c-badge c-badge-exp" id="b-fertilizer">0원</span></div><div class="card-body"><div id="l-fertilizer"></div><button class="add-btn" onclick="openModal('fertilizer')">+ 추가</button></div></div>
     <div class="nm-flat card-wrap" data-group="expense"><div class="card-hdr" onclick="toggleCard(this)"><span class="c-title">비품 구매<span class="c-arrow">▼</span></span><span class="c-badge c-badge-exp" id="b-parts">0원</span></div><div class="card-body"><div id="l-parts"></div><button class="add-btn" onclick="openModal('parts')">+ 추가</button></div></div>
@@ -601,7 +601,7 @@ let editLoanIdx = -1;
 
 const INC = ['retail','wholesale','group','personal','seedling'];
 const EXP = ['electric','labor','fertilizer','parts','repair','seedbuy'];
-const CAT = {retail:'소매',wholesale:'도매',group:'단체체험',personal:'개인체험',seedling:'육묘',electric:'전기세',labor:'인건비',fertilizer:'비료',parts:'비품',repair:'보수',seedbuy:'모종'};
+const CAT = {retail:'소매',wholesale:'도매',group:'단체체험',personal:'개인체험',seedling:'육묘',electric:'공과금',labor:'인건비',fertilizer:'비료',parts:'비품',repair:'보수',seedbuy:'모종'};
 const ICON = {retail:'🍓',wholesale:'🚚',group:'👥',personal:'🙋',seedling:'🌱',electric:'⚡',labor:'👷',fertilizer:'🌿',parts:'🔧',repair:'🏗',seedbuy:'🪴'};
 
 function p2(n){return String(n).padStart(2,'0');}
@@ -1583,7 +1583,7 @@ const XLS_COLS = {
 
 const CAT_KR = {
   retail:'소매판매', wholesale:'도매판매', group:'단체체험', personal:'개인체험',
-  seedling:'육묘판매', electric:'전기세', labor:'인건비', fertilizer:'비료 구매',
+  seedling:'육묘판매', electric:'공과금', labor:'인건비', fertilizer:'비료 구매',
   parts:'비품구매', repair:'보수정비비', seedbuy:'모종구입비'
 };
 
@@ -1726,7 +1726,7 @@ function downloadExcel(rangeType, extra={}) {
       ['총 수입',         totalInc],
       ['',''],
       ['[ 지출 ]',''],
-      ['  전기세',        expTotals['electric']||0],
+      ['  공과금',        expTotals['electric']||0],
       ['  인건비',        expTotals['labor']||0],
       ['  비료 구매',        expTotals['fertilizer']||0],
       ['  비품 구매',     expTotals['parts']||0],
@@ -1784,10 +1784,10 @@ function downloadExcel(rangeType, extra={}) {
     XLSX.utils.book_append_sheet(wb, ws, '수입');
   }
 
-  // ── 시트2: 지출 (전기세/인건비/비료 구매/비품구매/보수정비비/모종구입비 항목별) ──
+  // ── 시트2: 지출 (공과금/인건비/비료 구매/비품구매/보수정비비/모종구입비 항목별) ──
   {
     const sections=[
-      {cat:'electric', label:'전기세',    cols:['날짜','항목명','금액(원)','메모']},
+      {cat:'electric', label:'공과금',    cols:['날짜','항목명','금액(원)','메모']},
       {cat:'labor',    label:'인건비',    cols:['날짜','인력유형','인원수','금액(원)','메모']},
       {cat:'fertilizer',label:'비료 구매',  cols:['날짜','항목명','금액(원)','메모']},
       {cat:'parts',    label:'비품 구매', cols:['날짜','항목명','금액(원)','메모']},
