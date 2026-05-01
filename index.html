@@ -1964,7 +1964,7 @@ function populateFeedbackDateSelect(){
   }
   dates.sort((a,b)=>b.localeCompare(a)); // 최신순
   const cur = sel.value;
-  sel.innerHTML = '<option value="">날짜 선택...</option>';
+  sel.innerHTML = '<option value="">날짜 선택</option>';
   dates.forEach(d=>{
     const o = document.createElement('option');
     o.value = d;
