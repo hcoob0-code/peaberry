@@ -1639,7 +1639,7 @@ function delEntry(cat,idx){
   const arr=JSON.parse(localStorage.getItem(targetKey)||'[]');
   const ri=arr.findIndex(e=>JSON.stringify(e)===JSON.stringify(target));
   if(ri>=0)arr.splice(ri,1);
-  localStorage.setItem(targetKey,JSON.stringify(arr));
+  sl(targetKey,arr);
   renderIncExp();renderAll();
 }
 
@@ -2109,12 +2109,12 @@ function saveEntry(){
         const oldArr=JSON.parse(localStorage.getItem(oldKey)||'[]');
         const ri=oldArr.findIndex(x=>JSON.stringify(x)===JSON.stringify(oldEntry));
         if(ri>=0)oldArr.splice(ri,1);
-        localStorage.setItem(oldKey,JSON.stringify(oldArr));
+        sl(oldKey,oldArr);
       }
     }
     const arr=JSON.parse(localStorage.getItem(saveKey)||'[]');
     arr.push(e);
-    localStorage.setItem(saveKey,JSON.stringify(arr));
+    sl(saveKey,arr);
     closeModal();renderIncExp();renderAll();
   }
 }
@@ -3481,17 +3481,19 @@ function delVisitRoute(i){
 
   // Firebase REST PUT
   function fbPut(path, value){
-    return fetch(DB_URL+'/'+path+'.json?auth='+API_KEY, {
+    return fetch(DB_URL+'/'+path+'.json', {
       method:'PUT',
       headers:{'Content-Type':'application/json'},
+      mode:'cors',
       body:JSON.stringify(value)
-    }).catch(function(){ });
+    }).then(function(r){ return r.ok ? r.json() : null; })
+      .catch(function(){ return null; });
   }
 
   // Firebase REST GET
   function fbGet(path){
-    return fetch(DB_URL+'/'+path+'.json?auth='+API_KEY)
-      .then(function(r){ return r.json(); })
+    return fetch(DB_URL+'/'+path+'.json', {mode:'cors'})
+      .then(function(r){ return r.ok ? r.json() : null; })
       .catch(function(){ return null; });
   }
 
