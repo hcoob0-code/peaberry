@@ -272,15 +272,316 @@ canvas { max-width: 100%; }
 /* 필수 입력 빨간 별표 */
 .fg label.req::after { content: ' *'; color: var(--red); font-size: 11px; }
 
+
+/* ── Auth Screen ── */
+#auth-screen {
+  position: fixed; inset: 0; z-index: 10000;
+  background: #F7F8FA;
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  padding: 24px;
+  font-family: 'Noto Sans KR', sans-serif;
+}
+#auth-screen.hidden { display: none; }
+.auth-card {
+  background: #fff;
+  border: 1px solid #E5E7EB;
+  border-radius: 24px;
+  padding: 32px 28px 28px;
+  width: 100%; max-width: 360px;
+  box-shadow: 0 4px 32px rgba(0,0,0,0.06);
+}
+.auth-title-area {
+  display: flex; align-items: center; gap: 12px;
+  margin-bottom: 28px;
+}
+.auth-logo-icon {
+  width: 44px; height: 44px; border-radius: 12px;
+  background: #111827; display: flex; align-items: center;
+  justify-content: center; font-size: 22px; flex-shrink: 0;
+}
+.auth-app-title {
+  font-size: 20px; font-weight: 800; color: #111827;
+  letter-spacing: -0.5px; line-height: 1.2;
+}
+.auth-sub { font-size: 13px; color: #6B7280; margin-bottom: 24px; }
+.auth-label { font-size: 11px; font-weight: 600; color: #6B7280;
+  display: block; margin-bottom: 5px; letter-spacing: 0.3px; }
+.auth-input {
+  width: 100%; padding: 13px 14px; font-size: 14px;
+  font-family: 'Noto Sans KR', sans-serif; color: #111827;
+  background: #F7F8FA; border: 1.5px solid #E5E7EB;
+  border-radius: 12px; margin-bottom: 12px;
+  box-sizing: border-box; transition: border-color 0.15s;
+  -webkit-appearance: none;
+}
+.auth-input:focus { outline: none; border-color: #6366F1; background: #EEF2FF; }
+.auth-input::placeholder { color: #9CA3AF; }
+.auth-btn-primary {
+  width: 100%; padding: 14px; font-size: 15px; font-weight: 700;
+  font-family: 'Noto Sans KR', sans-serif; color: white;
+  background: #111827; border: none; border-radius: 12px;
+  cursor: pointer; margin-top: 4px;
+  box-shadow: 0 3px 12px rgba(17,24,39,0.25);
+  transition: opacity 0.15s, transform 0.1s;
+}
+.auth-btn-primary:active { opacity: 0.88; transform: scale(0.98); }
+.auth-btn-secondary {
+  width: 100%; padding: 13px; font-size: 14px; font-weight: 600;
+  font-family: 'Noto Sans KR', sans-serif; color: #374151;
+  background: #F3F4F6; border: 1.5px solid #E5E7EB;
+  border-radius: 12px; cursor: pointer; margin-top: 8px;
+  transition: background 0.15s;
+}
+.auth-btn-secondary:active { background: #E5E7EB; }
+.auth-divider {
+  display: flex; align-items: center; gap: 10px;
+  margin: 16px 0; color: #9CA3AF; font-size: 12px;
+}
+.auth-divider::before, .auth-divider::after {
+  content: ''; flex: 1; height: 1px; background: #E5E7EB;
+}
+.auth-admin-link {
+  text-align: center; font-size: 12px; color: #9CA3AF;
+  margin-top: 16px; cursor: pointer;
+  transition: color 0.15s;
+}
+.auth-admin-link:hover { color: #6366F1; }
+.auth-check-row {
+  display: flex; align-items: center; gap: 8px;
+  font-size: 13px; color: #6B7280; margin: 8px 0 4px;
+  cursor: pointer;
+}
+.auth-check-row input { accent-color: #6366F1; transform: scale(1.15); cursor: pointer; }
+.auth-err {
+  font-size: 12px; color: #EF4444; text-align: center;
+  margin: -4px 0 8px; min-height: 18px;
+}
+.auth-view { display: none; }
+.auth-view.active { display: block; }
+
+/* 관리자 패널 */
+#admin-panel {
+  position: fixed; inset: 0; z-index: 10001;
+  background: #F7F8FA; overflow-y: auto;
+  font-family: 'Noto Sans KR', sans-serif;
+  display: none;
+}
+#admin-panel.open { display: block; }
+.admin-hdr {
+  background: #111827; color: white;
+  padding: calc(env(safe-area-inset-top,20px) + 14px) 20px 14px;
+  display: flex; align-items: center; justify-content: space-between;
+  position: sticky; top: 0; z-index: 10;
+}
+.admin-hdr-title { font-size: 16px; font-weight: 700; }
+.admin-close { font-size: 20px; cursor: pointer; opacity: 0.7; padding: 4px 8px; }
+.admin-body { padding: 16px 16px calc(40px + env(safe-area-inset-bottom,0px)); max-width: 430px; margin: 0 auto; }
+.admin-section-title {
+  font-size: 10px; font-weight: 700; letter-spacing: 1.5px;
+  color: #6B7280; margin: 20px 0 10px; text-transform: uppercase;
+}
+.admin-farm-row {
+  background: white; border: 1px solid #E5E7EB;
+  border-radius: 14px; padding: 14px 16px; margin-bottom: 8px;
+  display: flex; align-items: center; justify-content: space-between;
+}
+.admin-farm-name { font-size: 14px; font-weight: 600; color: #111827; }
+.admin-farm-code { font-size: 12px; color: #6366F1; font-weight: 600;
+  background: #EEF2FF; padding: 3px 10px; border-radius: 50px; }
+.admin-version-row {
+  background: white; border: 1px solid #E5E7EB;
+  border-radius: 14px; padding: 14px 16px; margin-bottom: 8px;
+}
+.admin-version-tag {
+  font-size: 11px; font-weight: 700; color: white;
+  background: #10B981; padding: 3px 8px; border-radius: 6px;
+  display: inline-block; margin-right: 8px;
+}
+.admin-version-note { font-size: 12px; color: #6B7280; margin-top: 4px; line-height: 1.5; }
+.admin-add-btn {
+  width: 100%; padding: 11px; font-size: 13px; font-weight: 600;
+  font-family: 'Noto Sans KR', sans-serif; color: #6B7280;
+  background: transparent; border: 1.5px dashed #D1D5DB;
+  border-radius: 12px; cursor: pointer; margin-top: 4px;
+}
+.admin-del-btn {
+  font-size: 11px; padding: 4px 10px; border-radius: 8px;
+  border: 1px solid #FECACA; color: #EF4444; background: #FEF2F2;
+  cursor: pointer; font-family: 'Noto Sans KR', sans-serif;
+}
+
+/* 계정 설정 모달 */
+#account-modal {
+  position: fixed; inset: 0; z-index: 5000;
+  background: rgba(26,28,35,0.45); display: none;
+  align-items: flex-end; justify-content: center;
+  backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px);
+}
+#account-modal.open { display: flex; }
+.account-sheet {
+  background: white; border-radius: 22px 22px 0 0;
+  padding: 20px 20px calc(24px + env(safe-area-inset-bottom,0px));
+  width: 100%; max-width: 430px;
+  border-top: 1px solid #E5E7EB;
+}
+.account-handle { width: 36px; height: 4px; background: #E5E7EB;
+  border-radius: 2px; margin: 0 auto 18px; }
+.account-farm-badge {
+  display: flex; align-items: center; gap: 10px;
+  background: #F7F8FA; border: 1px solid #E5E7EB;
+  border-radius: 14px; padding: 14px 16px; margin-bottom: 16px;
+}
+.account-farm-icon {
+  width: 44px; height: 44px; border-radius: 12px;
+  background: #111827; display: flex; align-items: center;
+  justify-content: center; font-size: 20px; flex-shrink: 0;
+}
+.account-farm-info { flex: 1; min-width: 0; }
+.account-farm-name { font-size: 15px; font-weight: 700; color: #111827; }
+.account-farm-id { font-size: 12px; color: #6B7280; margin-top: 2px; }
+.account-menu-item {
+  display: flex; align-items: center; gap: 12px;
+  padding: 13px 14px; border-radius: 12px; cursor: pointer;
+  transition: background 0.12s; margin-bottom: 4px;
+  font-size: 14px; font-weight: 500; color: #111827;
+}
+.account-menu-item:active { background: #F3F4F6; }
+.account-menu-icon { font-size: 18px; width: 24px; text-align: center; flex-shrink: 0; }
+.account-logout {
+  color: #EF4444;
+  border-top: 1px solid #F3F4F6; margin-top: 8px; padding-top: 12px;
+}
+
 </style>
 </head>
 <body>
+
+<!-- ══ AUTH SCREEN ══ -->
+<div id="auth-screen">
+  <div class="auth-card">
+    <div class="auth-sub" id="auth-sub-text">농장명과 접속 코드를 입력해 주세요</div>
+
+    <!-- 로그인 뷰 -->
+    <div class="auth-view active" id="auth-login-view">
+      <label class="auth-label">농장명</label>
+      <input class="auth-input" type="text" id="auth-farm-id" placeholder="예) peakberry" autocomplete="off" autocapitalize="none" spellcheck="false">
+      <label class="auth-label">접속 코드</label>
+      <input class="auth-input" type="tel" id="auth-code" placeholder="숫자 6자리" maxlength="6" pattern="[0-9]*" inputmode="numeric">
+      <label class="auth-check-row">
+        <input type="checkbox" id="auth-remember" checked>
+        자동 로그인
+      </label>
+      <div class="auth-err" id="auth-err"></div>
+      <button class="auth-btn-primary" onclick="doLogin()">로그인</button>
+      <div class="auth-divider">또는</div>
+      <button class="auth-btn-secondary" onclick="showAuthView('register')">새 농장 등록하기</button>
+      <div class="auth-admin-link" onclick="showAuthView('admin-login')">관리자</div>
+    </div>
+
+    <!-- 농장 등록 뷰 -->
+    <div class="auth-view" id="auth-register-view">
+      <label class="auth-label">농장명 (로그인 ID)</label>
+      <input class="auth-input" type="text" id="reg-farm-id" placeholder="예) peakberry" autocomplete="off" autocapitalize="none" spellcheck="false">
+      <label class="auth-label">접속 코드 (6자리)</label>
+      <input class="auth-input" type="tel" id="reg-code" placeholder="숫자 6자리" maxlength="6" pattern="[0-9]*" inputmode="numeric">
+      <label class="auth-label">앱에 표시될 농장 이름</label>
+      <input class="auth-input" type="text" id="reg-display-name" placeholder="예) 피크베리 농장">
+      <label class="auth-label">부제목 (선택)</label>
+      <input class="auth-input" type="text" id="reg-display-sub" placeholder="예) 수입·지출 관리">
+      <div class="auth-err" id="reg-err"></div>
+      <button class="auth-btn-primary" onclick="doRegister()">등록하고 시작하기</button>
+      <button class="auth-btn-secondary" onclick="showAuthView('login')">로그인 화면으로 이동</button>
+    </div>
+
+    <!-- 관리자 로그인 뷰 -->
+    <div class="auth-view" id="auth-admin-login-view">
+      <label class="auth-label">관리자 비밀번호</label>
+      <input class="auth-input" type="password" id="admin-pw-input" placeholder="비밀번호 입력" onkeydown="if(event.key==='Enter')doAdminLogin()">
+      <div class="auth-err" id="admin-login-err"></div>
+      <button class="auth-btn-primary" onclick="doAdminLogin()">관리자 입장</button>
+      <button class="auth-btn-secondary" onclick="showAuthView('login')">← 로그인으로</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══ 관리자 패널 ══ -->
+<div id="admin-panel">
+  <div class="admin-hdr">
+    <span class="admin-hdr-title">관리자 패널</span>
+    <span class="admin-close" onclick="closeAdminPanel()">✕</span>
+  </div>
+  <div class="admin-body">
+    <div class="admin-section-title">등록된 농장</div>
+    <div id="admin-farm-list"></div>
+    <div class="admin-section-title">앱 버전 내역</div>
+    <div id="admin-version-list"></div>
+    <button class="admin-add-btn" onclick="openAdminAddVersion()">+ 버전 추가</button>
+  </div>
+</div>
+
+<!-- ══ 계정 설정 시트 ══ -->
+<div id="account-modal" onclick="if(event.target.id==='account-modal')closeAccountModal()">
+  <div class="account-sheet">
+    <div class="account-handle"></div>
+    <div class="account-farm-badge">
+      <div class="account-farm-info">
+        <div class="account-farm-name" id="acct-display-name">농장</div>
+        <div class="account-farm-id" id="acct-farm-id">@farmid</div>
+      </div>
+    </div>
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 14px;background:#F7F8FA;border:1px solid #E5E7EB;border-radius:12px;margin-bottom:12px;">
+      <span style="font-size:12px;color:#6B7280;">접속 코드</span>
+      <span id="acct-current-code" style="font-size:18px;font-weight:700;letter-spacing:6px;color:#111827;">——————</span>
+    </div>
+    <div class="account-menu-item" onclick="openFarmNameModal();closeAccountModal()">
+      농장 정보 수정
+    </div>
+    <div class="account-menu-item" onclick="openChangeCodeModal()">
+      접속 코드 변경
+    </div>
+    <div class="account-menu-item account-logout" onclick="doLogout()">
+      로그아웃
+    </div>
+  </div>
+</div>
+
+<!-- 코드 변경 모달 -->
+<div class="alert-bg" id="changeCodeBg" onclick="if(event.target.id==='changeCodeBg')closeChangeCodeModal()">
+  <div class="alert-box" style="width:300px;">
+    <p style="font-size:15px;font-weight:700;margin-bottom:16px;">접속 코드 변경</p>
+    <p style="font-size:11px;color:#6B7280;margin-bottom:5px;text-align:left;">현재 코드</p>
+    <div id="current-code-display" style="width:100%;padding:12px 14px;font-size:18px;font-weight:700;letter-spacing:6px;color:#111827;background:#F3F4F6;border:1.5px solid #E5E7EB;border-radius:12px;box-sizing:border-box;margin-bottom:14px;text-align:center;">——————</div>
+    <p style="font-size:11px;color:#6B7280;margin-bottom:5px;text-align:left;">변경할 코드 (숫자 6자리)</p>
+    <input type="tel" id="new-code-input" maxlength="6" placeholder="새 코드 입력" pattern="[0-9]*" inputmode="numeric"
+      style="width:100%;padding:12px 14px;font-size:18px;font-weight:700;letter-spacing:6px;font-family:'Noto Sans KR',sans-serif;color:#111827;background:#F7F8FA;border:1.5px solid #E5E7EB;border-radius:12px;box-sizing:border-box;margin-bottom:6px;text-align:center;">
+    <p style="font-size:11px;color:#EF4444;min-height:16px;margin-bottom:8px;" id="change-code-err"></p>
+    <div style="display:flex;gap:8px;">
+      <button onclick="closeChangeCodeModal()" style="flex:1;padding:12px;font-size:13px;font-weight:600;font-family:'Noto Sans KR',sans-serif;color:#6B7280;background:#F3F4F6;border:none;border-radius:12px;cursor:pointer;">취소</button>
+      <button onclick="doChangeCode()" style="flex:1.5;padding:12px;font-size:13px;font-weight:700;font-family:'Noto Sans KR',sans-serif;color:white;background:#111827;border:none;border-radius:12px;cursor:pointer;">변경</button>
+    </div>
+  </div>
+</div>
+
+<!-- 버전 추가 모달 -->
+<div class="alert-bg" id="addVersionBg" onclick="if(event.target.id==='addVersionBg')closeAdminAddVersion()">
+  <div class="alert-box" style="width:310px;">
+    <p style="font-size:15px;font-weight:700;margin-bottom:14px;">버전 추가</p>
+    <input type="text" id="av-ver" placeholder="예) v1.2.0" style="width:100%;padding:11px 14px;font-size:14px;font-family:'Noto Sans KR',sans-serif;color:#111827;background:#F7F8FA;border:1.5px solid #E5E7EB;border-radius:12px;box-sizing:border-box;margin-bottom:8px;">
+    <textarea id="av-note" placeholder="업데이트 내용 입력" style="width:100%;padding:11px 14px;font-size:13px;font-family:'Noto Sans KR',sans-serif;color:#111827;background:#F7F8FA;border:1.5px solid #E5E7EB;border-radius:12px;box-sizing:border-box;height:80px;resize:none;margin-bottom:12px;"></textarea>
+    <div style="display:flex;gap:8px;">
+      <button onclick="closeAdminAddVersion()" style="flex:1;padding:12px;font-size:13px;font-weight:600;font-family:'Noto Sans KR',sans-serif;color:#6B7280;background:#F3F4F6;border:none;border-radius:12px;cursor:pointer;">취소</button>
+      <button onclick="saveAdminVersion()" style="flex:1.5;padding:12px;font-size:13px;font-weight:700;font-family:'Noto Sans KR',sans-serif;color:white;background:#111827;border:none;border-radius:12px;cursor:pointer;">저장</button>
+    </div>
+  </div>
+</div>
+
 <div class="app">
 
 <!-- HEADER -->
 <div class="hdr">
   <div>
-    <div class="hdr-title" id="farm-title" onclick="openFarmNameModal()">피크베리 농장</div>
+    <div class="hdr-title" id="farm-title" onclick="openAccountModal()">피크베리 농장</div>
     <div class="hdr-sub" id="farm-sub">수입·지출 관리</div>
   </div>
   <div style="text-align:right;line-height:1.4;flex-shrink:0;">
@@ -318,13 +619,9 @@ canvas { max-width: 100%; }
       <div class="lbl">총 지출 →</div><div class="val val-exp" id="s-exp">0원</div>
     </div>
   </div>
-  <div style="margin:14px 0 6px;">
-    <div class="sec-label" style="margin:0;cursor:pointer;" onclick="toggleSumSection('inc')">INCOME <span id="sum-inc-arrow">▾</span></div>
-  </div>
+  <div style="margin:14px 0 6px;"><div class="sec-label" style="margin:0;cursor:pointer;" onclick="toggleSumSection('inc')">INCOME <span id="sum-inc-arrow">▾</span></div></div>
   <div id="sum-inc-list"></div>
-  <div style="margin:14px 0 6px;">
-    <div class="sec-label" style="margin:0;cursor:pointer;" onclick="toggleSumSection('exp')">EXPENSE <span id="sum-exp-arrow">▾</span></div>
-  </div>
+  <div style="margin:14px 0 6px;"><div class="sec-label" style="margin:0;cursor:pointer;" onclick="toggleSumSection('exp')">EXPENSE <span id="sum-exp-arrow">▾</span></div></div>
   <div id="sum-exp-list"></div>
   <div class="sec-label">05. STATISTICS</div>
   <div class="nm-flat" style="padding:12px 16px;margin-bottom:12px;">
@@ -441,10 +738,11 @@ canvas { max-width: 100%; }
       </div>
       <div>
         <div style="font-size:10px;font-weight:600;color:var(--text-secondary);margin-bottom:4px;">시간</div>
-        <input type="time" id="sl-time" style="width:100%;padding:8px 6px;font-size:11px;font-family:'Noto Sans KR',sans-serif;background:var(--bg);border:1px solid var(--border);border-radius:var(--radius-md);color:var(--text-primary);box-sizing:border-box;min-height:40px;appearance:none;-webkit-appearance:none;">
+        <div style="display:flex;gap:4px;">
+          <input type="time" id="sl-time" style="flex:1;padding:8px 6px;font-size:11px;font-family:'Noto Sans KR',sans-serif;background:var(--bg);border:1px solid var(--border);border-radius:var(--radius-md);color:var(--text-primary);min-height:40px;appearance:none;-webkit-appearance:none;">
+          <button onclick="document.getElementById('sl-time').value=getNowTime()" style="padding:0 8px;font-size:10px;font-weight:600;font-family:'Noto Sans KR',sans-serif;color:var(--accent);background:var(--accent-soft);border:1px solid #C7D2FE;border-radius:var(--radius-md);cursor:pointer;white-space:nowrap;min-height:40px;flex-shrink:0;">현재시간</button>
+        </div>
       </div>
-    </div>
-    <!-- 햇빛/온도/습도 한 줄 -->
     <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:10px;">
       <div>
         <div style="font-size:10px;font-weight:600;color:var(--text-secondary);margin-bottom:4px;">조도(fc)</div>
@@ -472,7 +770,10 @@ canvas { max-width: 100%; }
       </div>
       <div>
         <div style="font-size:10px;font-weight:600;color:var(--text-secondary);margin-bottom:4px;">시간</div>
-        <input type="time" id="sl-water-time" style="width:100%;padding:8px 6px;font-size:11px;font-family:'Noto Sans KR',sans-serif;background:var(--bg);border:1px solid var(--border);border-radius:var(--radius-md);color:var(--text-primary);box-sizing:border-box;min-height:40px;appearance:none;-webkit-appearance:none;">
+        <div style="display:flex;gap:4px;">
+          <input type="time" id="sl-water-time" style="flex:1;padding:8px 6px;font-size:11px;font-family:'Noto Sans KR',sans-serif;background:var(--bg);border:1px solid var(--border);border-radius:var(--radius-md);color:var(--text-primary);min-height:40px;appearance:none;-webkit-appearance:none;">
+          <button onclick="document.getElementById('sl-water-time').value=getNowTime()" style="padding:0 8px;font-size:10px;font-weight:600;font-family:'Noto Sans KR',sans-serif;color:var(--accent);background:var(--accent-soft);border:1px solid #C7D2FE;border-radius:var(--radius-md);cursor:pointer;white-space:nowrap;min-height:40px;flex-shrink:0;">현재시간</button>
+        </div>
       </div>
     </div>
     <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:6px;" id="water-records"></div>
@@ -658,6 +959,369 @@ canvas { max-width: 100%; }
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <script>
+
+// ══════════════════════════════════════════
+// MULTI-TENANT AUTH SYSTEM
+// ══════════════════════════════════════════
+var ADMIN_PW = '940318';
+var DB_URL_AUTH = 'https://peakberry-default-rtdb.firebaseio.com';
+var API_KEY_AUTH = 'AIzaSyC0Zc4seMa9YvG70QUgFuczREPdNoof2cU';
+var _currentFarmId = null;
+
+function authFbGet(path){
+  return fetch(DB_URL_AUTH+'/'+path+'.json', {mode:'cors'})
+    .then(function(r){ if(!r.ok) return null; return r.json(); })
+    .catch(function(){ return null; });
+}
+function authFbPut(path, val){
+  return fetch(DB_URL_AUTH+'/'+path+'.json', {
+    method:'PUT',
+    headers:{'Content-Type':'application/json'},
+    mode:'cors',
+    body:JSON.stringify(val)
+  }).then(function(r){ if(!r.ok) return null; return r.json(); })
+    .catch(function(e){ console.warn('authFbPut err:',e); return null; });
+}
+function authFbDelete(path){
+  return fetch(DB_URL_AUTH+'/'+path+'.json',{
+    method:'DELETE'
+  }).catch(function(e){ console.warn('authFbDelete err:',e); });
+}
+
+function showAuthView(view){
+  document.querySelectorAll('.auth-view').forEach(function(el){el.classList.remove('active');});
+  var el=document.getElementById('auth-'+view+'-view');
+  if(el)el.classList.add('active');
+  var subs={login:'농장명과 접속 코드를 입력해 주세요',register:'새 농장을 등록하세요','admin-login':'관리자 비밀번호를 입력하세요'};
+  document.getElementById('auth-sub-text').textContent=subs[view]||'';
+  ['auth-err','reg-err','admin-login-err'].forEach(function(id){var e=document.getElementById(id);if(e)e.textContent='';});
+}
+
+// ── 자동 로그인 체크 ──
+function checkAutoLogin(){
+  var saved=null;
+  try{saved=JSON.parse(localStorage.getItem('pb8_auth_session')||'null');}catch(e){}
+  if(saved&&saved.farmId&&saved.code&&saved.autoLogin){
+    verifyAndLogin(saved.farmId, saved.code, true, true);
+    return true;
+  }
+  return false;
+}
+
+// ── 로그인 실행 ──
+function doLogin(){
+  var farmId=(document.getElementById('auth-farm-id').value||'').trim().toLowerCase();
+  var code=(document.getElementById('auth-code').value||'').trim();
+  var remember=document.getElementById('auth-remember').checked;
+  var err=document.getElementById('auth-err');
+  if(!farmId){err.textContent='농장명을 입력해 주세요.';return;}
+  if(!code){err.textContent='접속 코드를 입력해 주세요.';return;}
+  if(!/^\d{6}$/.test(code)){err.textContent='접속 코드는 숫자 6자리여야 합니다.';return;}
+  err.textContent='확인 중...';
+  verifyAndLogin(farmId, code, remember, false);
+}
+
+function verifyAndLogin(farmId, code, remember, silent){
+  // 로컬 캐시 폴백 함수
+  function tryLocalLogin(){
+    var localFarm=null;
+    try{localFarm=JSON.parse(localStorage.getItem('pb8_farm_local_'+farmId)||'null');}catch(e){}
+    if(!localFarm){
+      if(!silent){var e=document.getElementById('auth-err');if(e)e.textContent='등록되지 않은 농장명입니다. (서버 연결 필요)';}
+      return;
+    }
+    if(String(localFarm.code)!==String(code)){
+      if(!silent){var e=document.getElementById('auth-err');if(e)e.textContent='접속 코드가 올바르지 않습니다.';}
+      return;
+    }
+    doLoginSuccess(farmId, code, remember, localFarm);
+  }
+
+  authFbGet('farms/'+farmId).then(function(farm){
+    if(!farm){
+      tryLocalLogin();
+      return;
+    }
+    if(String(farm.code)!==String(code)){
+      if(!silent){var e=document.getElementById('auth-err');if(e)e.textContent='접속 코드가 올바르지 않습니다.';}
+      return;
+    }
+    // 로컬 캐시 업데이트
+    localStorage.setItem('pb8_farm_local_'+farmId, JSON.stringify(farm));
+    doLoginSuccess(farmId, code, remember, farm);
+  }).catch(function(){ tryLocalLogin(); });
+}
+
+function doLoginSuccess(farmId, code, remember, farm){
+  _currentFarmId=farmId;
+  if(remember){
+    localStorage.setItem('pb8_auth_session', JSON.stringify({farmId:farmId,code:code,autoLogin:true}));
+  } else {
+    localStorage.removeItem('pb8_auth_session');
+  }
+  var dn=farm.displayName||farmId;
+  var ds=farm.displaySub||'수입·지출 관리';
+  _PB8_PREFIX='pb8_'+farmId+'_';
+  var t=document.getElementById('farm-title');if(t)t.textContent=dn;
+  var s=document.getElementById('farm-sub');if(s)s.textContent=ds;
+  var an=document.getElementById('acct-display-name');if(an)an.textContent=dn;
+  var ai=document.getElementById('acct-farm-id');if(ai)ai.textContent='@'+farmId;
+  document.getElementById('admin-panel').classList.remove('open');
+  document.getElementById('addVersionBg').classList.remove('open');
+  var authScreen=document.getElementById('auth-screen');
+  if(authScreen)authScreen.classList.add('hidden');
+  if(typeof showTab==='function') showTab('summary');
+  if(typeof window.loadAllFromFirebase==='function') window.loadAllFromFirebase();
+}
+
+// ── 농장 등록 ──
+function doRegister(){
+  var farmId=(document.getElementById('reg-farm-id').value||'').trim().toLowerCase();
+  var code=(document.getElementById('reg-code').value||'').trim();
+  var dn=(document.getElementById('reg-display-name').value||'').trim();
+  var ds=(document.getElementById('reg-display-sub').value||'').trim();
+  var err=document.getElementById('reg-err');
+  if(!farmId){err.textContent='농장명을 입력해 주세요.';return;}
+  if(!/^[a-z0-9_-]+$/.test(farmId)){err.textContent='농장명은 영문 소문자/숫자/-/_만 사용 가능합니다.';return;}
+  if(!code||code.length!==6){err.textContent='접속 코드는 6자리여야 합니다.';return;}
+  if(!/^\d{6}$/.test(code)){err.textContent='접속 코드는 숫자만 입력 가능합니다.';return;}
+  if(!dn){err.textContent='표시될 농장 이름을 입력해 주세요.';return;}
+  err.textContent='등록 중...';
+  var farmData={code:code, displayName:dn, displaySub:ds||'수입·지출 관리', createdAt:new Date().toISOString()};
+
+  function enterApp(){
+    err.textContent='';
+    document.getElementById('admin-panel').classList.remove('open');
+    document.getElementById('addVersionBg').classList.remove('open');
+    _currentFarmId=farmId;
+    // 로컬 캐시에도 농장 정보 저장 (오프라인 대비)
+    localStorage.setItem('pb8_farm_local_'+farmId, JSON.stringify(farmData));
+    localStorage.setItem('pb8_auth_session', JSON.stringify({farmId:farmId,code:code,autoLogin:true}));
+    var t=document.getElementById('farm-title');if(t)t.textContent=dn;
+    var s=document.getElementById('farm-sub');if(s)s.textContent=ds||'수입·지출 관리';
+    var an=document.getElementById('acct-display-name');if(an)an.textContent=dn;
+    var ai=document.getElementById('acct-farm-id');if(ai)ai.textContent='@'+farmId;
+    var authScreen=document.getElementById('auth-screen');
+    if(authScreen)authScreen.classList.add('hidden');
+    if(typeof showTab==='function') showTab('summary');
+    if(typeof window.loadAllFromFirebase==='function') window.loadAllFromFirebase();
+  }
+
+  // Firebase 저장 시도 (실패해도 앱 진입 허용)
+  authFbGet('farms/'+farmId).then(function(existing){
+    if(existing){err.textContent='이미 사용 중인 농장명입니다. 다른 이름을 사용해 주세요.';return;}
+    authFbPut('farms/'+farmId, farmData).then(function(res){
+      if(!res){ console.warn('Firebase PUT failed, entering app with local storage only'); }
+      enterApp();
+    }).catch(function(){ enterApp(); });
+  }).catch(function(){
+    // 네트워크 오류 → 로컬에만 저장하고 앱 진입
+    console.warn('Firebase GET failed, registering locally only');
+    enterApp();
+  });
+}
+
+// ── 로그아웃 ──
+function doLogout(){
+  localStorage.removeItem('pb8_auth_session');
+  _currentFarmId=null;
+  closeAccountModal();
+  var authScreen=document.getElementById('auth-screen');
+  if(authScreen)authScreen.classList.remove('hidden');
+  showAuthView('login');
+}
+
+// ── 접속 코드 변경 ──
+function openChangeCodeModal(){
+  closeAccountModal();
+  document.getElementById('new-code-input').value='';
+  document.getElementById('change-code-err').textContent='';
+  // 현재 코드 표시
+  var disp=document.getElementById('current-code-display');
+  if(disp) disp.textContent='···';
+  if(_currentFarmId){
+    authFbGet('farms/'+_currentFarmId).then(function(farm){
+      if(farm&&disp) disp.textContent=farm.code||'——';
+    });
+  }
+  document.getElementById('changeCodeBg').classList.add('open');
+}
+function closeChangeCodeModal(){document.getElementById('changeCodeBg').classList.remove('open');}
+function doChangeCode(){
+  var newCode=(document.getElementById('new-code-input').value||'').trim();
+  var err=document.getElementById('change-code-err');
+  if(!newCode||newCode.length!==6){err.textContent='6자리 코드를 입력해 주세요.';return;}
+  if(!/^\d{6}$/.test(newCode)){err.textContent='숫자만 입력 가능합니다.';return;}
+  if(!_currentFarmId){err.textContent='로그인 상태가 아닙니다.';return;}
+  authFbGet('farms/'+_currentFarmId).then(function(farm){
+    if(!farm){err.textContent='오류가 발생했습니다.';return;}
+    farm.code=newCode;
+    authFbPut('farms/'+_currentFarmId, farm).then(function(){
+      // 세션 업데이트
+      var sess=JSON.parse(localStorage.getItem('pb8_auth_session')||'{}');
+      if(sess&&sess.autoLogin){sess.code=newCode;localStorage.setItem('pb8_auth_session',JSON.stringify(sess));}
+      closeChangeCodeModal();
+      showSaveToast('✓ 접속 코드가 변경되었습니다');
+    });
+  });
+}
+
+// ── 계정 모달 ──
+function openAccountModal(){
+  var farmId=_currentFarmId||'';
+  var dn=document.getElementById('farm-title')?.textContent||farmId;
+  var an=document.getElementById('acct-display-name');if(an)an.textContent=dn;
+  var ai=document.getElementById('acct-farm-id');if(ai)ai.textContent='@'+farmId;
+  // 현재 코드 바로 표시
+  var codeEl=document.getElementById('acct-current-code');
+  if(codeEl){
+    codeEl.textContent='···';
+    if(farmId){
+      authFbGet('farms/'+farmId).then(function(farm){
+        if(farm&&codeEl) codeEl.textContent=farm.code||'——';
+      });
+    }
+  }
+  document.getElementById('account-modal').classList.add('open');
+}
+function closeAccountModal(){document.getElementById('account-modal').classList.remove('open');}
+
+// ── 관리자 로그인 ──
+function doAdminLogin(){
+  var pw=(document.getElementById('admin-pw-input').value||'').trim();
+  var err=document.getElementById('admin-login-err');
+  if(pw!==ADMIN_PW){err.textContent='비밀번호가 올바르지 않습니다.';return;}
+  err.textContent='';
+  document.getElementById('auth-screen').classList.add('hidden');
+  openAdminPanel();
+}
+
+// ── 관리자 패널 ──
+function openAdminPanel(){
+  document.getElementById('admin-panel').classList.add('open');
+  renderAdminFarms();
+  renderAdminVersions();
+}
+function closeAdminPanel(){
+  document.getElementById('admin-panel').classList.remove('open');
+  closeAdminAddVersion(); // 버전 추가 모달도 함께 닫기
+  if(!_currentFarmId){
+    document.getElementById('auth-screen').classList.remove('hidden');
+    showAuthView('login');
+  }
+}
+function renderAdminFarms(){
+  var el=document.getElementById('admin-farm-list');
+  if(!el)return;
+  el.innerHTML='<p style="font-size:12px;color:#9CA3AF;padding:8px 0;">불러오는 중...</p>';
+  authFbGet('farms').then(function(farms){
+    if(!farms){el.innerHTML='<p style="font-size:12px;color:#9CA3AF;padding:8px 0;">등록된 농장 없음</p>';return;}
+    var keys=Object.keys(farms);
+    el.innerHTML=keys.map(function(k){
+      var f=farms[k];
+      var esc=k.replace(/'/g,"\\'");
+      return '<div class="admin-farm-row" style="flex-direction:column;align-items:stretch;gap:10px;">'
+        +'<div style="display:flex;align-items:center;justify-content:space-between;">'
+        +'<div><div class="admin-farm-name">'+f.displayName+'</div>'
+        +'<div style="font-size:11px;color:#6B7280;margin-top:2px;">@'+k+' · '+f.displaySub+'</div></div>'
+        +'<button class="admin-del-btn" onclick="adminDeleteFarm(\''+esc+'\')">삭제</button>'
+        +'</div>'
+        +'<div style="display:flex;gap:6px;align-items:center;">'
+        +'<span style="font-size:11px;color:#6B7280;flex-shrink:0;">코드</span>'
+        +'<input type="tel" id="admin-code-'+k+'" value="'+f.code+'" maxlength="6" pattern="[0-9]*" inputmode="numeric" '
+        +'style="flex:1;padding:8px 10px;font-size:13px;font-family:\'Noto Sans KR\',sans-serif;color:#111827;background:#F7F8FA;border:1.5px solid #E5E7EB;border-radius:10px;min-width:0;">'
+        +'<button onclick="adminChangeCode(\''+esc+'\')" '
+        +'style="padding:8px 14px;font-size:12px;font-weight:600;font-family:\'Noto Sans KR\',sans-serif;color:white;background:#111827;border:none;border-radius:10px;cursor:pointer;white-space:nowrap;flex-shrink:0;">변경</button>'
+        +'</div>'
+        +'</div>';
+    }).join('');
+  });
+}
+function adminDeleteFarm(farmId){
+  if(!confirm(farmId+' 농장을 삭제하시겠습니까?')) return;
+  authFbDelete('farms/'+farmId).then(function(){ renderAdminFarms(); });
+}
+function adminChangeCode(farmId){
+  var inp=document.getElementById('admin-code-'+farmId);
+  var newCode=(inp?inp.value:'').trim();
+  if(!newCode||newCode.length!==6){alert('6자리 숫자 코드를 입력해 주세요.');return;}
+  if(!/^\d{6}$/.test(newCode)){alert('숫자만 입력 가능합니다.');return;}
+  authFbGet('farms/'+farmId).then(function(farm){
+    if(!farm){alert('농장 정보를 찾을 수 없습니다.');return;}
+    farm.code=newCode;
+    authFbPut('farms/'+farmId, farm).then(function(){
+      if(typeof showSaveToast==='function') showSaveToast('✓ '+farmId+' 코드가 변경되었습니다');
+    });
+  });
+}
+function renderAdminVersions(){
+  var el=document.getElementById('admin-version-list');
+  if(!el)return;
+  authFbGet('versions').then(function(versions){
+    if(!versions){
+      el.innerHTML='<div class="admin-version-row"><span class="admin-version-tag">v1.1.0</span><span style="font-size:12px;color:#111827;font-weight:600;">2026-05-01</span><div class="admin-version-note">초기 릴리즈</div></div>';
+      return;
+    }
+    var keys=Object.keys(versions).sort().reverse();
+    el.innerHTML=keys.map(function(k){
+      var v=versions[k];
+      var esc=k.replace(/'/g,"\\'");
+      var noteId='admin-note-'+k.replace(/-/g,'');
+      return '<div class="admin-version-row">'
+        +'<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">'
+        +'<div><span class="admin-version-tag">'+v.ver+'</span>'
+        +'<span style="font-size:12px;color:#111827;font-weight:600;">'+k+'</span></div>'
+        +'<button class="admin-del-btn" onclick="adminDeleteVersion(\''+esc+'\')">삭제</button>'
+        +'</div>'
+        +'<textarea id="'+noteId+'" '
+        +'style="width:100%;padding:8px 10px;font-size:12px;font-family:\'Noto Sans KR\',sans-serif;color:#374151;background:#F9FAFB;border:1.5px solid #E5E7EB;border-radius:10px;resize:none;height:60px;box-sizing:border-box;line-height:1.5;">'
+        +v.note+'</textarea>'
+        +'<button onclick="adminSaveVersionNote(\''+esc+'\',\''+noteId+'\')" '
+        +'style="margin-top:6px;padding:6px 14px;font-size:11px;font-weight:600;font-family:\'Noto Sans KR\',sans-serif;color:#6366F1;background:#EEF2FF;border:1px solid #C7D2FE;border-radius:8px;cursor:pointer;">메모 저장</button>'
+        +'</div>';
+    }).join('');
+  });
+}
+function adminSaveVersionNote(dateKey, textareaId){
+  var ta=document.getElementById(textareaId);
+  var note=(ta?ta.value:'').trim();
+  authFbGet('versions/'+dateKey).then(function(v){
+    if(!v){alert('버전 정보를 찾을 수 없습니다.');return;}
+    v.note=note||'-';
+    authFbPut('versions/'+dateKey, v).then(function(){
+      if(typeof showSaveToast==='function') showSaveToast('✓ 메모가 저장되었습니다');
+    });
+  });
+}
+function openAdminAddVersion(){document.getElementById('addVersionBg').classList.add('open');}
+function closeAdminAddVersion(){document.getElementById('addVersionBg').classList.remove('open');}
+function saveAdminVersion(){
+  var ver=(document.getElementById('av-ver').value||'').trim();
+  var note=(document.getElementById('av-note').value||'').trim();
+  if(!ver){alert('버전을 입력해 주세요.');return;}
+  var today=new Date();
+  var dateKey=today.getFullYear()+'-'+String(today.getMonth()+1).padStart(2,'0')+'-'+String(today.getDate()).padStart(2,'0');
+  authFbPut('versions/'+dateKey, {ver:ver, note:note||'-'}).then(function(){
+    closeAdminAddVersion();
+    renderAdminVersions();
+  });
+}
+function adminDeleteVersion(k){
+  authFbDelete('versions/'+k).then(function(){renderAdminVersions();});
+}
+
+// ── 엔터키 로그인 지원 ──
+document.getElementById('auth-code').addEventListener('keydown',function(e){if(e.key==='Enter')doLogin();});
+document.getElementById('auth-farm-id').addEventListener('keydown',function(e){if(e.key==='Enter')document.getElementById('auth-code').focus();});
+
+// ── 앱 시작: 자동 로그인 체크 ──
+(function(){
+  var autoLoggedIn = checkAutoLogin();
+  if(!autoLoggedIn){
+    // auth screen 보여주기 (이미 기본이 표시 상태)
+  }
+})();
+
 const NOW = new Date();
 let curModal = null, editIdx = -1, lChart = null, pChart = null, sChart = null;
 let editLoanIdx = -1;
@@ -1457,10 +2121,8 @@ function saveEntry(){
 
 function closeMBg(e){if(e.target.id==='modal')closeModal();}
 function closeModal(){document.getElementById('modal').classList.remove('open');curModal=null;editIdx=-1;}
-
-// 모달 스크롤 다운 → 닫기
 (function setupModalSwipeClose(){
-  let _sY=0, _sST=0, _target=null;
+  let _sY=0,_sST=0,_target=null;
   document.addEventListener('touchstart',function(e){
     _target=null;
     ['modal','loanModal'].forEach(function(mid){
@@ -2195,43 +2857,30 @@ function getEnvData(dateStr) {
 
 // 육묘 탭 진입 시 초기화
 function renderSeedlingTab() {
-  // 날짜/시간 기본값: 지금
-  const nowDate=getNowDate(), nowTime=getNowTime();
-  ['sl-date','sl-water-date','sl-feedback-date'].forEach(id=>{
-    const el=document.getElementById(id);if(el&&!el.value)el.value=nowDate;
+  const nowDate=getNowDate();
+
+  // 날짜는 오늘 날짜로, 시간은 항상 빈칸
+  ['sl-date','sl-water-date'].forEach(id=>{
+    const el=document.getElementById(id);if(el)el.value=nowDate;
   });
   ['sl-time','sl-water-time'].forEach(id=>{
-    const el=document.getElementById(id);if(el&&!el.value)el.value=nowTime;
+    const el=document.getElementById(id);if(el)el.value='';
   });
-  // 피드백 datetime select 채우기
-  populateFeedbackDateSelect();
 
-  // 오늘 날짜 데이터로 기본 채우기
-  const todayStr=nowDate;
-  const env=getEnvData(todayStr);
-  const sf=document.getElementById('sl-sunlight');const tf=document.getElementById('sl-temp');const hf=document.getElementById('sl-humidity');
-  if(sf&&!sf.value)sf.value=env.sunlight||'';
-  if(tf&&!tf.value)tf.value=env.temp||'';
-  if(hf&&!hf.value)hf.value=env.humidity||'';
+  // 조도/온도/습도 항상 0으로 초기화
+  ['sl-sunlight','sl-temp','sl-humidity'].forEach(id=>{
+    const el=document.getElementById(id);if(el)el.value='';
+  });
+
+  // 피드백 초기화
   const fb=document.getElementById('sl-feedback');
-  if(fb&&!fb.value){fb.value=env.feedback||''; updateFbCount();}
+  if(fb){fb.value='';updateFbCount();}
 
-  // 물 구역 렌더 (저장된 구역 수 기준)
+  // 물 구역 렌더 — 값은 모두 0(빈칸)으로
   const savedZones=gl('pb8_water_zones')||6;
-  renderWaterRecords(env.water||[], savedZones);
+  renderWaterRecords([], savedZones);
 
-  // 작업기록 (오늘)
-  const parts=todayStr.split('-');
-  const dayCtx={mode:'day',year:parseInt(parts[0]),month:parseInt(parts[1]),day:parseInt(parts[2])};
-  ['labor','parts','fertilizer'].forEach(cat=>{
-    const arr=getData(cat,dayCtx);
-    const total=arr.reduce((s,e)=>s+(+e.amount||0),0);
-    const b=document.getElementById('sl-b-'+cat);const l=document.getElementById('sl-l-'+cat);
-    if(b)b.textContent=fmt(total);
-    if(l)l.innerHTML=arr.length?arr.map((e,i)=>renderRow(cat,e,i,false)).join(''):'<p class="empty-msg">내역 없음</p>';
-  });
-
-  // 피드백 날짜 select: 저장된 물 날짜들로 채우기
+  // 피드백 datetime select 채우기
   populateFeedbackDateSelect();
 
   renderSeedlingEnvChart();
@@ -2743,35 +3392,29 @@ function renderSettings(){
   const progs=getProgs();
   const pl=document.getElementById('prog-list');
   pl.innerHTML=progs.map((p,i)=>`<div class="prog-item"><div class="prog-item-info"><div class="prog-item-name">${p.name}</div><div class="prog-item-meta">${p.desc||''}</div></div><span class="prog-item-price">${(+p.price).toLocaleString()}원</span><div class="prog-item-acts"><button class="eact" onclick="editProg(${i})">수정</button><button class="eact del" onclick="delProg(${i})">삭제</button></div></div>`).join('')||'<p class="empty-msg">프로그램 없음</p>';
-  // 방문경로 태그 렌더링
   const routes=gl('pb8_visit_routes')||[];
   const vl=document.getElementById('visit-route-list');
   if(vl){
     vl.innerHTML=routes.length
-      ? `<div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:8px;">${routes.map((r,i)=>`<span style="display:inline-flex;align-items:center;gap:4px;padding:5px 12px;background:var(--accent-soft);border:1px solid #C7D2FE;border-radius:50px;font-size:12px;font-weight:500;color:var(--accent);">${r}<button onclick="delVisitRoute(${i})" style="background:none;border:none;cursor:pointer;font-size:12px;color:var(--accent);padding:0;margin-left:3px;line-height:1;">✕</button></span>`).join('')}</div>`
+      ? `<div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:8px;">${routes.map((r,i)=>`<span style="display:inline-flex;align-items:center;gap:4px;padding:5px 12px;background:var(--accent-soft);border:1px solid #C7D2FE;border-radius:50px;font-size:12px;font-weight:500;color:var(--accent);">${r}<button onclick="delVisitRoute(${i})" style="background:none;border:none;cursor:pointer;font-size:12px;color:var(--accent);padding:0;margin-left:3px;">✕</button></span>`).join('')}</div>`
       : '<p class="empty-msg" style="margin-bottom:8px;">등록된 방문경로 없음</p>';
   }
 }
 
 function editProg(i){openModal('prog',i);}
 function delProg(i){const p=getProgs();p.splice(i,1);sl('pb8_progs',p);renderSettings();}
-
 function addVisitRoute(){
   const inp=document.getElementById('new-visit-route');
   const val=(inp?.value||'').trim();
   if(!val){showAlert('방문경로를 입력해 주세요.');return;}
   const routes=gl('pb8_visit_routes')||[];
   if(routes.includes(val)){showAlert('이미 등록된 방문경로입니다.');return;}
-  routes.push(val);
-  sl('pb8_visit_routes',routes);
-  if(inp)inp.value='';
-  renderSettings();
+  routes.push(val);sl('pb8_visit_routes',routes);
+  if(inp)inp.value='';renderSettings();
 }
 function delVisitRoute(i){
   const routes=gl('pb8_visit_routes')||[];
-  routes.splice(i,1);
-  sl('pb8_visit_routes',routes);
-  renderSettings();
+  routes.splice(i,1);sl('pb8_visit_routes',routes);renderSettings();
 }
 
 /* ══ INIT ══ */
@@ -2789,13 +3432,10 @@ function delVisitRoute(i){
   ['pr-to','sg-to','xl-to'].forEach(id=>{const el=document.getElementById(id);if(el)el.value=_today;});
   initDatePickers();
   setInitialModes();
-  // 마지막 활성 탭 복원
-  var _lastTab = 'summary';
-  try{_lastTab=localStorage.getItem('pb8_active_tab')||'summary';}catch(e){}
-  renderTabs(_lastTab);
-  // 해당 탭 활성화
+  // 항상 요약 탭으로 시작 (로그인 후 showTab('summary')로 재설정되지만 초기 렌더는 summary)
+  renderTabs('summary');
   document.querySelectorAll('.sec').forEach(el=>el.classList.remove('active'));
-  var _initSec=document.getElementById('sec-'+_lastTab);
+  var _initSec=document.getElementById('sec-summary');
   if(_initSec)_initSec.classList.add('active');
   renderAll();
   renderIncExp();
@@ -2810,33 +3450,33 @@ function delVisitRoute(i){
 </script>
 
 <script>
-// Firebase Realtime DB - REST API 방식
+// Firebase Realtime DB - REST API 방식 (멀티 테넌트)
 // ════════════════════════════════════════
 (function(){
   var DB_URL = 'https://peakberry-default-rtdb.firebaseio.com';
   var API_KEY = 'AIzaSyC0Zc4seMa9YvG70QUgFuczREPdNoof2cU';
 
+  function getFarmPrefix(){
+    // _currentFarmId가 설정된 경우 농장별 경로 사용
+    return (typeof _currentFarmId !== 'undefined' && _currentFarmId)
+      ? 'farmdata/'+_currentFarmId+'/'
+      : 'farmdata/legacy/';
+  }
+
   function toFbPath(key){
+    var prefix=getFarmPrefix();
     var k=key.replace(/^pb8_/,'');
-    // 환경 데이터
-    if(/^env_(\d{4}-\d{2}-\d{2})$/.test(k)) return 'env/'+k.replace('env_','');
-    // 시세 데이터
-    if(/^price_(\d{4}-\d{2}-\d{2})$/.test(k)) return 'prices/'+k.replace('price_','');
-    // 수입/지출 월단위: pb8_2026_05_retail → data/2026/05/retail
+    if(/^env_(\d{4}-\d{2}-\d{2})$/.test(k)) return prefix+'env/'+k.replace('env_','');
+    if(/^price_(\d{4}-\d{2}-\d{2})$/.test(k)) return prefix+'prices/'+k.replace('price_','');
     if(/^\d{4}_\d{2}_[a-z]+$/.test(k)){
       var parts=k.split('_');
-      return 'data/'+parts[0]+'/'+parts[1]+'/'+parts.slice(2).join('_');
+      return prefix+'data/'+parts[0]+'/'+parts[1]+'/'+parts.slice(2).join('_');
     }
-    // 구형 일단위: pb8_2026_05_01_retail → data/2026/05/01/retail
     if(/^\d{4}_\d{2}_\d{2}_[a-z]+$/.test(k)){
       var parts=k.split('_');
-      return 'data/'+parts[0]+'/'+parts[1]+'/'+parts[2]+'/'+parts.slice(3).join('_');
+      return prefix+'data/'+parts[0]+'/'+parts[1]+'/'+parts[2]+'/'+parts.slice(3).join('_');
     }
-    // 메타 데이터
-    if(/^(loans|progs|inv_in|inv_items|repaid|farmname|farmsub|loan|tab_order|water_zones|visit_routes|active_tab|sum_inc_collapsed|sum_exp_collapsed)$/.test(k))
-      return 'meta/'+k;
-    // 기타 (sum 접기 상태 등)
-    return 'meta/'+k;
+    return prefix+'meta/'+k;
   }
 
   // Firebase REST PUT
@@ -2860,12 +3500,9 @@ function delVisitRoute(i){
     if(!val||val==='null') return;
     try{
       if(path==='data'){
-        // Firebase 경로: data/{year}/{month}/{cat} → localStorage: pb8_{year}_{month}_{cat}
-        // 또는 data/{year}/{month}/{day}/{cat} → pb8_{year}_{month}_{day}_{cat}
         (function walk(obj, depth, parts){
           if(!obj||typeof obj!=='object') return;
           if(Array.isArray(obj)){
-            // 리프 노드: 배열 = 실제 데이터
             var lsKey='pb8_'+parts.join('_');
             localStorage.setItem(lsKey, JSON.stringify(obj));
             return;
@@ -2895,11 +3532,13 @@ function delVisitRoute(i){
     }).catch(function(){ showSyncStatus('error'); });
   };
 
-  // 전체 데이터 로드
+  // 전체 데이터 로드 (농장별 경로)
   window.loadAllFromFirebase = function(){
+    if(typeof _currentFarmId==='undefined'||!_currentFarmId) return Promise.resolve();
+    var prefix=getFarmPrefix();
     showSyncStatus('loading');
     return Promise.all(['data','meta','prices','env'].map(function(p){
-      return fbGet(p).then(function(v){ if(v) restoreToLS(p,v); });
+      return fbGet(prefix+p).then(function(v){ if(v) restoreToLS(p,v); });
     })).then(function(){
       showSyncStatus('ok');
       if(typeof renderAll==='function') renderAll();
@@ -2940,7 +3579,6 @@ function delVisitRoute(i){
     _pa=false;_py=0;
     var el=getPullEl();
     el.style.height='44px';el.textContent='⟳ 동기화 중...';
-    // 현재 활성 탭 기억
     var activeTab=document.querySelector('.tab.active')?.dataset?.tab||localStorage.getItem('pb8_active_tab')||'summary';
     window.loadAllFromFirebase().then(function(){
       el.textContent='✓ 동기화 완료';
@@ -2952,19 +3590,16 @@ function delVisitRoute(i){
     });
   },{passive:true});
 
-  // 앱 시작 시 로드
-  setTimeout(function(){ window.loadAllFromFirebase(); }, 500);
-
-  // 30초마다 Firebase 체크 (다른 기기 변경사항 반영)
+  // 30초마다 Firebase 체크
   setInterval(function(){
-    if(document.visibilityState==='visible'){
+    if(document.visibilityState==='visible' && typeof _currentFarmId!=='undefined' && _currentFarmId){
       window.loadAllFromFirebase();
     }
   }, 30000);
 
   // 앱 포커스 시 즉시 동기화
   document.addEventListener('visibilitychange', function(){
-    if(document.visibilityState==='visible'){
+    if(document.visibilityState==='visible' && typeof _currentFarmId!=='undefined' && _currentFarmId){
       window.loadAllFromFirebase();
     }
   });
