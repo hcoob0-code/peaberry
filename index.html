@@ -980,12 +980,12 @@ function authFbPut(path, val){
     mode:'cors',
     body:JSON.stringify(val)
   }).then(function(r){ if(!r.ok) return null; return r.json(); })
-    .catch(function(e){ console.warn('authFbPut err:',e); return null; });
+    .catch(function(){ return null; });
 }
 function authFbDelete(path){
   return fetch(DB_URL_AUTH+'/'+path+'.json',{
     method:'DELETE'
-  }).catch(function(e){ console.warn('authFbDelete err:',e); });
+  }).catch(function(){ });
 }
 
 function showAuthView(view){
@@ -1111,12 +1111,12 @@ function doRegister(){
   authFbGet('farms/'+farmId).then(function(existing){
     if(existing){err.textContent='이미 사용 중인 농장명입니다. 다른 이름을 사용해 주세요.';return;}
     authFbPut('farms/'+farmId, farmData).then(function(res){
-      if(!res){ console.warn('Firebase PUT failed, entering app with local storage only'); }
+
       enterApp();
     }).catch(function(){ enterApp(); });
   }).catch(function(){
     // 네트워크 오류 → 로컬에만 저장하고 앱 진입
-    console.warn('Firebase GET failed, registering locally only');
+
     enterApp();
   });
 }
@@ -3522,7 +3522,7 @@ function delVisitRoute(i){
       } else if(path==='env'){
         Object.keys(val).forEach(function(d){ localStorage.setItem('pb8_env_'+d, JSON.stringify(val[d])); });
       }
-    } catch(e){ console.warn('restoreToLS:',e); }
+    } catch(e){ }
   }
 
   // sl() 후킹: localStorage + Firebase
@@ -3548,7 +3548,7 @@ function delVisitRoute(i){
       if(typeof renderLoanList==='function') renderLoanList();
       if(typeof renderSettings==='function') renderSettings();
     }).catch(function(e){
-      console.warn('loadAll err:',e);
+
       showSyncStatus('error');
     });
   };
