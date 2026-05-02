@@ -465,7 +465,7 @@ canvas { max-width: 100%; }
     <!-- 로그인 뷰 -->
     <div class="auth-view active" id="auth-login-view">
       <label class="auth-label">농장명</label>
-      <input class="auth-input" type="text" id="auth-farm-id" placeholder="예) peakberry" autocomplete="off" autocapitalize="none" spellcheck="false">
+      <input class="auth-input" type="text" id="auth-farm-id" placeholder="예) peakberry" autocomplete="off" autocapitalize="none" spellcheck="false" oninput="localStorage.setItem('pb8_saved_farm_id',this.value)">
       <label class="auth-label">접속 코드</label>
       <input class="auth-input" type="tel" id="auth-code" placeholder="숫자 6자리" maxlength="6" pattern="[0-9]*" inputmode="numeric">
       <label class="auth-check-row">
@@ -728,10 +728,10 @@ canvas { max-width: 100%; }
 
 <!-- ══ 육묘 탭 ══ -->
 <div class="sec" id="sec-seedling-tab">
-  <!-- 환경 기록 -->
-  <div class="sec-label">환경</div>
+  <!-- 조도 기록 -->
+  <div class="sec-label">조도</div>
   <div class="nm-flat" style="padding:14px 16px;margin-bottom:10px;">
-            <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px;padding-bottom:10px;border-bottom:1px solid var(--border);">
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px;padding-bottom:10px;border-bottom:1px solid var(--border);">
       <div>
         <div style="font-size:10px;font-weight:600;color:var(--text-secondary);margin-bottom:4px;">날짜</div>
         <input type="date" id="sl-date" style="width:100%;padding:8px 6px;font-size:11px;font-family:'Noto Sans KR',sans-serif;background:var(--bg);border:1px solid var(--border);border-radius:var(--radius-md);color:var(--text-primary);box-sizing:border-box;min-height:40px;appearance:none;-webkit-appearance:none;">
@@ -743,21 +743,94 @@ canvas { max-width: 100%; }
           <button onclick="document.getElementById('sl-time').value=getNowTime()" style="padding:0 8px;font-size:10px;font-weight:600;font-family:'Noto Sans KR',sans-serif;color:var(--accent);background:var(--accent-soft);border:1px solid #C7D2FE;border-radius:var(--radius-md);cursor:pointer;white-space:nowrap;min-height:40px;flex-shrink:0;">현재시간</button>
         </div>
       </div>
-    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:10px;">
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:10px;" id="sunlight-records">
       <div>
-        <div style="font-size:10px;font-weight:600;color:var(--text-secondary);margin-bottom:4px;">조도(fc)</div>
-        <input type="number" id="sl-sunlight" placeholder="4200" style="width:100%;padding:9px 8px;font-size:12px;font-family:'Noto Sans KR',sans-serif;background:var(--bg);border:1px solid var(--border);border-radius:var(--radius-md);color:var(--text-primary);">
+        <div style="font-size:10px;font-weight:600;color:var(--text-secondary);margin-bottom:4px;">1구역 (fc)</div>
+        <input type="number" id="sl-sunlight-1" placeholder="0" style="width:100%;padding:9px 8px;font-size:12px;font-family:'Noto Sans KR',sans-serif;background:var(--bg);border:1px solid var(--border);border-radius:var(--radius-md);color:var(--text-primary);">
       </div>
       <div>
-        <div style="font-size:10px;font-weight:600;color:var(--text-secondary);margin-bottom:4px;">온도(°C)</div>
-        <input type="number" id="sl-temp" placeholder="22" step="0.1" style="width:100%;padding:9px 8px;font-size:12px;font-family:'Noto Sans KR',sans-serif;background:var(--bg);border:1px solid var(--border);border-radius:var(--radius-md);color:var(--text-primary);">
+        <div style="font-size:10px;font-weight:600;color:var(--text-secondary);margin-bottom:4px;">2구역 (fc)</div>
+        <input type="number" id="sl-sunlight-2" placeholder="0" style="width:100%;padding:9px 8px;font-size:12px;font-family:'Noto Sans KR',sans-serif;background:var(--bg);border:1px solid var(--border);border-radius:var(--radius-md);color:var(--text-primary);">
       </div>
       <div>
-        <div style="font-size:10px;font-weight:600;color:var(--text-secondary);margin-bottom:4px;">습도(%)</div>
-        <input type="number" id="sl-humidity" placeholder="65" min="0" max="100" style="width:100%;padding:9px 8px;font-size:12px;font-family:'Noto Sans KR',sans-serif;background:var(--bg);border:1px solid var(--border);border-radius:var(--radius-md);color:var(--text-primary);">
+        <div style="font-size:10px;font-weight:600;color:var(--text-secondary);margin-bottom:4px;">3구역 (fc)</div>
+        <input type="number" id="sl-sunlight-3" placeholder="0" style="width:100%;padding:9px 8px;font-size:12px;font-family:'Noto Sans KR',sans-serif;background:var(--bg);border:1px solid var(--border);border-radius:var(--radius-md);color:var(--text-primary);">
       </div>
     </div>
-    <button onclick="saveEnvSection()" style="width:100%;margin-top:10px;padding:11px;font-size:13px;font-family:'Noto Sans KR',sans-serif;font-weight:600;background:var(--text-primary);color:white;border:none;border-radius:var(--radius-md);cursor:pointer;">저장</button>
+    <!-- 하위 호환용 숨김 필드 -->
+    <input type="hidden" id="sl-sunlight">
+    <button onclick="saveSunlightSection()" style="width:100%;margin-top:4px;padding:11px;font-size:13px;font-family:'Noto Sans KR',sans-serif;font-weight:600;background:var(--text-primary);color:white;border:none;border-radius:var(--radius-md);cursor:pointer;">저장</button>
+  </div>
+
+  <!-- 온도 기록 -->
+  <div class="sec-label">온도</div>
+  <div class="nm-flat" style="padding:14px 16px;margin-bottom:10px;">
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px;padding-bottom:10px;border-bottom:1px solid var(--border);">
+      <div>
+        <div style="font-size:10px;font-weight:600;color:var(--text-secondary);margin-bottom:4px;">날짜</div>
+        <input type="date" id="sl-temp-date" style="width:100%;padding:8px 6px;font-size:11px;font-family:'Noto Sans KR',sans-serif;background:var(--bg);border:1px solid var(--border);border-radius:var(--radius-md);color:var(--text-primary);box-sizing:border-box;min-height:40px;appearance:none;-webkit-appearance:none;">
+      </div>
+      <div>
+        <div style="font-size:10px;font-weight:600;color:var(--text-secondary);margin-bottom:4px;">시간</div>
+        <div style="display:flex;gap:4px;">
+          <input type="time" id="sl-temp-time" style="flex:1;padding:8px 6px;font-size:11px;font-family:'Noto Sans KR',sans-serif;background:var(--bg);border:1px solid var(--border);border-radius:var(--radius-md);color:var(--text-primary);min-height:40px;appearance:none;-webkit-appearance:none;">
+          <button onclick="document.getElementById('sl-temp-time').value=getNowTime()" style="padding:0 8px;font-size:10px;font-weight:600;font-family:'Noto Sans KR',sans-serif;color:var(--accent);background:var(--accent-soft);border:1px solid #C7D2FE;border-radius:var(--radius-md);cursor:pointer;white-space:nowrap;min-height:40px;flex-shrink:0;">현재시간</button>
+        </div>
+      </div>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:10px;">
+      <div>
+        <div style="font-size:10px;font-weight:600;color:var(--text-secondary);margin-bottom:4px;">1구역 (°C)</div>
+        <input type="number" id="sl-temp-1" placeholder="0" step="0.1" style="width:100%;padding:9px 8px;font-size:12px;font-family:'Noto Sans KR',sans-serif;background:var(--bg);border:1px solid var(--border);border-radius:var(--radius-md);color:var(--text-primary);">
+      </div>
+      <div>
+        <div style="font-size:10px;font-weight:600;color:var(--text-secondary);margin-bottom:4px;">2구역 (°C)</div>
+        <input type="number" id="sl-temp-2" placeholder="0" step="0.1" style="width:100%;padding:9px 8px;font-size:12px;font-family:'Noto Sans KR',sans-serif;background:var(--bg);border:1px solid var(--border);border-radius:var(--radius-md);color:var(--text-primary);">
+      </div>
+      <div>
+        <div style="font-size:10px;font-weight:600;color:var(--text-secondary);margin-bottom:4px;">3구역 (°C)</div>
+        <input type="number" id="sl-temp-3" placeholder="0" step="0.1" style="width:100%;padding:9px 8px;font-size:12px;font-family:'Noto Sans KR',sans-serif;background:var(--bg);border:1px solid var(--border);border-radius:var(--radius-md);color:var(--text-primary);">
+      </div>
+    </div>
+    <!-- 하위 호환용 숨김 필드 -->
+    <input type="hidden" id="sl-temp">
+    <button onclick="saveTempSection()" style="width:100%;margin-top:4px;padding:11px;font-size:13px;font-family:'Noto Sans KR',sans-serif;font-weight:600;background:var(--text-primary);color:white;border:none;border-radius:var(--radius-md);cursor:pointer;">저장</button>
+  </div>
+
+  <!-- 습도 기록 -->
+  <div class="sec-label">습도</div>
+  <div class="nm-flat" style="padding:14px 16px;margin-bottom:10px;">
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px;padding-bottom:10px;border-bottom:1px solid var(--border);">
+      <div>
+        <div style="font-size:10px;font-weight:600;color:var(--text-secondary);margin-bottom:4px;">날짜</div>
+        <input type="date" id="sl-hum-date" style="width:100%;padding:8px 6px;font-size:11px;font-family:'Noto Sans KR',sans-serif;background:var(--bg);border:1px solid var(--border);border-radius:var(--radius-md);color:var(--text-primary);box-sizing:border-box;min-height:40px;appearance:none;-webkit-appearance:none;">
+      </div>
+      <div>
+        <div style="font-size:10px;font-weight:600;color:var(--text-secondary);margin-bottom:4px;">시간</div>
+        <div style="display:flex;gap:4px;">
+          <input type="time" id="sl-hum-time" style="flex:1;padding:8px 6px;font-size:11px;font-family:'Noto Sans KR',sans-serif;background:var(--bg);border:1px solid var(--border);border-radius:var(--radius-md);color:var(--text-primary);min-height:40px;appearance:none;-webkit-appearance:none;">
+          <button onclick="document.getElementById('sl-hum-time').value=getNowTime()" style="padding:0 8px;font-size:10px;font-weight:600;font-family:'Noto Sans KR',sans-serif;color:var(--accent);background:var(--accent-soft);border:1px solid #C7D2FE;border-radius:var(--radius-md);cursor:pointer;white-space:nowrap;min-height:40px;flex-shrink:0;">현재시간</button>
+        </div>
+      </div>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:10px;">
+      <div>
+        <div style="font-size:10px;font-weight:600;color:var(--text-secondary);margin-bottom:4px;">1구역 (%)</div>
+        <input type="number" id="sl-humidity-1" placeholder="0" min="0" max="100" style="width:100%;padding:9px 8px;font-size:12px;font-family:'Noto Sans KR',sans-serif;background:var(--bg);border:1px solid var(--border);border-radius:var(--radius-md);color:var(--text-primary);">
+      </div>
+      <div>
+        <div style="font-size:10px;font-weight:600;color:var(--text-secondary);margin-bottom:4px;">2구역 (%)</div>
+        <input type="number" id="sl-humidity-2" placeholder="0" min="0" max="100" style="width:100%;padding:9px 8px;font-size:12px;font-family:'Noto Sans KR',sans-serif;background:var(--bg);border:1px solid var(--border);border-radius:var(--radius-md);color:var(--text-primary);">
+      </div>
+      <div>
+        <div style="font-size:10px;font-weight:600;color:var(--text-secondary);margin-bottom:4px;">3구역 (%)</div>
+        <input type="number" id="sl-humidity-3" placeholder="0" min="0" max="100" style="width:100%;padding:9px 8px;font-size:12px;font-family:'Noto Sans KR',sans-serif;background:var(--bg);border:1px solid var(--border);border-radius:var(--radius-md);color:var(--text-primary);">
+      </div>
+    </div>
+    <!-- 하위 호환용 숨김 필드 -->
+    <input type="hidden" id="sl-humidity">
+    <button onclick="saveHumiditySection()" style="width:100%;margin-top:4px;padding:11px;font-size:13px;font-family:'Noto Sans KR',sans-serif;font-weight:600;background:var(--text-primary);color:white;border:none;border-radius:var(--radius-md);cursor:pointer;">저장</button>
   </div>
 
   <!-- 물 사용 기록 -->
@@ -1318,7 +1391,12 @@ document.getElementById('auth-farm-id').addEventListener('keydown',function(e){i
 (function(){
   var autoLoggedIn = checkAutoLogin();
   if(!autoLoggedIn){
-    // auth screen 보여주기 (이미 기본이 표시 상태)
+    // 저장된 농장명 자동 채우기
+    var savedFarmId = localStorage.getItem('pb8_saved_farm_id');
+    if(savedFarmId){
+      var farmInput = document.getElementById('auth-farm-id');
+      if(farmInput) farmInput.value = savedFarmId;
+    }
   }
 })();
 
@@ -1792,7 +1870,7 @@ function openModal(cat,idx=-1){
 
   if(cat==='retail'){
     fields.innerHTML=`
-      <div class="fg"><label class="req">날짜</label><input type="date" id="f-date" value="${e.date||todayStr}"></div>
+      <div class="fg"><label class="req">날짜</label><input type="date" id="f-date" value="${e.date||todayStr}" onchange="autoFillPriceFromDate(this.value)"></div>
       <div class="fr">
         <div class="fg"><label class="req">중량 (kg)</label><input type="number" id="f-kg" placeholder="0" value="${e.kg||''}"></div>
         <div class="fg"><label class="req">수량</label><input type="number" id="f-qty" placeholder="0" value="${e.qty||''}"></div>
@@ -1809,7 +1887,7 @@ function openModal(cat,idx=-1){
       </div>`).join('');
     fields.innerHTML=`
       <button class="sms-trigger-btn" type="button" onclick="openSMSModal()">📱 문자 내역 붙여넣기로 자동입력</button>
-      <div class="fg"><label class="req">날짜</label><input type="date" id="f-date" value="${e.date||todayStr}"></div>
+      <div class="fg"><label class="req">날짜</label><input type="date" id="f-date" value="${e.date||todayStr}" onchange="autoFillPriceFromDate(this.value)"></div>
       <div class="fr" style="grid-template-columns:2fr 1fr;">
         <div class="fg" style="margin-bottom:0;"><label class="req">출하처</label><input type="text" id="f-source" placeholder="예: 창원청과시장" value="${e.source||''}"></div>
         <div class="fg" style="margin-bottom:0;"><label class="req">중량(kg)</label><input type="number" id="f-kg-common" placeholder="3.5" value="${e.wsItems?.[0]?.kg||e.kg1||''}" oninput="syncAllKg()"></div>
@@ -1848,6 +1926,8 @@ function openModal(cat,idx=-1){
       }
     }
     calcWsTotal();
+    // 신규 추가 시 날짜에 해당하는 저장된 시세 자동 채우기 (기존 데이터가 없는 경우만)
+    if(idx<0) autoFillPriceFromDate(document.getElementById('f-date')?.value);
     } else if(cat==='group'||cat==='personal'){
     const progs=getProgs();
     const pOpts='<option value="__custom__">직접 입력...</option>'+progs.map(p=>`<option value="${p.name}">${p.name} (${(+p.price).toLocaleString()}원)</option>`).join('');
@@ -1869,7 +1949,7 @@ function openModal(cat,idx=-1){
         <div class="fg"><label class="req">단가</label><input type="number" id="f-pprice-${i}" value="${it.price||0}"></div></div>
       </div>`).join('');
     fields.innerHTML=`
-      <div class="fg"><label class="req">날짜</label><input type="date" id="f-date" value="${e.date||todayStr}"></div>
+      <div class="fg"><label class="req">날짜</label><input type="date" id="f-date" value="${e.date||todayStr}" onchange="autoFillPriceFromDate(this.value)"></div>
       ${cat==='group'?`<div class="fg"><label class="req">단체명</label><input type="text" id="f-org" placeholder="단체명" value="${e.orgName||''}"></div>`:''}
       ${cat==='personal'?`<div class="fg"><label>방문경로</label><select id="f-visit-route" style="width:100%;padding:12px 14px;font-size:14px;font-family:'Noto Sans KR',sans-serif;background:var(--bg);border:1px solid var(--border);border-radius:var(--radius-md);appearance:none;-webkit-appearance:none;">${vOpts}</select></div>`:''}
       <div id="pi-wrap">${piHtml}</div>
@@ -1880,14 +1960,14 @@ function openModal(cat,idx=-1){
     });
   } else if(cat==='seedling'){
     fields.innerHTML=`
-      <div class="fg"><label class="req">날짜</label><input type="date" id="f-date" value="${e.date||todayStr}"></div>
+      <div class="fg"><label class="req">날짜</label><input type="date" id="f-date" value="${e.date||todayStr}" onchange="autoFillPriceFromDate(this.value)"></div>
       <div class="fr"><div class="fg"><label class="req">수량</label><input type="number" id="f-qty" placeholder="0" value="${e.qty||''}"></div>
       <div class="fg"><label class="req">단가 (원)</label><input type="number" id="f-price" placeholder="0" value="${e.price||''}"></div></div>
       <div class="fg"><label>메모(선택사항)</label><textarea id="f-note" placeholder="메모(선택사항)">${e.note||''}</textarea></div>`;
   } else if(cat==='labor'){
     // 시급 제거 - 일당/건별만
     fields.innerHTML=`
-      <div class="fg"><label class="req">날짜</label><input type="date" id="f-date" value="${e.date||todayStr}"></div>
+      <div class="fg"><label class="req">날짜</label><input type="date" id="f-date" value="${e.date||todayStr}" onchange="autoFillPriceFromDate(this.value)"></div>
       <div class="fr">
         <div class="fg"><label class="req">인력 유형</label><select id="f-ltype"><option value="일용직" ${e.laborType==='일용직'?'selected':''}>일용직</option><option value="파트타임" ${e.laborType==='파트타임'?'selected':''}>파트타임</option><option value="고정직" ${e.laborType==='고정직'?'selected':''}>고정직</option><option value="기타" ${e.laborType==='기타'?'selected':''}>기타</option></select></div>
         <div class="fg"><label class="req">인원 수</label><input type="number" id="f-count" value="${e.count||1}" min="1"></div>
@@ -1896,7 +1976,7 @@ function openModal(cat,idx=-1){
       <div class="fg"><label>메모(선택사항)</label><textarea id="f-note" placeholder="메모(선택사항)">${e.note||''}</textarea></div>`;
   } else if(cat==='electric'||cat==='fertilizer'||cat==='parts'||cat==='repair'||cat==='seedbuy'){
     fields.innerHTML=`
-      <div class="fg"><label class="req">날짜</label><input type="date" id="f-date" value="${e.date||todayStr}"></div>
+      <div class="fg"><label class="req">날짜</label><input type="date" id="f-date" value="${e.date||todayStr}" onchange="autoFillPriceFromDate(this.value)"></div>
       <div class="fg"><label class="req">항목명</label><input type="text" id="f-name" placeholder="항목명" value="${e.name||''}"></div>
       <div class="fg"><label class="req">금액 (원)</label><input type="number" id="f-amount" placeholder="0" value="${e.amount||''}"></div>
       <div class="fg"><label>메모(선택사항)</label><textarea id="f-note" placeholder="메모(선택사항)">${e.note||''}</textarea></div>`;
@@ -1909,7 +1989,7 @@ function openModal(cat,idx=-1){
     const items=getInvItems();
     const iOpts=items.map(i=>`<option value="${i.name}">${i.name}</option>`).join('');
     fields.innerHTML=`
-      <div class="fg"><label class="req">날짜</label><input type="date" id="f-date" value="${e.date||todayStr}"></div>
+      <div class="fg"><label class="req">날짜</label><input type="date" id="f-date" value="${e.date||todayStr}" onchange="autoFillPriceFromDate(this.value)"></div>
       <div class="fg"><label class="req">항목</label><select id="f-invitem">${iOpts}</select></div>
       <div class="fr"><div class="fg"><label class="req">수량</label><input type="number" id="f-qty" value="${e.qty||''}"></div>
       <div class="fg"><label class="req">단위</label><input type="text" id="f-unit" value="${e.unit||''}"></div></div>
@@ -1958,6 +2038,21 @@ function calcWsTotal(){
   const tsEl=document.getElementById('f-totalSales');
   if(tsEl&&sum>0)tsEl.value=Math.round(sum);
   calcFee();
+}
+
+// 도매 모달: 날짜 선택 시 해당 날짜 저장된 시세 자동 채우기
+function autoFillPriceFromDate(dateStr){
+  if(!dateStr) return;
+  const priceData = gl('pb8_price_'+dateStr)||{};
+  let filled = false;
+  for(let k=1;k<=5;k++){
+    const prEl=document.getElementById('f-price'+k);
+    if(prEl && !prEl.value && priceData[k]){
+      prEl.value = priceData[k];
+      filled = true;
+    }
+  }
+  if(filled) calcWsTotal();
 }
 
 function calcFee(){
@@ -2040,7 +2135,7 @@ function saveEntry(){
     if(dateStr){
       const existing=gl('pb8_price_'+dateStr)||{};
       let updated=false;
-      wsItems.forEach((it,i)=>{if(it.price>0){existing[i+1]=it.price;updated=true;}});
+      wsItems.forEach((it,i)=>{if(it.cnt>0&&it.price>0){existing[i+1]=it.price;updated=true;}});
       if(updated) sl('pb8_price_'+dateStr, existing);
     }
   } else if(cat==='group'||cat==='personal'){
@@ -2860,15 +2955,15 @@ function renderSeedlingTab() {
   const nowDate=getNowDate();
 
   // 날짜는 오늘 날짜로, 시간은 항상 빈칸
-  ['sl-date','sl-water-date'].forEach(id=>{
+  ['sl-date','sl-water-date','sl-temp-date','sl-hum-date'].forEach(id=>{
     const el=document.getElementById(id);if(el)el.value=nowDate;
   });
-  ['sl-time','sl-water-time'].forEach(id=>{
+  ['sl-time','sl-water-time','sl-temp-time','sl-hum-time'].forEach(id=>{
     const el=document.getElementById(id);if(el)el.value='';
   });
 
-  // 조도/온도/습도 항상 0으로 초기화
-  ['sl-sunlight','sl-temp','sl-humidity'].forEach(id=>{
+  // 구역별 조도/온도/습도 초기화
+  ['sl-sunlight-1','sl-sunlight-2','sl-sunlight-3','sl-temp-1','sl-temp-2','sl-temp-3','sl-humidity-1','sl-humidity-2','sl-humidity-3'].forEach(id=>{
     const el=document.getElementById(id);if(el)el.value='';
   });
 
@@ -2986,22 +3081,62 @@ function renderRecentFeedbacks(){
     : '';
 }
 
-// 환경 저장 버튼
-function saveEnvSection(){
+// 조도 저장 버튼
+function saveSunlightSection(){
   const _sd=document.getElementById('sl-date')?.value||getNowDate();
   const _st=document.getElementById('sl-time')?.value||getNowTime();
-  const sl_v=document.getElementById('sl-sunlight')?.value||'';
-  const temp_v=document.getElementById('sl-temp')?.value||'';
-  const hum_v=document.getElementById('sl-humidity')?.value||'';
-  if(!sl_v&&!temp_v&&!hum_v){showAlert('데이터를 모두 입력해 주세요.');return;}
+  const z1=document.getElementById('sl-sunlight-1')?.value||'';
+  const z2=document.getElementById('sl-sunlight-2')?.value||'';
+  const z3=document.getElementById('sl-sunlight-3')?.value||'';
+  if(!z1&&!z2&&!z3){showAlert('최소 한 구역의 조도를 입력해 주세요.');return;}
   const dateStr=_sd;
   const env=getEnvData(dateStr);
-  env.sunlight=sl_v; env.temp=temp_v; env.humidity=hum_v; env.time=_st;
+  env.sunlight=z1||env.sunlight;  // 1구역 기본값 (그래프 하위 호환)
+  env.sunlightZones={z1,z2,z3};
+  env.time=_st;
   sl('pb8_env_'+dateStr, env);
-  showSaveToast('✓ 환경 데이터가 저장되었습니다');
-  // 초기화
-  ['sl-sunlight','sl-temp','sl-humidity'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
+  showSaveToast('✓ 조도 데이터가 저장되었습니다');
+  ['sl-sunlight-1','sl-sunlight-2','sl-sunlight-3'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
 }
+
+// 온도 저장 버튼
+function saveTempSection(){
+  const _sd=document.getElementById('sl-temp-date')?.value||getNowDate();
+  const _st=document.getElementById('sl-temp-time')?.value||getNowTime();
+  const z1=document.getElementById('sl-temp-1')?.value||'';
+  const z2=document.getElementById('sl-temp-2')?.value||'';
+  const z3=document.getElementById('sl-temp-3')?.value||'';
+  if(!z1&&!z2&&!z3){showAlert('최소 한 구역의 온도를 입력해 주세요.');return;}
+  const dateStr=_sd;
+  const env=getEnvData(dateStr);
+  env.temp=z1||env.temp;  // 1구역 기본값 (그래프 하위 호환)
+  env.tempZones={z1,z2,z3};
+  env.time=_st;
+  sl('pb8_env_'+dateStr, env);
+  showSaveToast('✓ 온도 데이터가 저장되었습니다');
+  ['sl-temp-1','sl-temp-2','sl-temp-3'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
+}
+
+// 습도 저장 버튼
+function saveHumiditySection(){
+  const _sd=document.getElementById('sl-hum-date')?.value||getNowDate();
+  const _st=document.getElementById('sl-hum-time')?.value||getNowTime();
+  const z1=document.getElementById('sl-humidity-1')?.value||'';
+  const z2=document.getElementById('sl-humidity-2')?.value||'';
+  const z3=document.getElementById('sl-humidity-3')?.value||'';
+  if(!z1&&!z2&&!z3){showAlert('최소 한 구역의 습도를 입력해 주세요.');return;}
+  const dateStr=_sd;
+  const env=getEnvData(dateStr);
+  env.humidity=z1||env.humidity;  // 1구역 기본값 (그래프 하위 호환)
+  env.humidityZones={z1,z2,z3};
+  env.time=_st;
+  sl('pb8_env_'+dateStr, env);
+  showSaveToast('✓ 습도 데이터가 저장되었습니다');
+  ['sl-humidity-1','sl-humidity-2','sl-humidity-3'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
+}
+
+// 하위 호환용 (기존 saveEnvSection 호출 코드 대비)
+function saveEnvSection(){ saveSunlightSection(); }
 
 // 물 저장 버튼
 function saveWaterSection(){
