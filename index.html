@@ -5,8 +5,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
-<link rel="icon" id="dynamic-favicon" href="">
-<link rel="apple-touch-icon" id="dynamic-apple-icon" href="">
+<link rel="icon" id="dynamic-favicon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='22' fill='%23111827'/%3E%3Ctext y='78' font-size='64' x='50' text-anchor='middle'%3E🌱%3C/text%3E%3C/svg%3E">
+<link rel="apple-touch-icon" id="dynamic-apple-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='22' fill='%23111827'/%3E%3Ctext y='78' font-size='64' x='50' text-anchor='middle'%3E🌱%3C/text%3E%3C/svg%3E">
 <title>피크베리 농장</title>
 <script>
 window.showAuthView=function(view){
@@ -481,6 +481,7 @@ canvas { max-width: 100%; }
   border-top: 1px solid #F3F4F6; margin-top: 8px; padding-top: 12px;
 }
 .icon-choice-row { display:grid; grid-template-columns:repeat(6,1fr); gap:6px; margin-bottom:12px; }
+#farm-new-code-input::placeholder { font-size:12px; font-weight:400; letter-spacing:0; }
 .icon-choice-btn { padding:8px 0; border-radius:10px; border:1px solid var(--border); background:var(--bg); font-size:18px; cursor:pointer; font-family:'Noto Sans KR',sans-serif; }
 .icon-choice-btn.active { background:var(--text-primary); color:white; border-color:var(--text-primary); }
 
@@ -635,15 +636,14 @@ canvas { max-width: 100%; }
 <!-- HEADER -->
 <div class="hdr">
   <div class="hdr-main">
-    <div class="hdr-app-icon" id="hdr-app-icon" onclick="openAccountModal()">🍓</div>
     <div>
       <div class="hdr-title" id="farm-title" onclick="openAccountModal()">피크베리 농장</div>
       <div class="hdr-sub" id="farm-sub">수입·지출 관리</div>
     </div>
   </div>
-  <div style="text-align:right;line-height:1.4;flex-shrink:0;">
+  <div style="text-align:right;line-height:1.2;flex-shrink:0;">
     <div style="font-size:6pt;color:var(--text-tertiary);opacity:0.3;">Version 1.1.0 - 20260501</div>
-    <div id="sync-status-local" style="font-size:7px;font-family:'Noto Sans KR',sans-serif;font-weight:600;color:var(--text-tertiary);margin-top:1px;transition:color 0.3s;">로컬 저장됨</div>
+    <div id="sync-status-local" style="font-size:7px;font-family:'Noto Sans KR',sans-serif;font-weight:600;color:var(--text-tertiary);transition:color 0.3s;">로컬 저장됨</div>
     <div id="sync-status-remote" style="font-size:7px;font-family:'Noto Sans KR',sans-serif;font-weight:600;color:var(--text-tertiary);transition:color 0.3s;">클라우드 대기</div>
   </div>
 </div>
@@ -817,7 +817,7 @@ canvas { max-width: 100%; }
       <div id="ecowitt-status" style="font-size:10px;color:var(--text-tertiary);margin-bottom:6px;min-height:12px;"></div>
       <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;">
         <div>
-          <div style="font-size:10px;font-weight:600;color:var(--text-secondary);margin-bottom:4px;">조도 (fc) <span style="color:var(--red);">*</span></div>
+          <div style="font-size:10px;font-weight:600;color:var(--text-secondary);margin-bottom:4px;">조도 (lux) <span style="color:var(--red);">*</span></div>
           <input type="number" id="sl-sunlight" placeholder="0" step="0.1" style="width:100%;padding:9px 8px;font-size:12px;font-family:'Noto Sans KR',sans-serif;background:var(--bg);border:1px solid var(--border);border-radius:var(--radius-md);color:var(--text-primary);">
         </div>
         <div>
@@ -913,11 +913,11 @@ canvas { max-width: 100%; }
     </div>
     <div class="settings-acc-body" id="acc-body-route">
       <div class="nm-flat" style="padding:12px 14px;margin-bottom:4px;">
-        <div id="visit-route-list"></div>
-        <div style="display:flex;gap:6px;margin-top:7px;">
+        <div style="display:flex;gap:6px;margin-bottom:10px;">
           <input type="text" id="new-visit-route" placeholder="새 체험 경로" style="flex:1;padding:7px 10px;font-size:12px;font-family:'Noto Sans KR',sans-serif;background:var(--bg);border:1px solid var(--border);border-radius:999px;color:var(--text-primary);">
           <button onclick="addVisitRoute()" style="padding:7px 12px;font-size:11px;font-family:'Noto Sans KR',sans-serif;font-weight:600;background:#F3F4F6;color:var(--text-secondary);border:1px solid var(--border);border-radius:999px;cursor:pointer;">추가</button>
         </div>
+        <div id="visit-route-list"></div>
       </div>
     </div>
   </div>
@@ -970,7 +970,7 @@ canvas { max-width: 100%; }
             <select id="eco-map-indoor-temp" style="width:100%;padding:6px 8px;font-size:11px;font-family:'Noto Sans KR',sans-serif;background:white;border:1px solid var(--border);border-radius:var(--radius-sm);color:var(--text-primary);appearance:none;-webkit-appearance:none;text-align:center;text-align-last:center;" onchange="ecoMapColor(this)">
               <option value="">미사용</option>
               <option value="temp">→ 온도 (°C)</option>
-              <option value="sunlight">→ 조도 (fc)</option>
+              <option value="sunlight">→ 조도 (lux)</option>
               <option value="humidity">→ 습도 (%)</option>
             </select>
           </div>
@@ -983,7 +983,7 @@ canvas { max-width: 100%; }
               <option value="">미사용</option>
               <option value="humidity">→ 습도 (%)</option>
               <option value="temp">→ 온도 (°C)</option>
-              <option value="sunlight">→ 조도 (fc)</option>
+              <option value="sunlight">→ 조도 (lux)</option>
             </select>
           </div>
           <!-- outdoor temp/humi -->
@@ -995,7 +995,7 @@ canvas { max-width: 100%; }
             <select id="eco-map-outdoor-temp" style="width:100%;padding:6px 8px;font-size:11px;font-family:'Noto Sans KR',sans-serif;background:white;border:1px solid var(--border);border-radius:var(--radius-sm);color:var(--text-primary);appearance:none;-webkit-appearance:none;text-align:center;text-align-last:center;" onchange="ecoMapColor(this)">
               <option value="">미사용</option>
               <option value="temp" selected>→ 온도 (°C)</option>
-              <option value="sunlight">→ 조도 (fc)</option>
+              <option value="sunlight">→ 조도 (lux)</option>
               <option value="humidity">→ 습도 (%)</option>
             </select>
           </div>
@@ -1008,18 +1008,18 @@ canvas { max-width: 100%; }
               <option value="">미사용</option>
               <option value="humidity" selected>→ 습도 (%)</option>
               <option value="temp">→ 온도 (°C)</option>
-              <option value="sunlight">→ 조도 (fc)</option>
+              <option value="sunlight">→ 조도 (lux)</option>
             </select>
           </div>
           <!-- Solar -->
           <div style="display:grid;grid-template-columns:1fr 1fr;gap:0;align-items:center;padding:9px 10px;border-bottom:1px solid var(--border-light);background:white;">
             <div>
               <div style="font-size:11px;font-weight:600;color:var(--text-primary);">Solar 일사량</div>
-              <div style="font-size:9px;color:var(--text-tertiary);">solar_and_uvi · solar (W/m² → fc)</div>
+              <div style="font-size:9px;color:var(--text-tertiary);">solar_and_uvi · solar (W/m² → lux)</div>
             </div>
             <select id="eco-map-solar" style="width:100%;padding:6px 8px;font-size:11px;font-family:'Noto Sans KR',sans-serif;background:white;border:1px solid var(--border);border-radius:var(--radius-sm);color:var(--text-primary);appearance:none;-webkit-appearance:none;text-align:center;text-align-last:center;" onchange="ecoMapColor(this)">
               <option value="">미사용</option>
-              <option value="sunlight" selected>→ 조도 (fc)</option>
+              <option value="sunlight" selected>→ 조도 (lux)</option>
               <option value="temp">→ 온도 (°C)</option>
               <option value="humidity">→ 습도 (%)</option>
             </select>
@@ -1032,7 +1032,7 @@ canvas { max-width: 100%; }
             </div>
             <select id="eco-map-uvi" style="width:100%;padding:6px 8px;font-size:11px;font-family:'Noto Sans KR',sans-serif;background:white;border:1px solid var(--border);border-radius:var(--radius-sm);color:var(--text-primary);appearance:none;-webkit-appearance:none;text-align:center;text-align-last:center;" onchange="ecoMapColor(this)">
               <option value="" selected>미사용</option>
-              <option value="sunlight">→ 조도 (fc)</option>
+              <option value="sunlight">→ 조도 (lux)</option>
               <option value="temp">→ 온도 (°C)</option>
               <option value="humidity">→ 습도 (%)</option>
             </select>
@@ -1045,7 +1045,7 @@ canvas { max-width: 100%; }
             </div>
             <select id="eco-map-rain" style="width:100%;padding:6px 8px;font-size:11px;font-family:'Noto Sans KR',sans-serif;background:white;border:1px solid var(--border);border-radius:var(--radius-sm);color:var(--text-primary);appearance:none;-webkit-appearance:none;text-align:center;text-align-last:center;" onchange="ecoMapColor(this)">
               <option value="" selected>미사용</option>
-              <option value="sunlight">→ 조도 (fc)</option>
+              <option value="sunlight">→ 조도 (lux)</option>
               <option value="temp">→ 온도 (°C)</option>
               <option value="humidity">→ 습도 (%)</option>
             </select>
@@ -1058,7 +1058,7 @@ canvas { max-width: 100%; }
             </div>
             <select id="eco-map-wind" style="width:100%;padding:6px 8px;font-size:11px;font-family:'Noto Sans KR',sans-serif;background:white;border:1px solid var(--border);border-radius:var(--radius-sm);color:var(--text-primary);appearance:none;-webkit-appearance:none;text-align:center;text-align-last:center;" onchange="ecoMapColor(this)">
               <option value="" selected>미사용</option>
-              <option value="sunlight">→ 조도 (fc)</option>
+              <option value="sunlight">→ 조도 (lux)</option>
               <option value="temp">→ 온도 (°C)</option>
               <option value="humidity">→ 습도 (%)</option>
             </select>
@@ -1071,7 +1071,7 @@ canvas { max-width: 100%; }
             </div>
             <select id="eco-map-pressure" style="width:100%;padding:6px 8px;font-size:11px;font-family:'Noto Sans KR',sans-serif;background:white;border:1px solid var(--border);border-radius:var(--radius-sm);color:var(--text-primary);appearance:none;-webkit-appearance:none;text-align:center;text-align-last:center;" onchange="ecoMapColor(this)">
               <option value="" selected>미사용</option>
-              <option value="sunlight">→ 조도 (fc)</option>
+              <option value="sunlight">→ 조도 (lux)</option>
               <option value="temp">→ 온도 (°C)</option>
               <option value="humidity">→ 습도 (%)</option>
             </select>
@@ -1147,11 +1147,16 @@ canvas { max-width: 100%; }
     </div>
     <div class="settings-acc-body" id="acc-body-reset">
       <div class="nm-flat" style="padding:16px 18px;margin-bottom:4px;">
-        <p style="font-size:12px;color:var(--text-secondary);margin-bottom:12px;line-height:1.6;">농장 이름·접속 코드를 제외한 데이터를 초기화합니다.</p>
-        <div style="display:flex;flex-direction:column;gap:8px;">
-          <button onclick="resetAllData()" style="width:100%;padding:12px;font-size:13px;font-family:'Noto Sans KR',sans-serif;font-weight:700;color:white;background:#EF4444;border:none;border-radius:var(--radius-md);cursor:pointer;">수입/지출/육묘/시세/대출 전체 초기화</button>
-          <button onclick="resetSettingsData()" style="width:100%;padding:12px;font-size:13px;font-family:'Noto Sans KR',sans-serif;font-weight:600;color:var(--red);background:var(--red-soft);border:1px solid #FECACA;border-radius:var(--radius-md);cursor:pointer;">설정 초기화 (프로그램·경로·재고 등)</button>
+        <p style="font-size:12px;color:var(--text-secondary);margin-bottom:12px;line-height:1.6;">초기화할 항목을 선택하세요.</p>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px;">
+          <label class="chk-row" style="padding:10px 12px;background:var(--bg);border:1px solid var(--border);border-radius:var(--radius-md);margin:0;"><input type="checkbox" id="rst-income"><span style="font-size:13px;color:var(--text-secondary);">수입</span></label>
+          <label class="chk-row" style="padding:10px 12px;background:var(--bg);border:1px solid var(--border);border-radius:var(--radius-md);margin:0;"><input type="checkbox" id="rst-expense"><span style="font-size:13px;color:var(--text-secondary);">지출</span></label>
+          <label class="chk-row" style="padding:10px 12px;background:var(--bg);border:1px solid var(--border);border-radius:var(--radius-md);margin:0;"><input type="checkbox" id="rst-seedling"><span style="font-size:13px;color:var(--text-secondary);">육묘</span></label>
+          <label class="chk-row" style="padding:10px 12px;background:var(--bg);border:1px solid var(--border);border-radius:var(--radius-md);margin:0;"><input type="checkbox" id="rst-price"><span style="font-size:13px;color:var(--text-secondary);">시세</span></label>
+          <label class="chk-row" style="padding:10px 12px;background:var(--bg);border:1px solid var(--border);border-radius:var(--radius-md);margin:0;"><input type="checkbox" id="rst-loan"><span style="font-size:13px;color:var(--text-secondary);">대출</span></label>
+          <label class="chk-row" style="padding:10px 12px;background:var(--bg);border:1px solid var(--border);border-radius:var(--radius-md);margin:0;"><input type="checkbox" id="rst-settings"><span style="font-size:13px;color:var(--text-secondary);">설정</span></label>
         </div>
+        <button onclick="resetSelectedData()" style="width:100%;padding:12px;font-size:13px;font-family:'Noto Sans KR',sans-serif;font-weight:700;color:white;background:#EF4444;border:none;border-radius:var(--radius-md);cursor:pointer;">각 메뉴 데이터 초기화</button>
       </div>
     </div>
   </div>
@@ -1246,33 +1251,40 @@ canvas { max-width: 100%; }
 
 <!-- 농장 이름 수정 모달 -->
 <div class="alert-bg" id="farmNameBg" onclick="closeFarmBg(event)">
-  <div class="alert-box" style="width:300px;">
+  <div class="alert-box" style="width:300px;overflow:hidden;">
     <p style="font-size:15px;font-weight:700;margin-bottom:12px;">농장 정보 수정</p>
     <p style="font-size:11px;color:var(--text-secondary);margin-bottom:5px;text-align:left;">농장 이름</p>
-    <input type="text" id="farm-name-input" placeholder="예: 피크베리 농장"
-      style="width:100%;padding:12px 14px;font-size:14px;font-family:'Noto Sans KR',sans-serif;color:var(--text-primary);background:var(--bg);border:1px solid var(--border);border-radius:var(--radius-md);margin-bottom:10px;">
+    <input type="text" id="farm-name-input" placeholder="예) 가나다 농장"
+      style="width:100%;padding:12px 14px;font-size:12px;color:var(--text-tertiary);font-family:'Noto Sans KR',sans-serif;color:var(--text-primary);background:var(--bg);border:1px solid var(--border);border-radius:var(--radius-md);margin-bottom:10px;">
     <p style="font-size:11px;color:var(--text-secondary);margin-bottom:5px;text-align:left;">부제목</p>
-    <input type="text" id="farm-sub-input" placeholder="예: 수입·지출 관리"
-      style="width:100%;padding:12px 14px;font-size:14px;font-family:'Noto Sans KR',sans-serif;color:var(--text-primary);background:var(--bg);border:1px solid var(--border);border-radius:var(--radius-md);margin-bottom:14px;">
-    <p style="font-size:11px;color:var(--text-secondary);margin-bottom:6px;text-align:left;">앱 아이콘</p>
-    <div id="farm-icon-choices" class="icon-choice-row"></div>
-    <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 12px;background:var(--bg);border:1px solid var(--border);border-radius:var(--radius-md);margin-bottom:8px;">
-      <div>
-        <p style="font-size:11px;color:var(--text-secondary);margin-bottom:4px;text-align:left;">현재 접속 코드</p>
-        <div id="farm-current-code-display" style="font-size:17px;font-weight:700;letter-spacing:5px;color:var(--text-primary);">——————</div>
+    <input type="text" id="farm-sub-input" placeholder="예) 수입·지출 관리"
+      style="width:100%;padding:12px 14px;font-size:12px;color:var(--text-tertiary);font-family:'Noto Sans KR',sans-serif;color:var(--text-primary);background:var(--bg);border:1px solid var(--border);border-radius:var(--radius-md);margin-bottom:14px;">
+    <p style="font-size:11px;color:var(--text-secondary);margin-bottom:6px;text-align:left;">어플 아이콘 변경</p>
+    <label style="display:flex;align-items:center;justify-content:center;gap:6px;padding:11px;font-size:12px;font-weight:600;font-family:'Noto Sans KR',sans-serif;color:var(--text-secondary);background:var(--bg);border:1px dashed var(--border);border-radius:var(--radius-md);cursor:pointer;margin-bottom:8px;">
+      📷 PNG 업로드
+      <input type="file" accept="image/png,image/jpeg,image/webp" style="display:none;" onchange="onFarmIconFileChange(event)">
+    </label>
+    <div style="margin-bottom:8px;">
+      <button type="button" onclick="showFarmCodeEditor()" id="farm-code-toggle-btn" style="width:100%;padding:10px;font-size:13px;font-weight:600;font-family:'Noto Sans KR',sans-serif;color:var(--text-primary);background:#E5E7EB;border:none;border-radius:var(--radius-md);cursor:pointer;text-align:center;">접속 코드 변경</button>
+      <div id="farm-code-editor" style="display:none;margin-top:8px;padding:12px;background:var(--bg);border:1px solid var(--border);border-radius:var(--radius-md);">
+        <div style="font-size:11px;color:var(--text-secondary);margin-bottom:4px;">현재 코드</div>
+        <div id="farm-current-code-display" style="font-size:16px;font-weight:700;letter-spacing:5px;color:var(--text-primary);margin-bottom:10px;">——————</div>
+        <div style="font-size:11px;color:var(--text-secondary);margin-bottom:4px;">변경할 코드</div>
+        <input type="tel" id="farm-new-code-input" maxlength="6" placeholder="숫자 6자리" pattern="[0-9]*" inputmode="numeric" oninput="updateFarmCodePreview()"
+          style="width:100%;padding:9px 14px;font-size:16px;font-weight:700;letter-spacing:5px;font-family:'Noto Sans KR',sans-serif;color:var(--text-primary);background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-md);text-align:center;box-sizing:border-box;margin-bottom:8px;--placeholder-size:12px;">
+        <div id="farm-code-preview" style="display:none;"></div>
+        <div id="farm-code-err" style="font-size:11px;color:#EF4444;min-height:14px;margin-bottom:6px;"></div>
+        <div style="display:flex;gap:8px;">
+          <button type="button" onclick="document.getElementById('farm-code-editor').style.display='none';document.getElementById('farm-new-code-input').value='';document.getElementById('farm-code-err').textContent='';" style="flex:1;padding:10px;font-size:13px;font-weight:600;font-family:'Noto Sans KR',sans-serif;color:var(--text-secondary);background:var(--bg);border:1px solid var(--border);border-radius:var(--radius-md);cursor:pointer;">취소</button>
+          <button type="button" onclick="saveFarmCodeOnly()" style="flex:1;padding:10px;font-size:13px;font-weight:700;font-family:'Noto Sans KR',sans-serif;color:white;background:var(--text-primary);border:none;border-radius:var(--radius-md);cursor:pointer;">저장</button>
+        </div>
       </div>
-      <button type="button" onclick="showFarmCodeEditor()" style="padding:8px 12px;font-size:12px;font-weight:700;font-family:'Noto Sans KR',sans-serif;color:var(--text-primary);background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-md);cursor:pointer;">변경</button>
-    </div>
-    <div id="farm-code-editor" style="display:none;margin-bottom:12px;">
-      <input type="tel" id="farm-new-code-input" maxlength="6" placeholder="새 코드 입력" pattern="[0-9]*" inputmode="numeric" oninput="updateFarmCodePreview()"
-        style="width:100%;padding:12px 14px;font-size:18px;font-weight:700;letter-spacing:6px;font-family:'Noto Sans KR',sans-serif;color:var(--text-primary);background:var(--bg);border:1px solid var(--border);border-radius:var(--radius-md);text-align:center;margin-bottom:7px;">
-      <div id="farm-code-preview" style="font-size:12px;color:var(--text-secondary);min-height:18px;"></div>
-      <div id="farm-code-err" style="font-size:11px;color:#EF4444;min-height:16px;"></div>
     </div>
     <div style="display:flex;gap:8px;">
       <button onclick="closeFarmNameModal()" style="flex:1;padding:12px;font-size:13px;font-weight:600;font-family:'Noto Sans KR',sans-serif;color:var(--text-secondary);background:var(--bg);border:1px solid var(--border);border-radius:var(--radius-md);cursor:pointer;">취소</button>
-      <button id="farm-save-btn" onclick="saveFarmName()" style="flex:1.5;padding:12px;font-size:13px;font-weight:700;font-family:'Noto Sans KR',sans-serif;color:white;background:var(--text-primary);border:none;border-radius:var(--radius-md);cursor:pointer;">저장</button>
+      <button id="farm-save-btn" onclick="saveFarmName()" style="flex:1;padding:12px;font-size:13px;font-weight:700;font-family:'Noto Sans KR',sans-serif;color:white;background:var(--text-primary);border:none;border-radius:var(--radius-md);cursor:pointer;">저장</button>
     </div>
+    <button onclick="confirmDeleteFarm()" style="width:100%;margin-top:8px;padding:10px;font-size:12px;font-family:'Noto Sans KR',sans-serif;font-weight:600;color:var(--red);background:transparent;border:none;cursor:pointer;text-decoration:underline;text-underline-offset:2px;">계정 삭제</button>
   </div>
 </div>
 
@@ -1727,19 +1739,49 @@ function showAlert(msg){document.getElementById('alertMsg').textContent=msg||'�
 
 let _farmModalOriginalCode='';
 let _farmModalCodeDirty=false;
-let _farmModalIcon='🍓';
-const FARM_ICON_CHOICES=['🍓','🌱','🏡','☀️','🍀','🧺','🌿','💧','🍯','🫐','🍅','🌾'];
+let _farmModalIcon='🌱';
+const FARM_ICON_CHOICES=['🌱','🍓','🏡','☀️','🍀','🧺','🌿','💧','🍯','🫐','🍅','🌾','🪴','🌻','🐄','🐓'];
 
 function makeIconDataUrl(icon){
-  const svg='<svg xmlns="http://www.w3.org/2000/svg" width="180" height="180" viewBox="0 0 180 180"><rect width="180" height="180" rx="40" fill="%23111827"/><text x="90" y="110" font-size="82" text-anchor="middle">'+icon+'</text></svg>';
+  const svg='<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512"><rect width="512" height="512" rx="115" fill="%23111827"/><text x="256" y="360" font-size="320" text-anchor="middle">'+icon+'</text></svg>';
   return 'data:image/svg+xml;charset=utf-8,'+encodeURIComponent(svg);
 }
+function onFarmIconFileChange(e){
+  const file=e.target.files&&e.target.files[0];
+  if(!file)return;
+  const reader=new FileReader();
+  reader.onload=function(ev){
+    const dataUrl=ev.target.result;
+    _farmModalIcon=dataUrl;
+    renderFarmIconChoices();
+    // 미리보기: 아이콘 버튼 중 선택 표시
+    const wrap=document.getElementById('farm-icon-choices');
+    if(wrap){
+      const prev=document.createElement('div');
+      prev.style.cssText='display:inline-flex;align-items:center;justify-content:center;width:44px;height:44px;border-radius:10px;overflow:hidden;border:2px solid var(--text-primary);margin-right:4px;';
+      prev.innerHTML='<img src="'+dataUrl+'" style="width:100%;height:100%;object-fit:cover;">';
+      wrap.insertBefore(prev, wrap.firstChild);
+    }
+  };
+  reader.readAsDataURL(file);
+}
+
 function applyFarmIcon(icon){
-  icon=icon||'🍓';
+  icon=icon||'🌱';
   sl('pb8_appicon', icon);
   const hdr=document.getElementById('hdr-app-icon');if(hdr)hdr.textContent=icon;
-  const fav=document.getElementById('dynamic-favicon');if(fav)fav.href=makeIconDataUrl(icon);
-  const apple=document.getElementById('dynamic-apple-icon');if(apple)apple.href=makeIconDataUrl(icon);
+  // favicon: 이미지 URL이면 직접 사용, 이모지면 SVG로 변환
+  const isImg=icon.startsWith('data:')||icon.startsWith('http');
+  const fav=document.getElementById('dynamic-favicon');
+  const apple=document.getElementById('dynamic-apple-icon');
+  if(isImg){
+    if(fav)fav.href=icon;
+    if(apple)apple.href=icon;
+  } else {
+    const dataUrl=makeIconDataUrl(icon);
+    if(fav)fav.href=dataUrl;
+    if(apple)apple.href=dataUrl;
+  }
 }
 function selectFarmIcon(icon){
   _farmModalIcon=icon||'🍓';
@@ -1768,14 +1810,42 @@ function getCachedFarmCode(){
 
 function setFarmCodeSaveState(isDirty){
   _farmModalCodeDirty=!!isDirty;
-  const btn=document.getElementById('farm-save-btn');
-  if(btn) btn.style.background=isDirty?'#10B981':'var(--text-primary)';
+  // 저장 버튼 색상 변경 안 함
+}
+
+function saveFarmCodeOnly(){
+  const newCode=(document.getElementById('farm-new-code-input')?.value||'').trim();
+  const err=document.getElementById('farm-code-err');
+  if(!newCode){if(err)err.textContent='코드를 입력해 주세요.';return;}
+  if(!/^\d{6}$/.test(newCode)){if(err)err.textContent='숫자 6자리를 입력해 주세요.';return;}
+  if(newCode===_farmModalOriginalCode){if(err)err.textContent='현재 코드와 동일합니다.';return;}
+  if(!_currentFarmId){if(err)err.textContent='로그인 정보가 없습니다.';return;}
+  if(err)err.textContent='';
+  authFbGet('farms/'+_currentFarmId).then(function(farm){
+    farm=farm||{};
+    farm.code=newCode;
+    authFbPut('farms/'+_currentFarmId, farm).then(function(){
+      localStorage.setItem('pb8_farm_local_'+_currentFarmId, JSON.stringify(farm));
+      try{
+        var sess=JSON.parse(localStorage.getItem('pb8_auth_session')||'{}');
+        if(sess&&sess.farmId===_currentFarmId){sess.code=newCode;localStorage.setItem('pb8_auth_session',JSON.stringify(sess));}
+      }catch(e){}
+      _farmModalOriginalCode=newCode;
+      const codeDisp=document.getElementById('farm-current-code-display');
+      if(codeDisp)codeDisp.textContent=newCode;
+      document.getElementById('farm-new-code-input').value='';
+      document.getElementById('farm-code-editor').style.display='none';
+      showSaveToast('✓ 접속 코드가 변경되었습니다');
+    }).catch(function(){if(err)err.textContent='저장 실패. 다시 시도해 주세요.';});
+  });
 }
 
 function showFarmCodeEditor(){
   const editor=document.getElementById('farm-code-editor');
   const input=document.getElementById('farm-new-code-input');
   const err=document.getElementById('farm-code-err');
+  const codeDisp=document.getElementById('farm-current-code-display');
+  if(codeDisp) codeDisp.textContent=_farmModalOriginalCode||'——————';
   if(editor) editor.style.display='block';
   if(input) input.value='';
   if(err) err.textContent='';
@@ -2948,19 +3018,44 @@ function renderLoanList(){
   // 총 대출 요약 계산 (항상 표시)
   const curY=NOW.getFullYear();
   const repaid=getRepaid();
-  let totalBalance=0, totalThisYearPrincipal=0, totalThisYearInterest=0, totalThisYearPaid=0;
+  let totalBalance=0, totalBalanceWithInterest=0;
+  let totalThisYearPrincipal=0, totalThisYearInterest=0;
+  let totalThisYearPaidPrincipal=0, totalThisYearPaidInterest=0;
+
   loans.forEach((lo,idx)=>{
-    if(lo.informal){totalBalance+=lo.principal||0;return;}
+    if(lo.informal){
+      // 지인 대출
+      const hist=lo.repayHistory||[];
+      const paid=hist.reduce((s,r)=>s+(+r.amount||0),0);
+      const rem=Math.max(0,(lo.principal||0)-paid);
+      totalBalance+=rem;
+      totalBalanceWithInterest+=rem;
+      // 상환 계획에서 올해 예정/완료 계산
+      const plans=lo.repayPlans||[];
+      plans.filter(p=>p.year===curY).forEach(p=>{
+        const paidKey=`informal_${idx}_plan_${p.id}_paid`;
+        if(repaid[paidKey]){totalThisYearPaidPrincipal+=p.amount||0;}
+        else{totalThisYearPrincipal+=p.amount||0;}
+      });
+      return;
+    }
     const calc=calcLoanData(lo);
     if(!calc)return;
     totalBalance+=calc.balance;
+    // 원금+잔여이자 합산
+    if(calc.rows){
+      const remaining=calc.rows.filter(r=>r.y>=curY);
+      const totalInterest=remaining.reduce((s,r)=>s+(r.interest||0),0);
+      totalBalanceWithInterest+=calc.balance+totalInterest;
+    } else {
+      totalBalanceWithInterest+=calc.balance;
+    }
     if(calc.curRow){
-      totalThisYearPrincipal+=calc.curRow.principal||0;
-      totalThisYearInterest+=calc.curRow.interest||0;
-      const key=`${idx}_${curY}`;
-      if(repaid[key]===true){
-        totalThisYearPaid+=calc.curRow.total||0;
-      }
+      const kP=`${idx}_${curY}_p`, kI=`${idx}_${curY}_i`, kOld=`${idx}_${curY}`;
+      if(repaid[kP]===true||repaid[kOld]===true) totalThisYearPaidPrincipal+=calc.curRow.principal||0;
+      else totalThisYearPrincipal+=calc.curRow.principal||0;
+      if(repaid[kI]===true||repaid[kOld]===true) totalThisYearPaidInterest+=calc.curRow.interest||0;
+      else totalThisYearInterest+=calc.curRow.interest||0;
     }
   });
 
@@ -2969,20 +3064,28 @@ function renderLoanList(){
     ${loans.length===0?`<div style="font-size:13px;color:var(--text-tertiary);text-align:center;padding:8px 0;">등록된 대출이 없습니다.</div>`:`
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
       <div style="background:var(--red-soft);border:1px solid #FECACA;border-radius:10px;padding:10px 12px;">
-        <div style="font-size:10px;color:var(--text-secondary);margin-bottom:4px;">총 남은 대출</div>
-        <div style="font-size:15px;font-weight:700;color:var(--red);">${fmtM(totalBalance)}</div>
+        <div style="font-size:9px;color:var(--text-secondary);margin-bottom:4px;">남은 원금</div>
+        <div style="font-size:14px;font-weight:700;color:var(--red);">${fmtM(totalBalance)}</div>
       </div>
-      <div style="background:${totalThisYearPaid>0?'var(--green-soft)':'var(--bg)'};border:1px solid ${totalThisYearPaid>0?'#A7F3D0':'var(--border)'};border-radius:10px;padding:10px 12px;">
-        <div style="font-size:10px;color:var(--text-secondary);margin-bottom:4px;">올해 상환한 금액</div>
-        <div style="font-size:15px;font-weight:700;color:${totalThisYearPaid>0?'var(--green)':'var(--text-tertiary)'};">${totalThisYearPaid>0?fmtM(totalThisYearPaid):'미상환'}</div>
+      <div style="background:var(--red-soft);border:1px solid #FECACA;border-radius:10px;padding:10px 12px;">
+        <div style="font-size:9px;color:var(--text-secondary);margin-bottom:4px;">남은 원금+이자</div>
+        <div style="font-size:14px;font-weight:700;color:var(--red);">${fmtM(totalBalanceWithInterest)}</div>
       </div>
       <div style="background:var(--bg);border:1px solid var(--border);border-radius:10px;padding:10px 12px;">
-        <div style="font-size:10px;color:var(--text-secondary);margin-bottom:4px;">올해 상환 원금</div>
-        <div style="font-size:15px;font-weight:700;color:var(--text-primary);">${fmtM(totalThisYearPrincipal)}</div>
+        <div style="font-size:9px;color:var(--text-secondary);margin-bottom:4px;">올해 남은 원금</div>
+        <div style="font-size:14px;font-weight:700;color:var(--text-primary);">${fmtM(totalThisYearPrincipal)}</div>
       </div>
       <div style="background:var(--amber-soft);border:1px solid #FDE68A;border-radius:10px;padding:10px 12px;">
-        <div style="font-size:10px;color:var(--text-secondary);margin-bottom:4px;">올해 이자</div>
-        <div style="font-size:15px;font-weight:700;color:var(--amber);">${fmtM(totalThisYearInterest)}</div>
+        <div style="font-size:9px;color:var(--text-secondary);margin-bottom:4px;">올해 남은 이자</div>
+        <div style="font-size:14px;font-weight:700;color:var(--amber);">${fmtM(totalThisYearInterest)}</div>
+      </div>
+      <div style="background:var(--green-soft);border:1px solid #A7F3D0;border-radius:10px;padding:10px 12px;">
+        <div style="font-size:9px;color:var(--text-secondary);margin-bottom:4px;">올해 상환된 원금</div>
+        <div style="font-size:14px;font-weight:700;color:var(--green);">${totalThisYearPaidPrincipal>0?fmtM(totalThisYearPaidPrincipal):'없음'}</div>
+      </div>
+      <div style="background:var(--green-soft);border:1px solid #A7F3D0;border-radius:10px;padding:10px 12px;">
+        <div style="font-size:9px;color:var(--text-secondary);margin-bottom:4px;">올해 상환된 이자</div>
+        <div style="font-size:14px;font-weight:700;color:var(--green);">${totalThisYearPaidInterest>0?fmtM(totalThisYearPaidInterest):'없음'}</div>
       </div>
     </div>`}
   </div>`;
@@ -3013,6 +3116,7 @@ function renderLoanList(){
 
 function renderInformalLoanDetail(lo, loanIdx){
   const history=lo.repayHistory||[];
+  const plans=lo.repayPlans||[];
   const totalPaid=history.reduce((s,r)=>s+(+r.amount||0),0);
   const remaining=Math.max(0,(lo.principal||0)-totalPaid);
   const histHtml=history.length?history.map((r,i)=>`
@@ -3023,6 +3127,17 @@ function renderInformalLoanDetail(lo, loanIdx){
         <button onclick="event.stopPropagation();deleteInformalRepay(${loanIdx},${i})" style="font-size:9px;padding:2px 6px;border-radius:4px;border:1px solid #FECACA;background:#FEF2F2;color:#EF4444;cursor:pointer;font-family:'Noto Sans KR',sans-serif;">삭제</button>
       </div>
     </div>`).join(''):'<p style="font-size:12px;color:var(--text-tertiary);padding:8px 0;">상환 내역 없음</p>';
+
+  const plansHtml=plans.length?plans.map((p,i)=>`
+    <div style="display:flex;align-items:center;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border);">
+      <div><div style="font-size:12px;font-weight:500;">${p.year}년 ${p.month}월</div><div style="font-size:11px;color:var(--text-secondary);">${p.note||''}</div></div>
+      <div style="display:flex;align-items:center;gap:8px;">
+        <span style="font-size:12px;font-weight:700;color:var(--text-primary);">${fmtM(+p.amount||0)}</span>
+        <button onclick="event.stopPropagation();editInformalPlan(${loanIdx},${i})" style="font-size:9px;padding:2px 6px;border-radius:4px;border:1px solid var(--border);background:var(--bg);color:var(--text-secondary);cursor:pointer;font-family:'Noto Sans KR',sans-serif;">수정</button>
+        <button onclick="event.stopPropagation();deleteInformalPlan(${loanIdx},${i})" style="font-size:9px;padding:2px 6px;border-radius:4px;border:1px solid #FECACA;background:#FEF2F2;color:#EF4444;cursor:pointer;font-family:'Noto Sans KR',sans-serif;">삭제</button>
+      </div>
+    </div>`).join(''):'<p style="font-size:12px;color:var(--text-tertiary);padding:8px 0;">상환 계획 없음</p>';
+
   return `<div class="nm-flat" style="padding:14px 16px;margin-bottom:10px;">
     <div class="info-row"><span class="k">대출 원금</span><span class="v">${fmtM(lo.principal||0)}</span></div>
     <div class="info-row"><span class="k">실행시기</span><span class="v">${lo.startY||'-'}년 ${lo.startM||'-'}월${lo.startD?' '+lo.startD+'일':''}</span></div>
@@ -3032,7 +3147,108 @@ function renderInformalLoanDetail(lo, loanIdx){
   </div>
   <div class="sec-label" style="margin-top:0;">상환 내역</div>
   <div style="margin-bottom:8px;">${histHtml}</div>
-  <button onclick="event.stopPropagation();openInformalRepayModal(${loanIdx})" style="width:100%;padding:8px;font-size:12px;font-family:'Noto Sans KR',sans-serif;font-weight:600;color:var(--green);background:var(--green-soft);border:1px solid #A7F3D0;border-radius:var(--radius-md);cursor:pointer;margin-bottom:4px;">+ 상환 추가</button>`;
+  <button onclick="event.stopPropagation();openInformalRepayModal(${loanIdx})" style="width:100%;padding:8px;font-size:12px;font-family:'Noto Sans KR',sans-serif;font-weight:600;color:var(--green);background:var(--green-soft);border:1px solid #A7F3D0;border-radius:var(--radius-md);cursor:pointer;margin-bottom:12px;">+ 상환 추가</button>
+  <div class="sec-label" style="margin-top:0;">상환 계획</div>
+  <div style="margin-bottom:8px;">${plansHtml}</div>
+  <button onclick="event.stopPropagation();openInformalPlanModal(${loanIdx},-1)" style="width:100%;padding:8px;font-size:12px;font-family:'Noto Sans KR',sans-serif;font-weight:600;color:var(--accent);background:var(--accent-soft);border:1px solid #C7D2FE;border-radius:var(--radius-md);cursor:pointer;">+ 상환 계획 추가</button>`;
+}
+
+function openInformalPlanModal(loanIdx, planIdx){
+  const loans=getLoans();
+  const lo=loans[loanIdx];
+  const plan=planIdx>=0?(lo.repayPlans||[])[planIdx]:null;
+  const box=document.createElement('div');
+  box.style.cssText='position:fixed;inset:0;z-index:600;display:flex;align-items:flex-end;justify-content:center;background:rgba(0,0,0,0.4);backdrop-filter:blur(4px);';
+  const cy=NOW.getFullYear();
+  box.innerHTML=`<div style="background:var(--surface);border-radius:22px 22px 0 0;width:100%;max-width:430px;padding:20px 20px calc(20px + env(safe-area-inset-bottom,0px));">
+    <div style="font-size:15px;font-weight:700;margin-bottom:14px;">${planIdx>=0?'상환 계획 수정':'상환 계획 추가'}</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px;">
+      <div class="fg"><label style="font-size:11px;font-weight:600;color:var(--text-secondary);display:block;margin-bottom:4px;">년도</label>
+        <input type="number" id="ipm-year" value="${plan?plan.year:cy}" min="2020" max="2099" style="width:100%;padding:10px 12px;font-size:14px;font-family:'Noto Sans KR',sans-serif;background:var(--bg);border:1px solid var(--border);border-radius:var(--radius-md);">
+      </div>
+      <div class="fg"><label style="font-size:11px;font-weight:600;color:var(--text-secondary);display:block;margin-bottom:4px;">월</label>
+        <input type="number" id="ipm-month" value="${plan?plan.month:1}" min="1" max="12" style="width:100%;padding:10px 12px;font-size:14px;font-family:'Noto Sans KR',sans-serif;background:var(--bg);border:1px solid var(--border);border-radius:var(--radius-md);">
+      </div>
+    </div>
+    <div class="fg" style="margin-bottom:10px;"><label style="font-size:11px;font-weight:600;color:var(--text-secondary);display:block;margin-bottom:4px;">상환 예정 금액 (만원)</label>
+      <input type="number" id="ipm-amount" value="${plan?Math.round((plan.amount||0)/10000):''}" placeholder="0" style="width:100%;padding:10px 12px;font-size:14px;font-family:'Noto Sans KR',sans-serif;background:var(--bg);border:1px solid var(--border);border-radius:var(--radius-md);">
+    </div>
+    <div class="fg" style="margin-bottom:16px;"><label style="font-size:11px;font-weight:600;color:var(--text-secondary);display:block;margin-bottom:4px;">메모</label>
+      <input type="text" id="ipm-note" value="${plan?plan.note||'':''}" placeholder="예: 원금 일부 상환" style="width:100%;padding:10px 12px;font-size:14px;font-family:'Noto Sans KR',sans-serif;background:var(--bg);border:1px solid var(--border);border-radius:var(--radius-md);">
+    </div>
+    <div style="display:flex;gap:10px;">
+      <button onclick="this.closest('div[style*=fixed]').remove()" style="flex:1;padding:14px;font-size:14px;font-family:'Noto Sans KR',sans-serif;font-weight:600;color:var(--text-secondary);background:var(--bg);border:1px solid var(--border);border-radius:var(--radius-md);cursor:pointer;">취소</button>
+      <button id="ipm-save-btn" style="flex:1.5;padding:14px;font-size:14px;font-family:'Noto Sans KR',sans-serif;font-weight:700;color:white;background:var(--text-primary);border:none;border-radius:var(--radius-md);cursor:pointer;">저장</button>
+    </div>
+  </div>`;
+  box.onclick=function(ev){if(ev.target===box)box.remove();};
+  document.body.appendChild(box);
+  setTimeout(()=>{
+    const btn=document.getElementById('ipm-save-btn');
+    if(btn)btn.onclick=function(){
+      const year=parseInt(document.getElementById('ipm-year')?.value)||cy;
+      const month=parseInt(document.getElementById('ipm-month')?.value)||1;
+      const amtMan=parseFloat(document.getElementById('ipm-amount')?.value)||0;
+      const note=document.getElementById('ipm-note')?.value||'';
+      if(!amtMan){showAlert('금액을 입력해 주세요.');return;}
+      const loans=getLoans();
+      if(!loans[loanIdx].repayPlans)loans[loanIdx].repayPlans=[];
+      const newPlan={id:Date.now(),year,month,amount:Math.round(amtMan*10000),note};
+      if(planIdx>=0)loans[loanIdx].repayPlans[planIdx]=newPlan;
+      else loans[loanIdx].repayPlans.push(newPlan);
+      loans[loanIdx].repayPlans.sort((a,b)=>a.year*100+a.month-(b.year*100+b.month));
+      slF('loans',loans);
+      box.remove();
+      renderLoanList();
+    };
+  },0);
+}
+function editInformalPlan(loanIdx,planIdx){openInformalPlanModal(loanIdx,planIdx);}
+function deleteInformalPlan(loanIdx,planIdx){
+  if(!confirm('이 상환 계획을 삭제하시겠습니까?'))return;
+  const loans=getLoans();
+  if(loans[loanIdx]?.repayPlans)loans[loanIdx].repayPlans.splice(planIdx,1);
+  slF('loans',loans);renderLoanList();
+}
+
+// 7. 스와이프 다운으로 모달 닫기
+function initSwipeDownClose(){
+  document.querySelectorAll('.modal-bg, .alert-bg').forEach(bg=>{
+    const modal=bg.querySelector('.modal, .alert-box, [style*="border-radius:22px"]');
+    if(!modal)return;
+    let startY=0,startScrollY=0;
+    const handle=modal.querySelector('.modal-handle');
+    const dragTarget=handle||modal;
+    dragTarget.addEventListener('touchstart',function(e){
+      startY=e.touches[0].clientY;
+      startScrollY=modal.scrollTop||0;
+    },{passive:true});
+    dragTarget.addEventListener('touchmove',function(e){
+      const dy=e.touches[0].clientY-startY;
+      if(dy>0&&startScrollY===0){
+        modal.style.transform=`translateY(${dy}px)`;
+        modal.style.transition='none';
+      }
+    },{passive:true});
+    dragTarget.addEventListener('touchend',function(e){
+      const dy=e.changedTouches[0].clientY-startY;
+      modal.style.transition='transform 0.2s';
+      if(dy>80){
+        modal.style.transform='translateY(100%)';
+        setTimeout(()=>{
+          modal.style.transform='';
+          modal.style.transition='';
+          bg.classList.remove('open');
+          // farmNameBg는 별도 처리
+          if(bg.id==='farmNameBg')closeFarmNameModal();
+          else if(bg.id==='modal')closeModal();
+          else if(bg.id==='loanModal')closeLoanModal();
+        },200);
+      } else {
+        modal.style.transform='';
+      }
+    },{passive:true});
+  });
 }
 
 function openInformalRepayModal(loanIdx){
@@ -3655,7 +3871,7 @@ function downloadExcel(rangeType, extra={}) {
 
   // ── 시트4: 육묘 ──
   if(tabs.env){
-    const rows=[['날짜','조도(fc)','온도(°C)','습도(%)','총물사용(L)','1구역(L)','2구역(L)','3구역(L)','4구역(L)','5구역(L)','6구역(L)','피드백']];
+    const rows=[['날짜','조도(lux)','온도(°C)','습도(%)','총물사용(L)','1구역(L)','2구역(L)','3구역(L)','4구역(L)','5구역(L)','6구역(L)','피드백']];
     makeDateList().forEach(dt=>{
       const env=gl('pb8_env_'+dt)||{};
       if(!env.sunlight&&!env.temp&&!env.humidity&&!(env.water||[]).length) return;
@@ -3766,9 +3982,9 @@ function _applyEcowittData(data, status, keys){
   raw['indoor-humi'] = data.indoor?.humidity?.value!=null    ? parseFloat(data.indoor.humidity.value)    : null;
   raw['outdoor-temp']= data.outdoor?.temperature?.value!=null? parseFloat(data.outdoor.temperature.value): null;
   raw['outdoor-humi']= data.outdoor?.humidity?.value!=null   ? parseFloat(data.outdoor.humidity.value)   : null;
-  // Solar W/m² → fc (Ecowitt 앱 기준: 1 W/m² = 11.74 fc)
+  // Solar W/m² → lux (실측 158개 평균: 1 W/m² = 126.6 lux)
   raw['solar'] = data.solar_and_uvi?.solar?.value!=null
-    ? Math.round(parseFloat(data.solar_and_uvi.solar.value)*11.74*10)/10 : null;
+    ? Math.round(parseFloat(data.solar_and_uvi.solar.value)*126.6*10)/10 : null;
   raw['uvi']      = data.solar_and_uvi?.uvi?.value!=null     ? parseFloat(data.solar_and_uvi.uvi.value)  : null;
   raw['rain']     = data.rainfall?.rain_rate?.value!=null     ? parseFloat(data.rainfall.rain_rate.value) : null;
   raw['wind']     = data.wind?.wind_speed?.value!=null        ? parseFloat(data.wind.wind_speed.value)    : null;
@@ -3793,7 +4009,7 @@ function _applyEcowittData(data, status, keys){
     const el=document.getElementById('sl-sunlight');if(el)el.value=result.sunlight;
     // 어떤 소스에서 왔는지 표시
     const src=Object.keys(m).find(k=>m[k]==='sunlight'&&raw[k]!==null);
-    filled.push('조도 '+result.sunlight+'fc'+(src?' ('+_ecoSrcLabel(src)+')':''));
+    filled.push('조도 '+result.sunlight+'lux'+(src?' ('+_ecoSrcLabel(src)+')':''));
   }
   if(result.temp!==null){
     const el=document.getElementById('sl-temp');if(el)el.value=Math.round(result.temp*10)/10;
@@ -4230,7 +4446,7 @@ function renderSeedlingEnvChart() {
     return recs.length?getEnvByKey(recs[0].key):null;
   }
   const ds = [
-    { label:'조도(fc)', color:'#F59E0B', yID:'y1',
+    { label:'조도(lux)', color:'#F59E0B', yID:'y1',
       data: dates.map(d=>{ const e=getFirstRecForDate(d); return e&&e.sunlight?parseFloat(e.sunlight):null; }) },
     { label:'온도(°C)',  color:'#EF4444', yID:'y2',
       data: dates.map(d=>{ const e=getFirstRecForDate(d); return e&&e.temp?parseFloat(e.temp):null; }) },
@@ -4326,8 +4542,8 @@ function renderSeedlingCorrChart() {
     options:{responsive:true,maintainAspectRatio:false,
       plugins:{
         legend:{display:false},
-        title:{display:true,text:'온도(°C) vs 물사용(L)  ·  점 밝기=조도(fc)',font:{size:11,family:"'Noto Sans KR',sans-serif"},color:'#6B7280'},
-        tooltip:{callbacks:{label:p=>`${p.raw.date} · 온도${p.raw.x}°C · 물${p.raw.y}L · 조도${p.raw.sunlight}fc`}}
+        title:{display:true,text:'온도(°C) vs 물사용(L)  ·  점 밝기=조도(lux)',font:{size:11,family:"'Noto Sans KR',sans-serif"},color:'#6B7280'},
+        tooltip:{callbacks:{label:p=>`${p.raw.date} · 온도${p.raw.x}°C · 물${p.raw.y}L · 조도${p.raw.sunlight}lux`}}
       },
       scales:{
         x:{title:{display:true,text:'온도 (°C)',font:{size:10},color:'#6B7280'},ticks:{font:{size:9},color:'#9CA3AF'},grid:{color:'#F3F4F6'}},
@@ -4525,6 +4741,71 @@ function quickAddProg(name, price){
     renderSettings();
     showSaveToast('✓ 프로그램이 추가되었습니다');
   }
+}
+
+// 1. 계정 삭제
+function confirmDeleteFarm(){
+  const box=document.createElement('div');
+  box.style.cssText='position:fixed;inset:0;z-index:700;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,0.5);backdrop-filter:blur(4px);padding:20px;';
+  box.innerHTML=`<div style="background:var(--surface);border-radius:var(--radius-xl);padding:24px;width:100%;max-width:320px;">
+    <div style="font-size:16px;font-weight:700;margin-bottom:8px;color:var(--red);">⚠ 계정 삭제</div>
+    <div style="font-size:13px;color:#EF4444;margin-bottom:12px;line-height:1.6;">해당 농장의 모든 데이터가 영구 삭제됩니다.<br>이 작업은 되돌릴 수 없습니다.</div>
+    <div style="font-size:12px;color:var(--text-secondary);margin-bottom:16px;">확인을 위해 농장 ID를 입력하세요:</div>
+    <input type="text" id="delete-confirm-input" placeholder="${_currentFarmId}" style="width:100%;padding:10px 12px;font-size:14px;font-family:'Noto Sans KR',sans-serif;background:var(--bg);border:1px solid #FECACA;border-radius:var(--radius-md);color:var(--text-primary);box-sizing:border-box;margin-bottom:16px;">
+    <div style="display:flex;gap:8px;">
+      <button onclick="this.closest('div[style*=fixed]').remove()" style="flex:1;padding:12px;font-size:13px;font-family:'Noto Sans KR',sans-serif;font-weight:600;color:var(--text-secondary);background:var(--bg);border:1px solid var(--border);border-radius:var(--radius-md);cursor:pointer;">취소</button>
+      <button id="delete-confirm-btn" style="flex:1;padding:12px;font-size:13px;font-family:'Noto Sans KR',sans-serif;font-weight:700;color:white;background:#EF4444;border:none;border-radius:var(--radius-md);cursor:pointer;">삭제</button>
+    </div>
+  </div>`;
+  box.onclick=function(ev){if(ev.target===box)box.remove();};
+  document.body.appendChild(box);
+  setTimeout(()=>{
+    const btn=document.getElementById('delete-confirm-btn');
+    if(btn)btn.onclick=function(){
+      const val=(document.getElementById('delete-confirm-input')?.value||'').trim();
+      if(val!==_currentFarmId){showAlert('농장 ID가 일치하지 않습니다.');return;}
+      box.remove();
+      doDeleteFarm();
+    };
+  },0);
+}
+function doDeleteFarm(){
+  if(!_currentFarmId)return;
+  authFbDelete('farms/'+_currentFarmId).then(()=>{
+    // 로컬 데이터 전부 삭제
+    const keys=[];
+    for(let i=0;i<localStorage.length;i++){
+      const k=localStorage.key(i);
+      if(k&&(k.startsWith('pb8_'+_currentFarmId)||k.startsWith('pb8_farm_local_'+_currentFarmId)||k==='pb8_auth_session'))keys.push(k);
+    }
+    keys.forEach(k=>localStorage.removeItem(k));
+    localStorage.removeItem('pb8_auth_session');
+    location.reload();
+  });
+}
+
+// 5. 선택 항목 초기화
+function resetSelectedData(){
+  const inc=document.getElementById('rst-income')?.checked;
+  const exp=document.getElementById('rst-expense')?.checked;
+  const seed=document.getElementById('rst-seedling')?.checked;
+  const price=document.getElementById('rst-price')?.checked;
+  const loan=document.getElementById('rst-loan')?.checked;
+  const settings=document.getElementById('rst-settings')?.checked;
+  if(!inc&&!exp&&!seed&&!price&&!loan&&!settings){showAlert('초기화할 항목을 선택해 주세요.');return;}
+  const items=[];
+  if(inc)items.push('수입');if(exp)items.push('지출');if(seed)items.push('육묘');
+  if(price)items.push('시세');if(loan)items.push('대출');if(settings)items.push('설정');
+  if(!confirm(items.join(', ')+' 데이터를 초기화하시겠습니까?\n이 작업은 되돌릴 수 없습니다.'))return;
+  const prefix=_PB8_PREFIX;
+  if(inc){['income_','inc_'].forEach(p=>{for(let i=localStorage.length-1;i>=0;i--){const k=localStorage.key(i);if(k&&k.startsWith(prefix+p))localStorage.removeItem(k);}});slF('incomes',[]);}
+  if(exp){['expense_','exp_'].forEach(p=>{for(let i=localStorage.length-1;i>=0;i--){const k=localStorage.key(i);if(k&&k.startsWith(prefix+p))localStorage.removeItem(k);}});slF('expenses',[]);}
+  if(seed){for(let i=localStorage.length-1;i>=0;i--){const k=localStorage.key(i);if(k&&(k.startsWith('pb8_env_')||k.startsWith(prefix+'env')))localStorage.removeItem(k);}}
+  if(price){slF('prices',[]);}
+  if(loan){slF('loans',[]);slF('repaid',{});}
+  if(settings){slF('progs',[]);sl('pb8_visit_routes',[]);}
+  showSaveToast('✓ 초기화 완료');
+  setTimeout(()=>location.reload(),800);
 }
 
 function resetAllData(){
@@ -4761,6 +5042,7 @@ function delVisitRoute(i){
   ['pr-from','sg-from','xl-from','del-from'].forEach(id=>{const el=document.getElementById(id);if(el)el.value=_m1;});
   ['pr-to','sg-to','xl-to','del-to'].forEach(id=>{const el=document.getElementById(id);if(el)el.value=_today;});
   initDatePickers();
+  setTimeout(initSwipeDownClose, 500);
   setInitialModes();
   // 항상 요약 탭으로 시작 (로그인 후 showTab('summary')로 재설정되지만 초기 렌더는 summary)
   renderTabs('summary');
