@@ -3907,7 +3907,7 @@ function styleXlsHeader(ws, colCount) {
 
 function getEcowittKeys(){
   try{
-    const k=JSON.parse(localStorage.getItem('pb8_ecowitt_keys')||'null')||{apiKey:'',appKey:'',mac:'',proxyUrl:''};
+    const k=JSON.parse(localStorage.getItem('pb8_ecowitt_keys')||'null')||{apiKey:'',appKey:'',mac:'',proxyUrl:'',mapping:{}};
     // 구버전 URL 자동 정리
     if(k.proxyUrl&&k.proxyUrl.includes('hcoob0-9559s')){
       k.proxyUrl='https://peakberry.vercel.app';
@@ -3915,7 +3915,7 @@ function getEcowittKeys(){
     }
     return k;
   }
-  catch(e){return {apiKey:'',appKey:'',mac:'',proxyUrl:''};}
+  catch(e){return {apiKey:'',appKey:'',mac:'',proxyUrl:'',mapping:{}};}
 }
   function saveEcowittKeys(k){
   localStorage.setItem('pb8_ecowitt_keys', JSON.stringify(k));
@@ -3973,8 +3973,9 @@ async function fetchEcowittData(){
 function _applyEcowittData(data, status, keys){
   if(!data){if(status)status.textContent='⚠ 응답에 data 없음';return;}
   const cfg=keys||getEcowittKeys();
-  // 기본 매핑 (설정이 없을 때)
-  const m=cfg.mapping||{'outdoor-temp':'temp','outdoor-humi':'humidity','solar':'sunlight'};
+  // 기본 매핑 (설정이 없거나 비어있을 때)
+  const defaultMapping={'outdoor-temp':'temp','outdoor-humi':'humidity','solar':'sunlight'};
+  const m=(cfg.mapping&&Object.keys(cfg.mapping).length>0)?cfg.mapping:defaultMapping;
 
   // 각 Ecowitt 소스에서 값 추출
   const raw={};
