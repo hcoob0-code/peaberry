@@ -2527,4 +2527,746 @@ function openModal(cat,idx=-1){
   } else if(cat==='seedbuy'){
     fields.innerHTML=`
       <div class="fg"><label class="req">날짜</label><input type="date" id="f-date" value="${e.date||todayStr}"></div>
-      <div class="fg"><label class="req">모종 구매처</la
+      <div class="fg"><label class="req">모종 구매처</label><input type="text" id="f-name" placeholder="예: 청주모종농장" value="${e.name||''}"></div>
+      <div class="fr">
+        <div class="fg"><label class="req">수량 (개)</label><input type="number" id="f-qty" placeholder="0" value="${e.qty||''}" oninput="calcSeedbuyTotal()"></div>
+        <div class="fg"><label class="req">단가 (원/개)</label><input type="number" id="f-unitprice" placeholder="0" value="${e.unitPrice||''}" oninput="calcSeedbuyTotal()"></div>
+      </div>
+      <div class="fg"><label>총 금액 (원)</label><input type="number" id="f-amount" placeholder="자동계산" value="${e.amount||''}" readonly style="background:var(--border-light);color:var(--text-secondary);"></div>
+      <div class="fg"><label>메모(선택사항)</label><textarea id="f-note" placeholder="메모(선택사항)">${e.note||''}</textarea></div>`;
+    if(e.qty&&e.unitPrice) setTimeout(()=>calcSeedbuyTotal(),10);
+  } else if(cat==='prog'){
+    fields.innerHTML=`
+      <div class="fg"><label class="req">프로그램명</label><input type="text" id="f-pname" value="${e.name||''}"></div>
+      <div class="fg"><label class="req">기본 단가 (원)</label><input type="number" id="f-pprice" value="${e.price||''}"></div>
+      <div class="fg"><label>설명</label><textarea id="f-pdesc" placeholder="프로그램 설명">${e.desc||''}</textarea></div>`;
+  } else if(cat==='inv-in'){
+    const items=getInvItems();
+    const iOpts=items.map(i=>`<option value="${i.name}">${i.name}</option>`).join('');
+    fields.innerHTML=`
+      <div class="fg"><label class="req">날짜</label><input type="date" id="f-date" value="${e.date||todayStr}" onchange="autoFillPriceFromDate(this.value)"></div>
+      <div class="fg"><label class="req">항목</label><select id="f-invitem">${iOpts}</select></div>
+      <div class="fr"><div class="fg"><label class="req">수량</label><input type="number" id="f-qty" value="${e.qty||''}"></div>
+      <div class="fg"><label class="req">단위</label><input type="text" id="f-unit" value="${e.unit||''}"></div></div>
+      <div class="fg"><label>메모(선택사항)</label><textarea id="f-note">${e.note||''}</textarea></div>`;
+    if(e.item){const s=document.getElementById('f-invitem');if(s)s.value=e.item;}
+  } else if(cat==='inv-item'){
+    fields.innerHTML=`
+      <div class="fg"><label class="req">항목명</label><input type="text" id="f-iname" value="${e.name||''}"></div>
+      <div class="fg"><label class="req">단위</label><input type="text" id="f-iunit" placeholder="박스, kg, 개..." value="${e.unit||''}"></div>
+      <div class="fg"><label class="req">최소 재고 기준</label><input type="number" id="f-imin" placeholder="10" value="${e.minStock||''}"></div>`;
+  }
+  modal.classList.add('open');
+  // textarea 높이를 input과 동일하게 맞추기
+  setTimeout(()=>{
+    const inp=modal.querySelector('.fg input, .fg select');
+    const tas=modal.querySelectorAll('.fg textarea');
+    const h=inp?inp.offsetHeight:46;
+    tas.forEach(ta=>{ta.style.height=h+'px';});
+  },30);
+}
+
+
+
+function copyTotalToSettlement(){
+  const ts=document.getElementById('f-totalSales')?.value||'';
+  const se=document.getElementById('f-settlement');
+  if(se&&ts){se.value=ts;calcFee();}
+}
+
+function syncWsKg(fromRow){
+  const val=document.getElementById('f-kg'+fromRow)?.value||'';
+  for(let k=1;k<=5;k++){if(k===fromRow)continue;const el=document.getElementById('f-kg'+k);if(el)el.value=val;}
+}
+function toggleBonusField(){
+  const wrap=document.getElementById('f-bonus-wrap');
+  const sel=document.getElementById('f-paytype');
+  if(wrap)wrap.style.display=sel?.value==='상여금'?'block':'none';
+}
+
+function calcSeedbuyTotal(){
+  const qty=parseFloat(document.getElementById('f-qty')?.value)||0;
+  const up=parseFloat(document.getElementById('f-unitprice')?.value)||0;
+  const amtEl=document.getElementById('f-amount');
+  if(amtEl)amtEl.value=Math.round(qty*up)||'';
+}
+
+function syncAllKg(){
+  // 공통 중량 입력 → 저장 시 모든 행에 적용
+  calcWsTotal();
+}
+
+function calcWsTotal(){
+  let sum=0;
+  for(let k=1;k<=5;k++){
+    const cnt=parseFloat(document.getElementById('f-cnt'+k)?.value)||0;
+    const price=parseFloat(document.getElementById('f-price'+k)?.value)||0;
+    sum+=cnt*price;
+  }
+  const tsEl=document.getElementById('f-totalSales');
+  if(tsEl&&sum>0)tsEl.value=Math.round(sum);
+  calcFee();
+}
+
+// 도매 모달: 날짜 선택 시 해당 날짜 저장된 시세 자동 채우기
+function autoFillPriceFromDate(dateStr){
+  if(!dateStr) return;
+  const priceData = gl('pb8_price_'+dateStr)||{};
+  let filled = false;
+  for(let k=1;k<=5;k++){
+    const prEl=document.getElementById('f-price'+k);
+    if(prEl && !prEl.value && priceData[k]){
+      prEl.value = priceData[k];
+      filled = true;
+    }
+  }
+  if(filled) calcWsTotal();
+}
+
+function calcFee(){
+  const total=parseInt(document.getElementById('f-totalSales')?.value||0)||0;
+  const settle=parseInt(document.getElementById('f-settlement')?.value||0)||0;
+  const fee=Math.max(0,total-settle);
+  const pct=total>0?((fee/total)*100).toFixed(1):'0';
+  const box=document.getElementById('fee-display');
+  const val=document.getElementById('fee-calc-val');
+  const pctEl=document.getElementById('fee-pct-val');
+  if(box)box.style.display='flex';
+  if(val)val.textContent=fmt(fee);
+  if(pctEl)pctEl.textContent=`(${pct}%)`;
+}
+
+function addPiBlock(){
+  const wrap=document.getElementById('pi-wrap');
+  const i=wrap.children.length;
+  const progs=getProgs();
+  const pOpts=progs.map(p=>`<option value="${p.name}">${p.name} (${(+p.price).toLocaleString()}원)</option>`).join('');
+  const div=document.createElement('div');
+  div.className='pi-block';div.id='pi-'+i;
+  div.innerHTML=`<div class="pi-block-hdr"><span>항목 ${i+1}</span><button class="pi-xbtn" onclick="removePiBlock(${i})">✕</button></div>
+    <div class="fg"><label class="req">프로그램</label><select id="f-prog-${i}" onchange="onProgChange(${i})">${pOpts}</select></div>
+    <div class="fr"><div class="fg"><label class="req">수량</label><input type="number" id="f-pqty-${i}" value="1" min="1"></div>
+    <div class="fg"><label class="req">단가</label><input type="number" id="f-pprice-${i}" value="0"></div></div>`;
+  wrap.appendChild(div);
+  if(progs.length>0){const p=progs[0];const pe=document.getElementById(`f-pprice-${i}`);if(pe)pe.value=p.price;}
+}
+
+function removePiBlock(i){const el=document.getElementById('pi-'+i);if(el)el.remove();}
+
+function onProgChange(i){
+  const sel=document.getElementById('f-prog-'+i);
+  const customWrap=document.getElementById('f-prog-custom-wrap-'+i);
+  if(sel.value==='__custom__'){
+    if(customWrap)customWrap.style.display='block';
+    return;
+  }
+  if(customWrap)customWrap.style.display='none';
+  const p=getProgs().find(x=>x.name===sel.value);
+  if(p){const pe=document.getElementById('f-pprice-'+i);if(pe)pe.value=p.price;}
+}
+
+function saveEntry(){
+  const cat=curModal;
+  const tab=INC.includes(cat)?'inc':EXP.includes(cat)?'exp':null;
+  let e={};
+  const v=id=>document.getElementById(id)?.value||'';
+  if(cat==='retail'){
+    if(!v('f-date')||!v('f-price')){showAlert();return;}
+    e={date:v('f-date'),kg:parseFloat(v('f-kg'))||0,qty:parseInt(v('f-qty'))||0,price:parseFloat(v('f-price'))||0,note:v('f-note'),amount:Math.round((parseFloat(v('f-kg'))||0)*(parseFloat(v('f-price'))||0))||((parseInt(v('f-qty'))||0)*(parseFloat(v('f-price'))||0))};
+    if(e.amount===0)e.amount=(parseInt(v('f-qty'))||0)*(parseFloat(v('f-price'))||0);
+  } else if(cat==='wholesale'){
+    if(!v('f-date')){showAlert('날짜를 입력해 주세요.');return;}
+    const totalSales=parseFloat(v('f-totalSales'))||0;
+    const settlement=parseFloat(v('f-settlement'))||0;
+    if(!totalSales){showAlert('총판매금액을 입력해 주세요.');return;}
+    if(!settlement){showAlert('정산지급액을 입력해 주세요.');return;}
+    const commonKg=parseFloat(document.getElementById('f-kg-common')?.value)||0;
+    if(!commonKg){showAlert('공통 중량(kg)을 입력해 주세요.');return;}
+    const wsItems=[];let total=0;
+    for(let k=1;k<=5;k++){
+      const cnt=parseInt(document.getElementById('f-cnt'+k)?.value)||0;
+      const price=parseFloat(document.getElementById('f-price'+k)?.value)||0;
+      // 부분 입력 시 전체 필수
+      if((cnt>0||price>0)&&!(cnt>0&&price>0)){
+        showAlert(`${k}번: 수량과 단가를 모두 입력해 주세요.`);return;
+      }
+      wsItems.push({kg:commonKg,cnt,price});
+      total+=cnt*price;
+    }
+    const fee=totalSales-settlement;
+    const feePct=totalSales>0?((fee/totalSales)*100).toFixed(1):'0';
+    const amount=settlement;
+    e={date:v('f-date'),source:v('f-source'),note:v('f-note'),wsItems,totalSales,settlement,fee,feePct,amount,kg:commonKg};
+    for(let k=1;k<=5;k++){e['kg'+k]=commonKg;e['cnt'+k]=wsItems[k-1].cnt;e['price'+k]=wsItems[k-1].price;}
+    // 시세 자동 저장: 각 번호별 단가를 시세로 저장
+    const dateStr=v('f-date');
+    if(dateStr){
+      const existing=gl('pb8_price_'+dateStr)||{};
+      let updated=false;
+      wsItems.forEach((it,i)=>{if(it.cnt>0&&it.price>0){existing[i+1]=it.price;updated=true;}});
+      if(updated) sl('pb8_price_'+dateStr, existing);
+    }
+  } else if(cat==='group'||cat==='personal'){
+    if(!v('f-date')){showAlert();return;}
+    const wrap=document.getElementById('pi-wrap');
+    const items=[];let total=0;
+    Array.from(wrap.children).forEach((bl,i)=>{
+      let prog=document.getElementById('f-prog-'+i)?.value||'';
+      if(prog==='__custom__') prog=document.getElementById('f-prog-custom-'+i)?.value||'';
+      const qty=parseInt(document.getElementById('f-pqty-'+i)?.value)||1;
+      const price=parseFloat(document.getElementById('f-pprice-'+i)?.value)||0;
+      if(prog){
+        items.push({prog,qty,price});total+=qty*price;
+        // 미등록 프로그램이면 등록 제안
+        if(!getProgs().find(p=>p.name===prog)){
+          setTimeout(()=>suggestProgRegister(prog,price),100);
+        }
+      }
+    });
+    e={date:v('f-date'),orgName:cat==='group'?v('f-org'):'',visitRoute:cat==='personal'?(document.getElementById('f-visit-route')?.value||''):'',items,note:v('f-note'),amount:total};
+  } else if(cat==='seedling'){
+    if(!v('f-date')||!v('f-price')){showAlert();return;}
+    const qty=parseInt(v('f-qty'))||0;const price=parseFloat(v('f-price'))||0;
+    e={date:v('f-date'),qty,price,note:v('f-note'),amount:qty*price};
+  } else if(cat==='labor'){
+    if(!v('f-date')||!v('f-amount')){showAlert();return;}
+    const payType=v('f-paytype')||'일급';
+    const bonusReason=payType==='상여금'?(document.getElementById('f-bonus-reason')?.value||''):'';
+    if(payType==='상여금'&&!bonusReason.trim()){showAlert('상여금 내역을 입력해 주세요.');return;}
+    const baseAmt=Math.round((parseFloat(v('f-amount'))||0)*10000);
+    e={date:v('f-date'),laborType:v('f-ltype'),count:parseInt(v('f-count'))||1,payType,amount:baseAmt,bonusReason,note:v('f-note')};
+  } else if(['electric','fertilizer','parts','repair'].includes(cat)){
+    if(!v('f-date')||!v('f-amount')){showAlert();return;}
+    e={date:v('f-date'),name:v('f-name'),amount:parseFloat(v('f-amount'))||0,note:v('f-note')};
+  } else if(cat==='seedbuy'){
+    if(!v('f-date')||!v('f-qty')||!v('f-unitprice')){showAlert('날짜, 수량, 단가를 입력해 주세요.');return;}
+    const qty=parseFloat(v('f-qty'))||0;
+    const unitPrice=parseFloat(v('f-unitprice'))||0;
+    e={date:v('f-date'),name:v('f-name'),qty,unitPrice,amount:Math.round(qty*unitPrice),note:v('f-note')};
+  } else if(cat==='prog'){
+    if(!v('f-pname')){showAlert();return;}
+    const progs=getProgs();
+    const pe={name:v('f-pname'),price:parseFloat(v('f-pprice'))||0,desc:v('f-pdesc')};
+    if(editIdx>=0)progs[editIdx]=pe;else progs.push(pe);
+    slF('progs',progs);closeModal();renderSettings();return;
+  } else if(cat==='inv-in'){
+    if(!v('f-date')||!v('f-qty')){showAlert();return;}
+    const inv=getInvIn();
+    const ie={date:v('f-date'),item:document.getElementById('f-invitem')?.value||'',qty:parseFloat(v('f-qty'))||0,unit:v('f-unit'),note:v('f-note')};
+    if(editIdx>=0)inv[editIdx]=ie;else inv.push(ie);
+    slF('inv_in',inv);closeModal();renderInventory();return;
+  } else if(cat==='inv-item'){
+    if(!v('f-iname')){showAlert();return;}
+    const items=getInvItems();
+    const it={name:v('f-iname'),unit:v('f-iunit'),minStock:parseFloat(v('f-imin'))||0};
+    if(editIdx>=0)items[editIdx]=it;else items.push(it);
+    slF('inv_items',items);closeModal();renderInventory();return;
+  }
+  if(tab){
+    const ctx=getCtx(tab);
+    // 날짜 기반으로 저장 키 결정
+    const entryDate=e.date||`${ctx.year}-${p2(ctx.month)}-${p2(ctx.day)}`;
+    const parts=entryDate.split('-');
+    const ey=parseInt(parts[0]);const em=parseInt(parts[1]);const ed=parseInt(parts[2]);
+    // 항상 월 단위 키에 저장 (일간/월간/연간 모두)
+    const saveKey=sk(cat,ey,em);
+    // 수정 시: 기존 키에서 삭제
+    if(editIdx>=0){
+      const visibleData=getData(cat,ctx);
+      const oldEntry=visibleData[editIdx];
+      if(oldEntry){
+        const od=oldEntry.date||entryDate;
+        const op=od.split('-');
+        const oldKey=sk(cat,parseInt(op[0]),parseInt(op[1]));
+        const oldArr=JSON.parse(localStorage.getItem(oldKey)||'[]');
+        const ri=oldArr.findIndex(x=>JSON.stringify(x)===JSON.stringify(oldEntry));
+        if(ri>=0)oldArr.splice(ri,1);
+        sl(oldKey,oldArr);
+      }
+    }
+    const arr=JSON.parse(localStorage.getItem(saveKey)||'[]');
+    arr.push(e);
+    sl(saveKey,arr);
+    closeModal();renderIncExp();renderAll();
+  }
+}
+
+function closeMBg(e){if(e.target.id==='modal')closeModal();}
+function closeModal(){document.getElementById('modal').classList.remove('open');curModal=null;editIdx=-1;}
+(function setupModalSwipeClose(){
+  let _sY=0,_sST=0,_target=null;
+  document.addEventListener('touchstart',function(e){
+    _target=null;
+    ['modal','loanModal'].forEach(function(mid){
+      const bg=document.getElementById(mid);
+      if(!bg||!bg.classList.contains('open'))return;
+      const box=bg.querySelector('.modal');
+      if(box&&box.contains(e.target)){_sY=e.touches[0].clientY;_sST=box.scrollTop;_target=mid;}
+    });
+  },{passive:true});
+  document.addEventListener('touchend',function(e){
+    if(!_target)return;
+    const dy=e.changedTouches[0].clientY-_sY;
+    if(dy>90&&_sST<=2){
+      if(_target==='modal')closeModal();
+      else if(_target==='loanModal')closeLoanModal();
+    }
+    _target=null;
+  },{passive:true});
+})();
+
+// 모달 내 엔터키 → 다음 입력칸 이동
+document.addEventListener('keydown', function(e){
+  if(e.key!=='Enter')return;
+  const modal=document.getElementById('modal');
+  if(!modal.classList.contains('open'))return;
+  const focusable=Array.from(modal.querySelectorAll('input:not([type=hidden]), select, textarea, button.modal-save, button.modal-cancel'));
+  const active=document.activeElement;
+  const idx=focusable.indexOf(active);
+  if(idx<0)return;
+  // textarea는 엔터 허용 (메모칸) → 이동 안 함
+  if(active.tagName==='TEXTAREA')return;
+  // 마지막 항목이면 저장 버튼 클릭
+  const next=focusable[idx+1];
+  if(!next||next.classList.contains('modal-save')){
+    e.preventDefault();
+    document.querySelector('#modal .modal-save')?.click();
+    return;
+  }
+  e.preventDefault();
+  next.focus();
+});
+
+/* ══ 대출 다중 관리 ══ */
+function setRepayFreq(freq){
+  const yBtn=document.getElementById('lm-freq-year');
+  const mBtn=document.getElementById('lm-freq-month');
+  if(yBtn){yBtn.style.background=freq==='year'?'var(--text-primary)':'var(--surface)';yBtn.style.color=freq==='year'?'white':'var(--text-primary)';yBtn.dataset.active=freq==='year'?'1':'';}
+  if(mBtn){mBtn.style.background=freq==='month'?'var(--text-primary)':'var(--surface)';mBtn.style.color=freq==='month'?'white':'var(--text-primary)';}
+}
+function toggleInformalLoan(){
+  const on=document.getElementById('lm-informal').checked;
+  document.getElementById('lm-standard-fields').style.display=on?'none':'block';
+  document.getElementById('lm-friend-wrap').style.display=on?'block':'none';
+  document.getElementById('lm-name-wrap').style.display=on?'none':'block';
+  document.getElementById('lm-rate-wrap').style.display=on?'none':'block';
+  // 지인 대출이면 fr 안을 2칸(원금+지인)으로, 일반이면 2칸(원금+금리)
+}
+function openAddLoanModal(idx=-1){
+  editLoanIdx=idx;
+  const loans=getLoans();
+  const lo=idx>=0?loans[idx]:{};
+  const nameEl=document.getElementById('lm-name');if(nameEl)nameEl.value=lo.name||'';
+  document.getElementById('lm-orig').value=lo.principal?lo.principal/10000:'';
+  const rateEl=document.getElementById('lm-rate');if(rateEl)rateEl.value=lo.rate?lo.rate*100:'';
+  document.getElementById('lm-start-year').value=lo.startY||'';
+  document.getElementById('lm-start-month').value=lo.startM||lo.startMonth||'';
+  document.getElementById('lm-start-day').value=lo.startD||'';
+  const friendEl=document.getElementById('lm-friend');if(friendEl)friendEl.value=lo.friend||'';
+  const graceEl=document.getElementById('lm-grace');if(graceEl)graceEl.value=lo.graceY||0;
+  const periodEl=document.getElementById('lm-period');if(periodEl)periodEl.value=lo.period||'';
+  const freq=lo.repayFreq||'year';
+  setRepayFreq(freq);
+  const inf=document.getElementById('lm-informal');if(inf)inf.checked=lo.informal||false;
+  toggleInformalLoan();
+  document.getElementById('loan-modal-title').textContent=idx>=0?'대출 수정':'대출 추가';
+  document.getElementById('loanModal').classList.add('open');
+}
+function closeLoanModal(){document.getElementById('loanModal').classList.remove('open');editLoanIdx=-1;}
+function closeLoanModalBg(e){if(e.target.id==='loanModal')closeLoanModal();}
+
+function saveLoanEntry(){
+  const orig=parseFloat(document.getElementById('lm-orig').value)||0;
+  const startY=parseInt(document.getElementById('lm-start-year').value)||0;
+  const startM=parseInt(document.getElementById('lm-start-month').value)||0;
+  const startD=parseInt(document.getElementById('lm-start-day').value)||1;
+  const informal=document.getElementById('lm-informal')?.checked||false;
+  const friend=(document.getElementById('lm-friend')?.value||'').trim();
+  if(!orig||!startY||!startM){showAlert('대출 원금과 실행시기(년/월)는 필수입니다.');return;}
+  if(startM<1||startM>12){showAlert('실행 월은 1~12 사이로 입력해 주세요.');return;}
+  if(informal){
+    if(!friend){showAlert('지인 이름을 입력해 주세요.');return;}
+    const loans=getLoans();
+    const lo={name:friend+' 지인 대출',principal:orig*10000,startY,startM,startD,friend,informal:true,repayHistory:[]};
+    if(editLoanIdx>=0)lo.repayHistory=loans[editLoanIdx].repayHistory||[];
+    if(editLoanIdx>=0)loans[editLoanIdx]=lo;else loans.push(lo);
+    slF('loans',loans);closeLoanModal();renderLoanList();return;
+  }
+  const name=(document.getElementById('lm-name')?.value||'').trim();
+  const rate=parseFloat(document.getElementById('lm-rate')?.value)||0;
+  const graceY=parseInt(document.getElementById('lm-grace')?.value)||0;
+  const period=parseInt(document.getElementById('lm-period')?.value)||0;
+  if(!name||!rate||!period){showAlert('대출 이름, 연 금리, 상환 기간은 필수입니다.');return;}
+  const freqYearActive=document.getElementById('lm-freq-year')?.dataset?.active==='1';
+  const repayFreq=freqYearActive?'year':'month';
+  // 상환 월/일은 실행시기 기준으로 자동 계산
+  const repayMonth=startM;
+  const repayDay=startD||1;
+  const loans=getLoans();
+  const lo={name,principal:orig*10000,rate:rate/100,startY,startM,startD,graceY,period,repayFreq,repayMonth,repayDay,informal:false};
+  if(editLoanIdx>=0)loans[editLoanIdx]=lo;else loans.push(lo);
+  slF('loans',loans);closeLoanModal();renderLoanList();
+}
+
+function deleteLoan(idx){
+  const loans=getLoans();loans.splice(idx,1);slF('loans',loans);renderLoanList();
+}
+
+function calcLoanData(lo){
+  const{principal,rate,startY,graceY,period,repayMonth}=lo;
+  if(lo.informal)return null;
+  if(!principal||!rate||!period)return null;
+  const graceInterest=principal*rate;
+  const annualPrincipal=principal/period;
+  const curY=NOW.getFullYear();
+  const curM=NOW.getMonth()+1;
+  let rows=[];
+  // 거치기간
+  for(let i=0;i<graceY;i++){
+    const y=startY+i;
+    rows.push({y,type:'grace',principal:0,interest:graceInterest,total:graceInterest,balance:principal});
+  }
+  // 상환기간
+  for(let i=0;i<period;i++){
+    const y=startY+graceY+i;
+    const remaining=principal-annualPrincipal*i;
+    const interest=remaining*rate;
+    rows.push({y,type:'repay',principal:annualPrincipal,interest,total:annualPrincipal+interest,balance:remaining-annualPrincipal});
+  }
+  // 현재 잔액 계산
+  let balance=principal;
+  const repaid=getRepaid();
+  rows.forEach(r=>{if(r.y<curY||(r.y===curY&&curM>=repayMonth)){if(r.type==='repay')balance-=r.principal;}});
+  const curRow=rows.find(r=>r.y===curY);
+  return{rows,balance:Math.max(0,balance),graceInterest,annualPrincipal,curRow,curY};
+}
+
+function renderLoanList(){
+  const loans=getLoans();
+  const container=document.getElementById('loan-list');
+
+  // 총 대출 요약 계산 (항상 표시)
+  const curY=NOW.getFullYear();
+  const repaid=getRepaid();
+  let totalBalance=0, totalThisYearPrincipal=0, totalThisYearInterest=0, totalThisYearPaid=0;
+  loans.forEach((lo,idx)=>{
+    if(lo.informal){totalBalance+=lo.principal||0;return;}
+    const calc=calcLoanData(lo);
+    if(!calc)return;
+    totalBalance+=calc.balance;
+    if(calc.curRow){
+      totalThisYearPrincipal+=calc.curRow.principal||0;
+      totalThisYearInterest+=calc.curRow.interest||0;
+      const key=`${idx}_${curY}`;
+      if(repaid[key]===true){
+        totalThisYearPaid+=calc.curRow.total||0;
+      }
+    }
+  });
+
+  const summaryHtml=`<div class="nm-flat" style="padding:14px 16px;margin-bottom:12px;">
+    <div style="font-size:10px;font-weight:700;letter-spacing:1px;color:var(--text-secondary);text-transform:uppercase;margin-bottom:10px;">전체 대출 현황</div>
+    ${loans.length===0?`<div style="font-size:13px;color:var(--text-tertiary);text-align:center;padding:8px 0;">등록된 대출이 없습니다.</div>`:`
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
+      <div style="background:var(--red-soft);border:1px solid #FECACA;border-radius:10px;padding:10px 12px;">
+        <div style="font-size:10px;color:var(--text-secondary);margin-bottom:4px;">총 남은 대출</div>
+        <div style="font-size:15px;font-weight:700;color:var(--red);">${fmtM(totalBalance)}</div>
+      </div>
+      <div style="background:${totalThisYearPaid>0?'var(--green-soft)':'var(--bg)'};border:1px solid ${totalThisYearPaid>0?'#A7F3D0':'var(--border)'};border-radius:10px;padding:10px 12px;">
+        <div style="font-size:10px;color:var(--text-secondary);margin-bottom:4px;">올해 상환한 금액</div>
+        <div style="font-size:15px;font-weight:700;color:${totalThisYearPaid>0?'var(--green)':'var(--text-tertiary)'};">${totalThisYearPaid>0?fmtM(totalThisYearPaid):'미상환'}</div>
+      </div>
+      <div style="background:var(--bg);border:1px solid var(--border);border-radius:10px;padding:10px 12px;">
+        <div style="font-size:10px;color:var(--text-secondary);margin-bottom:4px;">올해 상환 원금</div>
+        <div style="font-size:15px;font-weight:700;color:var(--text-primary);">${fmtM(totalThisYearPrincipal)}</div>
+      </div>
+      <div style="background:var(--amber-soft);border:1px solid #FDE68A;border-radius:10px;padding:10px 12px;">
+        <div style="font-size:10px;color:var(--text-secondary);margin-bottom:4px;">올해 이자</div>
+        <div style="font-size:15px;font-weight:700;color:var(--amber);">${fmtM(totalThisYearInterest)}</div>
+      </div>
+    </div>`}
+  </div>`;
+
+  if(!loans.length){container.innerHTML=summaryHtml;return;}
+
+  container.innerHTML=summaryHtml+loans.map((lo,idx)=>{
+    const calc=calcLoanData(lo);
+    const balTxt=lo.informal?fmtM(lo.principal||0):(calc?fmtM(calc.balance):'-');
+    return `<div class="loan-card">
+      <div class="loan-card-hdr" onclick="toggleLoanCard(${idx})">
+        <span class="lc-name">${lo.name||'대출 '+(idx+1)}</span>
+        <div style="display:flex;align-items:center;gap:10px;">
+          <span class="lc-bal">${balTxt}</span>
+          <span style="font-size:10px;color:var(--text-tertiary);">▼</span>
+        </div>
+      </div>
+      <div class="loan-card-body" id="loan-body-${idx}">
+        ${lo.informal?renderInformalLoanDetail(lo,idx):(calc?renderLoanDetail(lo,calc,idx):'<p style="font-size:12px;color:var(--text-tertiary);">정보를 입력해 주세요.</p>')}
+        <div style="display:flex;gap:8px;margin-top:12px;">
+          <button class="modal-cancel" style="flex:1;padding:10px;font-size:13px;" onclick="openAddLoanModal(${idx})">수정</button>
+          <button class="modal-cancel" style="flex:1;padding:10px;font-size:13px;color:var(--red);border-color:#FECACA;background:var(--red-soft);" onclick="deleteLoan(${idx})">삭제</button>
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function renderInformalLoanDetail(lo, loanIdx){
+  const history=lo.repayHistory||[];
+  const totalPaid=history.reduce((s,r)=>s+(+r.amount||0),0);
+  const remaining=Math.max(0,(lo.principal||0)-totalPaid);
+  const histHtml=history.length?history.map((r,i)=>`
+    <div style="display:flex;align-items:center;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border);">
+      <div><div style="font-size:12px;font-weight:500;">${r.date}</div><div style="font-size:11px;color:var(--text-secondary);">${r.note||''}</div></div>
+      <div style="display:flex;align-items:center;gap:8px;">
+        <span style="font-size:12px;font-weight:700;color:var(--green);">${fmtM(+r.amount||0)}</span>
+        <button onclick="event.stopPropagation();deleteInformalRepay(${loanIdx},${i})" style="font-size:9px;padding:2px 6px;border-radius:4px;border:1px solid #FECACA;background:#FEF2F2;color:#EF4444;cursor:pointer;font-family:'Noto Sans KR',sans-serif;">삭제</button>
+      </div>
+    </div>`).join(''):'<p style="font-size:12px;color:var(--text-tertiary);padding:8px 0;">상환 내역 없음</p>';
+  return `<div class="nm-flat" style="padding:14px 16px;margin-bottom:10px;">
+    <div class="info-row"><span class="k">대출 원금</span><span class="v">${fmtM(lo.principal||0)}</span></div>
+    <div class="info-row"><span class="k">실행시기</span><span class="v">${lo.startY||'-'}년 ${lo.startM||'-'}월${lo.startD?' '+lo.startD+'일':''}</span></div>
+    <div class="info-row"><span class="k">지인</span><span class="v">${lo.friend||'-'}</span></div>
+    <div class="info-row"><span class="k">총 상환</span><span class="v" style="color:var(--green);">${fmtM(totalPaid)}</span></div>
+    <div class="info-row"><span class="k">남은 잔액</span><span class="v" style="color:var(--red);">${fmtM(remaining)}</span></div>
+  </div>
+  <div class="sec-label" style="margin-top:0;">상환 내역</div>
+  <div style="margin-bottom:8px;">${histHtml}</div>
+  <button onclick="event.stopPropagation();openInformalRepayModal(${loanIdx})" style="width:100%;padding:8px;font-size:12px;font-family:'Noto Sans KR',sans-serif;font-weight:600;color:var(--green);background:var(--green-soft);border:1px solid #A7F3D0;border-radius:var(--radius-md);cursor:pointer;margin-bottom:4px;">+ 상환 추가</button>`;
+}
+
+function openInformalRepayModal(loanIdx){
+  const box=document.createElement('div');
+  box.style.cssText='position:fixed;inset:0;z-index:600;display:flex;align-items:flex-end;justify-content:center;background:rgba(0,0,0,0.4);backdrop-filter:blur(4px);';
+  const today=`${NOW.getFullYear()}-${p2(NOW.getMonth()+1)}-${p2(NOW.getDate())}`;
+  box.innerHTML=`<div style="background:var(--surface);border-radius:22px 22px 0 0;width:100%;max-width:430px;padding:20px 20px calc(20px + env(safe-area-inset-bottom,0px));">
+    <div style="font-size:15px;font-weight:700;margin-bottom:14px;">상환 추가</div>
+    <div class="fg"><label class="req" style="font-size:11px;font-weight:600;color:var(--text-secondary);display:block;margin-bottom:5px;">날짜</label><input type="date" id="irm-date" value="${today}" style="width:100%;padding:12px 14px;font-size:14px;font-family:'Noto Sans KR',sans-serif;background:var(--bg);border:1px solid var(--border);border-radius:var(--radius-md);"></div>
+    <div class="fg" style="margin-top:10px;"><label class="req" style="font-size:11px;font-weight:600;color:var(--text-secondary);display:block;margin-bottom:5px;">상환 금액 (만원)</label><input type="number" id="irm-amount" placeholder="0" step="0.1" style="width:100%;padding:12px 14px;font-size:14px;font-family:'Noto Sans KR',sans-serif;background:var(--bg);border:1px solid var(--border);border-radius:var(--radius-md);"></div>
+    <div class="fg" style="margin-top:10px;"><label style="font-size:11px;font-weight:600;color:var(--text-secondary);display:block;margin-bottom:5px;">메모</label><input type="text" id="irm-note" placeholder="예: 1차 상환" style="width:100%;padding:12px 14px;font-size:14px;font-family:'Noto Sans KR',sans-serif;background:var(--bg);border:1px solid var(--border);border-radius:var(--radius-md);"></div>
+    <div style="display:flex;gap:10px;margin-top:16px;">
+      <button onclick="this.closest('div[style*=fixed]').remove()" style="flex:1;padding:14px;font-size:14px;font-family:'Noto Sans KR',sans-serif;font-weight:600;color:var(--text-secondary);background:var(--bg);border:1px solid var(--border);border-radius:var(--radius-md);cursor:pointer;">취소</button>
+      <button onclick="saveInformalRepay(${loanIdx});this.closest('div[style*=fixed]').remove();" style="flex:1.5;padding:14px;font-size:14px;font-family:'Noto Sans KR',sans-serif;font-weight:700;color:white;background:var(--text-primary);border:none;border-radius:var(--radius-md);cursor:pointer;">저장</button>
+    </div>
+  </div>`;
+  box.onclick=function(ev){if(ev.target===box)box.remove();};
+  document.body.appendChild(box);
+  setTimeout(()=>document.getElementById('irm-amount')?.focus(),100);
+}
+
+function saveInformalRepay(loanIdx){
+  const date=document.getElementById('irm-date')?.value||'';
+  const amount=parseFloat(document.getElementById('irm-amount')?.value)||0;
+  const note=document.getElementById('irm-note')?.value||'';
+  if(!date||!amount){showAlert('날짜와 금액을 입력해 주세요.');return;}
+  const loans=getLoans();
+  if(!loans[loanIdx])return;
+  if(!loans[loanIdx].repayHistory)loans[loanIdx].repayHistory=[];
+  loans[loanIdx].repayHistory.push({date,amount:Math.round(amount*10000),note});
+  loans[loanIdx].repayHistory.sort((a,b)=>a.date.localeCompare(b.date));
+  slF('loans',loans);
+  const bodyEl=document.getElementById('loan-body-'+loanIdx);
+  const wasOpen=bodyEl&&bodyEl.classList.contains('open');
+  renderLoanList();
+  if(wasOpen){const nb=document.getElementById('loan-body-'+loanIdx);if(nb)nb.classList.add('open');}
+  showSaveToast('✓ 상환 내역이 저장되었습니다');
+}
+
+function deleteInformalRepay(loanIdx, repayIdx){
+  const loans=getLoans();
+  if(!loans[loanIdx]||!loans[loanIdx].repayHistory)return;
+  loans[loanIdx].repayHistory.splice(repayIdx,1);
+  slF('loans',loans);
+  const bodyEl=document.getElementById('loan-body-'+loanIdx);
+  const wasOpen=bodyEl&&bodyEl.classList.contains('open');
+  renderLoanList();
+  if(wasOpen){const nb=document.getElementById('loan-body-'+loanIdx);if(nb)nb.classList.add('open');}
+}
+
+function toggleLoanCard(idx){
+  const body=document.getElementById('loan-body-'+idx);
+  if(body)body.classList.toggle('open');
+}
+
+function renderLoanDetail(lo,calc,loanIdx){
+  const{rows,balance,graceInterest,annualPrincipal,curRow,curY}=calc;
+  const repaid=getRepaid();
+  const ROW_H='40px';
+  const DCENTER=`display:flex;align-items:center;justify-content:center;height:${ROW_H};flex-direction:column;gap:2px;`;
+  const DLEFT=`display:flex;align-items:center;justify-content:flex-start;height:${ROW_H};`;
+  const DRIGHT=`display:flex;align-items:center;justify-content:flex-end;height:${ROW_H};`;
+  const BTN=`width:100%;padding:5px 4px;font-size:10px;font-weight:600;border-radius:6px;cursor:pointer;font-family:'Noto Sans KR',sans-serif;border:1px solid rgba(0,0,0,0.12);background:rgba(255,255,255,0.65);color:inherit;`;
+  const CANCEL=`font-size:8px;padding:1px 5px;border-radius:4px;border:1px solid #FECACA;background:#FEF2F2;color:#EF4444;cursor:pointer;font-family:'Noto Sans KR',sans-serif;`;
+
+  const rowsHtml=rows.map((r)=>{
+    const keyP=`${loanIdx}_${r.y}_p`;
+    const keyI=`${loanIdx}_${r.y}_i`;
+    const keyOld=`${loanIdx}_${r.y}`;
+    const paidP=repaid[keyP]===true||repaid[keyOld]===true;
+    const paidI=repaid[keyI]===true||repaid[keyOld]===true;
+    const isPast=r.y<curY;
+    const allPaid=(paidP&&paidI)||isPast;
+    const cls=allPaid?'r-paid':r.y===curY?'r-now':'r-future';
+
+    // 원금 셀
+    let principalCell;
+    if(r.type!=='repay'){
+      principalCell=`<div style="${DCENTER}"><span style="font-size:11px;opacity:0.4;">-</span></div>`;
+    } else if(isPast){
+      principalCell=`<div style="${DCENTER}"><span style="font-size:11px;">${fmtM(r.principal)}</span></div>`;
+    } else if(paidP){
+      principalCell=`<div style="${DCENTER}"><span style="font-size:10px;font-weight:700;color:#065F46;">✓${fmtM(r.principal)}</span><button style="${CANCEL}" onclick="event.stopPropagation();cancelRepaidKey('${keyP}','${keyOld}',${loanIdx})">취소</button></div>`;
+    } else {
+      principalCell=`<div style="${DCENTER}"><button style="${BTN}" onclick="event.stopPropagation();markRepaidKey('${keyP}',${loanIdx})">${fmtM(r.principal)}</button></div>`;
+    }
+
+    // 이자 셀
+    let interestCell;
+    if(isPast){
+      interestCell=`<div style="${DCENTER}"><span style="font-size:11px;">${fmtM(r.interest)}</span></div>`;
+    } else if(paidI){
+      interestCell=`<div style="${DCENTER}"><span style="font-size:10px;font-weight:700;color:#065F46;">✓${fmtM(r.interest)}</span><button style="${CANCEL}" onclick="event.stopPropagation();cancelRepaidKey('${keyI}','${keyOld}',${loanIdx})">취소</button></div>`;
+    } else {
+      interestCell=`<div style="${DCENTER}"><button style="${BTN}" onclick="event.stopPropagation();markRepaidKey('${keyI}',${loanIdx})">${fmtM(r.interest)}</button></div>`;
+    }
+
+    return `<div class="repay-row-item ${cls}" style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:4px;padding:0 8px;margin-bottom:3px;">
+      <div style="${DLEFT}"><span style="font-size:11px;font-weight:600;">${r.y}</span></div>
+      ${principalCell}
+      ${interestCell}
+      <div style="${DRIGHT}"><span style="font-size:11px;">${r.balance<=0?'0':fmtM(r.balance)}</span></div>
+    </div>`;
+  }).join('');
+
+  return `
+    <div class="nm-flat" style="padding:14px 16px;margin-bottom:10px;">
+      <div class="info-row"><span class="k">거치기간 연 이자</span><span class="v">${fmtM(graceInterest)}</span></div>
+      <div class="info-row"><span class="k">연 상환 원금</span><span class="v">${fmtM(annualPrincipal)}</span></div>
+      ${curRow?`<div class="info-row"><span class="k">올해 이자</span><span class="v">${fmtM(curRow.interest)}</span></div>
+      <div class="info-row"><span class="k">올해 납부액</span><span class="v">${fmtM(curRow.total)}</span></div>`:''}
+      <div class="info-row"><span class="k">실행시기</span><span class="v">${lo.startY||'-'}년 ${lo.startM||'-'}월</span></div>
+      <div class="info-row"><span class="k">현재 잔액</span><span class="v" style="color:var(--red);">${fmtM(balance)}</span></div>
+    </div>
+    <div class="sec-label" style="margin-top:0;">연도별 상환 내역 <span style="font-size:9px;color:var(--text-tertiary);font-weight:400;">(버튼 → 상환완료)</span></div>
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:4px;padding:2px 8px 4px;">
+      <span style="font-size:9px;color:var(--text-secondary);font-weight:600;">연도</span>
+      <span style="font-size:9px;color:var(--text-secondary);font-weight:600;text-align:center;">원금</span>
+      <span style="font-size:9px;color:var(--text-secondary);font-weight:600;text-align:center;">이자</span>
+      <span style="font-size:9px;color:var(--text-secondary);font-weight:600;text-align:right;">잔액</span>
+    </div>
+    ${rowsHtml}`;
+}
+
+function markRepaidKey(key,loanIdx){
+  const repaid=getRepaid();repaid[key]=true;slF('repaid',repaid);
+  // 상세내역 열린 상태 유지
+  const bodyEl=document.getElementById('loan-body-'+loanIdx);
+  const wasOpen=bodyEl&&bodyEl.classList.contains('open');
+  renderLoanList();
+  if(wasOpen){
+    const newBody=document.getElementById('loan-body-'+loanIdx);
+    if(newBody)newBody.classList.add('open');
+  }
+}
+
+function cancelRepaidKey(key,oldKey,loanIdx){
+  const repaid=getRepaid();
+  delete repaid[key];
+  // 구형 키도 삭제
+  if(oldKey&&repaid[oldKey]!==undefined) delete repaid[oldKey];
+  slF('repaid',repaid);
+  const bodyEl=document.getElementById('loan-body-'+loanIdx);
+  const wasOpen=bodyEl&&bodyEl.classList.contains('open');
+  renderLoanList();
+  if(wasOpen){
+    const newBody=document.getElementById('loan-body-'+loanIdx);
+    if(newBody)newBody.classList.add('open');
+  }
+}
+
+/* ══ PRICES ══ */
+function renderPricesTab(){
+  const d=document.getElementById('priceDate');
+  if(d&&!d.value){const t=NOW;d.value=`${t.getFullYear()}-${p2(t.getMonth()+1)}-${p2(t.getDate())}`;}
+  renderPriceDateView();
+  renderPriceChart();
+}
+
+function renderPriceDateView(){
+  const dateStr=document.getElementById('priceDate')?.value;
+  if(!dateStr)return;
+  const data=gl('pb8_price_'+dateStr)||{};
+  const panel=document.getElementById('price-day-panel');
+  const editing=panel.dataset.editing==='1';
+  if(!editing){
+    const rows=[1,2,3,4,5].map(i=>`<div class="price-row"><span class="lbl">${i}번</span><span class="val">${data[i]?data[i].toLocaleString()+'원':'-'}</span></div>`).join('');
+    panel.innerHTML=`<div class="price-date-card">${rows}</div>`;
+  }
+}
+
+function editPriceMode(){
+  const dateStr=document.getElementById('priceDate')?.value;
+  if(!dateStr)return;
+  const data=gl('pb8_price_'+dateStr)||{};
+  const panel=document.getElementById('price-day-panel');
+  panel.dataset.editing='1';
+  const inputs=[1,2,3,4,5].map(i=>`<div class="fg"><label class="req">${i}번 시세 (원/kg)</label><input class="price-input" type="number" id="pi-pr-${i}" value="${data[i]||''}"></div>`).join('');
+  panel.innerHTML=`<div class="nm-flat price-date-card">${inputs}<button class="nm-btn-primary" style="width:100%;padding:12px;font-size:14px;font-family:'Noto Sans KR',sans-serif;font-weight:700;" onclick="savePriceDay('${dateStr}')">저장</button></div>`;
+}
+
+function savePriceDay(dateStr){
+  const d={};
+  [1,2,3,4,5].forEach(i=>{const v=parseFloat(document.getElementById(`pi-pr-${i}`)?.value)||0;if(v)d[i]=v;});
+  sl('pb8_price_'+dateStr,d);
+  const panel=document.getElementById('price-day-panel');
+  panel.dataset.editing='0';
+  renderPriceDateView();
+  renderPriceChart();
+}
+
+let _showCompare=false;
+function toggleCompare(){
+  _showCompare=!_showCompare;
+  const sec=document.getElementById('compare-section');
+  const btn=document.getElementById('btn-compare');
+  if(sec)sec.style.display=_showCompare?'block':'none';
+  if(btn){btn.style.background=_showCompare?'var(--accent-soft)':'var(--surface)';btn.style.color=_showCompare?'var(--accent)':'var(--text-secondary)';btn.style.borderColor=_showCompare?'var(--accent)':'var(--border)';}
+  if(_showCompare) renderComparePriceChart(); // 열리자마자 기본 그래프 표시
+}
+
+function makePriceDateRange(fromId,toId){
+  const f=document.getElementById(fromId)?.value;
+  const t=document.getElementById(toId)?.value;
+  if(!f||!t)return[];
+  const dates=[];let cur=new Date(f);const end=new Date(t);
+  while(cur<=end){dates.push(`${cur.getFullYear()}-${p2(cur.getMonth()+1)}-${p2(cur.getDate())}`);cur.setDate(cur.getDate()+1);}
+  return dates;
+}
+
+function renderPriceChart(){
+  let dates=makePriceDateRange('pr-from','pr-to');
+  if(!dates.length){
+    const y=NOW.getFullYear(),m=NOW.getMonth()+1;
+    const days=new Date(y,m,0).getDate();
+    for(let d=1;d<=days;d++) dates.push(`${y}-${p2(m)}-${p2(d)}`);
+  }
+  const COLORS=['#EF4444','#F59E0B','#10B981','#3B82F6','#8B5CF6'];
+  const datasets=[1,2,3,4,5].map((grd,gi)=>{
+    const data=dates.map(d=>{const pr=gl('pb8_price_'+d)||{};return pr[grd]||null;});
+    return{label:`${grd}번`,data,borderColor:COLORS[gi],backgroundColor:'transparent',
+      fill:false,tension:0,spanGaps:true,
+      borderWidth:0.8,
+      pointRadius:1.5,pointHoverRadius:3,
+      pointBackgroundColor:COLORS[gi],pointBorderWidth:0};
+  });
+
+  // 비교 데이터셋
+  if(_showCompare){
+    const cDates=makePriceDateRange('pr-cmp-from','pr-cmp-to');
+    if(cDates.length){
+      [1,2,3,4,5].forEach((grd,gi)=>{
+        const data=cDates.map(d=>{const pr=gl('pb8_price_'+d)||{};return pr[grd]||null;});
+        datasets.push({label:`${grd}번(비교)`,data,borderColor:COLORS[gi],backgroundColor:'transparent',
+          fill:false,tension:0,spanGaps:true,
+          borderWidth:0.8,borderDash:[4,3],
+          poi
