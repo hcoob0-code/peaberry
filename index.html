@@ -3677,7 +3677,8 @@ function styleXlsHeader(ws, colCount) {
 // ══════════════════════════════════════════
 
 function getEcowittKeys(){
-  return gl('pb8_ecowitt_keys')||{apiKey:'',appKey:'',mac:''};
+  // farm prefix 없이 저장 (어느 농장에서도 공유)
+  return gl('pb8_ecowitt_keys')||{apiKey:'',appKey:'',mac:'',proxyUrl:''};
 }
 function saveEcowittKeys(k){sl('pb8_ecowitt_keys',k);}
 
@@ -3700,11 +3701,18 @@ async function fetchEcowittData(){
   if(status)status.textContent='Ecowitt 서버에 요청 중...';
 
   // 프록시 URL: 설정된 값 또는 기본값 사용
-  const proxyBase=(k.proxyUrl||'').replace(/\/+$/,'')||'https://ecowitt-proxy.vercel.app';
+  const proxyBase=(k.proxyUrl||'').replace(/\/+$/,'');
+  if(!proxyBase){
+    if(status)status.textContent='⚠ 프록시 URL이 설정되지 않았습니다';
+    if(btn){btn.disabled=false;btn.innerHTML='⇩ Ecowitt';}
+    showAlert('설정 탭 → Ecowitt 연동에서 프록시 서버 URL을 입력하고 저장해 주세요.\n\n프록시 URL: https://peakberry-hcoob0-9559s-projects.vercel.app');
+    return;
+  }
   const proxyUrl=proxyBase+'/api/ecowitt'
     +'?application_key='+encodeURIComponent(k.appKey)
     +'&api_key='+encodeURIComponent(k.apiKey)
     +'&mac='+encodeURIComponent(k.mac);
+  console.log('Ecowitt proxy URL:', proxyUrl);
 
   try{
     const r=await fetch(proxyUrl);
@@ -4600,7 +4608,9 @@ function renderSettings(){
   fillIfEmpty('eco-settings-appkey', ek.appKey);
   fillIfEmpty('eco-settings-apikey', ek.apiKey);
   fillIfEmpty('eco-settings-mac', ek.mac);
-  fillIfEmpty('eco-settings-proxy', ek.proxyUrl);
+  // 프록시 URL은 항상 저장된 값으로 덮어씀
+  const proxyEl=document.getElementById('eco-settings-proxy');
+  if(proxyEl&&ek.proxyUrl)proxyEl.value=ek.proxyUrl;
   // 매핑 셀렉트는 저장된 값으로 항상 복원 (select는 타이핑 없음)
   const m=ek.mapping||{'outdoor-temp':'temp','outdoor-humi':'humidity','solar':'sunlight'};
   const setV=(id,v)=>{const el=document.getElementById(id);if(el&&v!==undefined)el.value=v;};
