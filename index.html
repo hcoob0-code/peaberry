@@ -71,14 +71,14 @@ body {
 .hdr-app-icon { width:34px; height:34px; border-radius:10px; display:flex; align-items:center; justify-content:center; background:var(--text-primary); color:white; font-size:18px; flex-shrink:0; }
 .hdr-title { font-size: 24px; font-weight: 700; color: var(--text-primary); letter-spacing: -0.5px; cursor: pointer; }
 .hdr-sub { font-size: 12px; color: var(--text-secondary); margin-top: 3px; }
-.tabs-wrap { padding: 0 16px 14px; overflow-x: auto; -webkit-overflow-scrolling: touch; scrollbar-width: none; background: var(--bg); }
+.tabs-wrap { padding: 0 10px 14px; background: var(--bg); }
 .tabs-wrap::-webkit-scrollbar { display: none; }
-.tabs { display: flex; gap: 8px; width: max-content; }
-.tab { padding: 7px 14px; font-size: 12px; font-weight: 500; color: var(--text-secondary); border-radius: 50px; white-space: nowrap; cursor: pointer; transition: all 0.18s; background: var(--surface); border: 1px solid var(--border); }
+.tabs { display: flex; gap: 4px; width: 100%; }
+.tab { flex: 1; padding: 7px 4px; font-size: 11px; font-weight: 500; color: var(--text-secondary); border-radius: 50px; white-space: nowrap; cursor: pointer; transition: all 0.18s; background: var(--surface); border: 1px solid var(--border); text-align: center; }
 .tab.active { background: var(--text-primary); color: white; border-color: var(--text-primary); }
 .tab.summary-tab { background:#EEF2F7; border-color:#E5E7EB; }
 .tab.summary-tab.active { background: var(--text-primary); color: white; border-color: var(--text-primary); }
-.tab.settings-tab { padding: 0 5px; min-width: 28px; height: 31px; display: flex; align-items: center; justify-content: center; background: transparent; border-color: transparent; color: var(--text-tertiary); font-size: 19px; line-height: 1; }
+.tab.settings-tab { flex: none; padding: 0 8px; min-width: 32px; height: 31px; display: flex; align-items: center; justify-content: center; background: transparent; border-color: transparent; color: var(--text-tertiary); font-size: 19px; line-height: 1; }
 .tab.settings-tab.active { background: transparent; border-color: transparent; color: var(--text-primary); }
 .settings-gear-icon { display:inline-flex; align-items:center; justify-content:center; color:inherit; font-size:19px; line-height:1; transform:translateY(-1px); }
 .sec { display: none; padding: 0 16px; }
@@ -4012,9 +4012,9 @@ function _applyEcowittData(data, status, keys){
   raw['indoor-humi'] = data.indoor?.humidity?.value!=null    ? parseFloat(data.indoor.humidity.value)    : null;
   raw['outdoor-temp']= data.outdoor?.temperature?.value!=null? parseFloat(data.outdoor.temperature.value): null;
   raw['outdoor-humi']= data.outdoor?.humidity?.value!=null   ? parseFloat(data.outdoor.humidity.value)   : null;
-  // Solar W/m² → lux (실측 158개 평균: 1 W/m² = 126.6 lux)
+  // Solar W/m² → lux (실측 153개 선형회귀: 1 W/m² = 126.69 lux, R²≈1.00)
   raw['solar'] = data.solar_and_uvi?.solar?.value!=null
-    ? Math.round(parseFloat(data.solar_and_uvi.solar.value)*126.6*10)/10 : null;
+    ? Math.round(parseFloat(data.solar_and_uvi.solar.value)*126.69*10)/10 : null;
   raw['uvi']      = data.solar_and_uvi?.uvi?.value!=null     ? parseFloat(data.solar_and_uvi.uvi.value)  : null;
   raw['rain']     = data.rainfall?.rain_rate?.value!=null     ? parseFloat(data.rainfall.rain_rate.value) : null;
   raw['wind']     = data.wind?.wind_speed?.value!=null        ? parseFloat(data.wind.wind_speed.value)    : null;
