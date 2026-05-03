@@ -9,7 +9,6 @@
 <link rel="apple-touch-icon" id="dynamic-apple-icon" href="">
 <title>피크베리 농장</title>
 <script>
-// 버튼 클릭 즉시 동작 - Firebase 로드 전에도 사용 가능
 window.showAuthView=function(view){
   document.querySelectorAll('.auth-view').forEach(function(el){el.classList.remove('active');});
   var el=document.getElementById('auth-'+view+'-view');
@@ -20,26 +19,6 @@ window.showAuthView=function(view){
   ['auth-err','reg-err','admin-login-err'].forEach(function(id){var e=document.getElementById(id);if(e)e.textContent='';});
   if(view!=='admin-login'){var pwEl=document.getElementById('admin-pw-input');if(pwEl)pwEl.value='';}
 };
-// 나머지 함수들은 메인 스크립트 로드 후 위임
-function _waitAndCall(fn, args){
-  var t=Date.now();
-  var check=function(){
-    if(typeof window[fn]==='function'&&window[fn]!==window['_stub_'+fn]){
-      window[fn].apply(null,args||[]);
-    } else if(Date.now()-t<10000){
-      setTimeout(check,100);
-    } else {
-      alert('앱 로딩이 지연되고 있습니다. 새로고침 해주세요.');
-    }
-  };
-  setTimeout(check,100);
-}
-window.doLogin=function(){_waitAndCall('_doLogin');};
-window._stub_doLogin=window.doLogin;
-window.doRegister=function(){_waitAndCall('_doRegister');};
-window._stub_doRegister=window.doRegister;
-window.doAdminLogin=function(){_waitAndCall('_doAdminLogin');};
-window._stub_doAdminLogin=window.doAdminLogin;
 </script>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&display=swap');
@@ -1300,8 +1279,8 @@ canvas { max-width: 100%; }
   </div>
 </div>
 
-<script async src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
-<script async src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 <script>
 
 // ══════════════════════════════════════════
@@ -1398,7 +1377,8 @@ function verifyAndLogin(farmId, code, remember, silent){
 
   authFbGet('farms/'+farmId).then(function(farm){
     if(!farm){
-      tryLocalLogin();
+      // Firebase 조회 실패 시 로컬 캐시도 사용하지 않음 (보안)
+      if(!silent){var e=document.getElementById('auth-err');if(e)e.textContent='서버 연결에 실패했습니다. 잠시 후 다시 시도해 주세요.';}
       return;
     }
     if(String(farm.code)!==String(code)){
@@ -1408,7 +1388,9 @@ function verifyAndLogin(farmId, code, remember, silent){
     // 로컬 캐시 업데이트
     localStorage.setItem('pb8_farm_local_'+farmId, JSON.stringify(farm));
     doLoginSuccess(farmId, code, remember, farm);
-  }).catch(function(){ tryLocalLogin(); });
+  }).catch(function(){ 
+    if(!silent){var e=document.getElementById('auth-err');if(e)e.textContent='서버 연결에 실패했습니다. 잠시 후 다시 시도해 주세요.';}
+  });
 }
 
 function doLoginSuccess(farmId, code, remember, farm){
@@ -4677,6 +4659,7 @@ function applyEcoSavedStyle(){
   ['eco-settings-appkey','eco-settings-apikey','eco-settings-mac','eco-settings-proxy'].forEach(ecoInputGrey);
 }
 
+function ecoMapColor(sel){
   sel.style.color=sel.value?'var(--text-primary)':'var(--text-tertiary)';
 }
 function initEcoMapColors(){
