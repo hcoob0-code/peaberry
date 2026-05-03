@@ -20,6 +20,26 @@ window.showAuthView=function(view){
   ['auth-err','reg-err','admin-login-err'].forEach(function(id){var e=document.getElementById(id);if(e)e.textContent='';});
   if(view!=='admin-login'){var pwEl=document.getElementById('admin-pw-input');if(pwEl)pwEl.value='';}
 };
+// 나머지 함수들은 메인 스크립트 로드 후 위임
+function _waitAndCall(fn, args){
+  var t=Date.now();
+  var check=function(){
+    if(typeof window[fn]==='function'&&window[fn]!==window['_stub_'+fn]){
+      window[fn].apply(null,args||[]);
+    } else if(Date.now()-t<10000){
+      setTimeout(check,100);
+    } else {
+      alert('앱 로딩이 지연되고 있습니다. 새로고침 해주세요.');
+    }
+  };
+  setTimeout(check,100);
+}
+window.doLogin=function(){_waitAndCall('_doLogin');};
+window._stub_doLogin=window.doLogin;
+window.doRegister=function(){_waitAndCall('_doRegister');};
+window._stub_doRegister=window.doRegister;
+window.doAdminLogin=function(){_waitAndCall('_doAdminLogin');};
+window._stub_doAdminLogin=window.doAdminLogin;
 </script>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&display=swap');
@@ -1280,8 +1300,8 @@ canvas { max-width: 100%; }
   </div>
 </div>
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<script async src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<script async src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <script>
 
 // ══════════════════════════════════════════
