@@ -1377,8 +1377,7 @@ function verifyAndLogin(farmId, code, remember, silent){
 
   authFbGet('farms/'+farmId).then(function(farm){
     if(!farm){
-      // Firebase 조회 실패 시 로컬 캐시도 사용하지 않음 (보안)
-      if(!silent){var e=document.getElementById('auth-err');if(e)e.textContent='서버 연결에 실패했습니다. 잠시 후 다시 시도해 주세요.';}
+      tryLocalLogin();
       return;
     }
     if(String(farm.code)!==String(code)){
@@ -1388,9 +1387,7 @@ function verifyAndLogin(farmId, code, remember, silent){
     // 로컬 캐시 업데이트
     localStorage.setItem('pb8_farm_local_'+farmId, JSON.stringify(farm));
     doLoginSuccess(farmId, code, remember, farm);
-  }).catch(function(){ 
-    if(!silent){var e=document.getElementById('auth-err');if(e)e.textContent='서버 연결에 실패했습니다. 잠시 후 다시 시도해 주세요.';}
-  });
+  }).catch(function(){ tryLocalLogin(); });
 }
 
 function doLoginSuccess(farmId, code, remember, farm){
@@ -1515,13 +1512,17 @@ function openAccountModal(){
   var dn=document.getElementById('farm-title')?.textContent||farmId;
   var an=document.getElementById('acct-display-name');if(an)an.textContent=dn;
   var ai=document.getElementById('acct-farm-id');if(ai)ai.textContent='@'+farmId;
-  // 현재 코드 바로 표시
   var codeEl=document.getElementById('acct-current-code');
   if(codeEl){
-    codeEl.textContent='···';
+    // 로컬 캐시에서 즉시 표시
+    try{
+      var local=JSON.parse(localStorage.getItem('pb8_farm_local_'+farmId)||'null');
+      codeEl.textContent=(local&&local.code)?local.code:'···';
+    }catch(e){codeEl.textContent='···';}
+    // Firebase에서 최신값 업데이트
     if(farmId){
       authFbGet('farms/'+farmId).then(function(farm){
-        if(farm&&codeEl) codeEl.textContent=farm.code||'——';
+        if(farm&&codeEl) codeEl.textContent=farm.code||codeEl.textContent;
       });
     }
   }
