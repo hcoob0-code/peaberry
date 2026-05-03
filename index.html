@@ -4044,15 +4044,17 @@ function _applyEcowittData(data, status, keys){
   if(tEl&&!tEl.value)tEl.value=nowT;
 
   // 입력칸 채우기
+  const now=new Date();
+  const tsLabel=`${now.getMonth()+1}/${now.getDate()} ${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')} 기준`;
   const filled=[];
   if(result.sunlight!==null){
     const el=document.getElementById('sl-sunlight');
     if(el){
-      el.value=fmtLux(result.sunlight);  // 입력칸에도 K 형태로 표시
-      el.dataset.rawLux=result.sunlight; // raw 값은 data속성에 보관
+      el.value=Math.round(result.sunlight*10)/10; // number input엔 숫자로
+      el.dataset.rawLux=result.sunlight;
     }
     const src=Object.keys(m).find(k=>m[k]==='sunlight'&&raw[k]!==null);
-    filled.push('조도 '+fmtLux(result.sunlight)+'lux'+(src?' ('+_ecoSrcLabel(src)+')':''));
+    filled.push('조도 '+fmtLux(result.sunlight)+(src?' ('+_ecoSrcLabel(src)+')':''));
   }
   if(result.temp!==null){
     const el=document.getElementById('sl-temp');if(el)el.value=Math.round(result.temp*10)/10;
@@ -4065,7 +4067,13 @@ function _applyEcowittData(data, status, keys){
     filled.push('습도 '+Math.round(result.humidity)+'%'+(src?' ('+_ecoSrcLabel(src)+')':''));
   }
 
-  if(status) status.textContent=filled.length?'✓ '+filled.join(' · '):'⚠ 매핑된 데이터 없음 (설정 확인)';
+  if(status){
+    if(filled.length){
+      status.innerHTML=`<span style="color:var(--text-tertiary);font-size:9px;">${tsLabel}</span><br>✓ ${filled.join(' · ')}`;
+    } else {
+      status.textContent='⚠ 매핑된 데이터 없음 (설정 확인)';
+    }
+  }
   if(filled.length) showSaveToast('✓ Ecowitt 불러오기 완료');
 }
 
