@@ -1067,6 +1067,15 @@ canvas { max-width: 100%; }
         </div>
 
         <div style="font-size:10px;color:var(--text-tertiary);margin:10px 0 12px;line-height:1.6;">💡 기본 추천 설정이 미리 선택되어 있어요. 육묘 하우스 환경에 맞게 변경하시면 됩니다.<br>예) 실내 온습도 센서가 있으면 "실내 온도 → 온도", "실내 습도 → 습도"로 바꿔보세요.</div>
+
+        <!-- 프록시 URL -->
+        <div style="margin-bottom:12px;padding:12px;background:var(--amber-soft);border:1px solid #FDE68A;border-radius:var(--radius-md);">
+          <div style="font-size:11px;font-weight:700;color:#92400E;margin-bottom:4px;">⚠ 프록시 서버 설정 필요</div>
+          <div style="font-size:10px;color:#92400E;margin-bottom:8px;line-height:1.6;">Ecowitt API는 브라우저에서 직접 호출이 차단(CORS)됩니다.<br>아래 가이드로 무료 프록시를 30초만에 배포하고 URL을 입력하세요.</div>
+          <div style="font-size:10px;font-weight:600;color:#92400E;margin-bottom:3px;">프록시 서버 URL</div>
+          <input type="text" id="eco-settings-proxy" placeholder="https://your-proxy.vercel.app" autocomplete="off" spellcheck="false" style="width:100%;padding:9px 12px;font-size:12px;font-family:'Noto Sans KR',sans-serif;background:white;border:1px solid #FDE68A;border-radius:var(--radius-md);color:var(--text-primary);box-sizing:border-box;margin-bottom:6px;">
+          <div style="font-size:9px;color:#92400E;line-height:1.6;">배포 방법: <b>github.com/new</b> → 저장소 만들기 → <b>api/ecowitt.js</b> 파일 업로드 → <b>vercel.com</b>에서 해당 저장소 연결 → 생성된 URL 입력</div>
+        </div>
         <button onclick="saveEcowittSettingsFromTab()" style="width:100%;padding:12px;font-size:13px;font-family:'Noto Sans KR',sans-serif;font-weight:700;color:white;background:#059669;border:none;border-radius:var(--radius-md);cursor:pointer;">Ecowitt 설정 저장</button>
         <div id="eco-settings-status" style="font-size:11px;color:var(--text-tertiary);margin-top:8px;min-height:16px;text-align:center;"></div>
       </div>
@@ -3690,71 +3699,24 @@ async function fetchEcowittData(){
   if(btn){btn.disabled=true;btn.innerHTML='⏳ 불러오는 중...';}
   if(status)status.textContent='Ecowitt 서버에 요청 중...';
 
-  const ecowittUrl='https://api.ecowitt.net/api/v3/device/real_time'
+  // 프록시 URL: 설정된 값 또는 기본값 사용
+  const proxyBase=(k.proxyUrl||'').replace(/\/+$/,'')||'https://ecowitt-proxy.vercel.app';
+  const proxyUrl=proxyBase+'/api/ecowitt'
     +'?application_key='+encodeURIComponent(k.appKey)
     +'&api_key='+encodeURIComponent(k.apiKey)
-    +'&mac='+encodeURIComponent(k.mac)
-    +'&call_back=all&temp_unitid=1&pressure_unitid=3&wind_speed_unitid=6&rainfall_unitid=12&solar_irradiance_unitid=16';
+    +'&mac='+encodeURIComponent(k.mac);
 
   try{
-    // Claude API: computer_use 방식으로 URL fetch 요청
-    const resp=await fetch('https://api.anthropic.com/v1/messages',{
-      method:'POST',
-      headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({
-        model:'claude-sonnet-4-20250514',
-        max_tokens:4000,
-        tools:[{
-          type:'computer_20250124',
-          name:'computer',
-          display_width_px:1280,
-          display_height_px:800
-        }],
-        messages:[{
-          role:'user',
-          content:'아래 URL의 JSON 응답을 가져와서 JSON만 출력해줘. 다른 설명은 필요없어.\n\n'+ecowittUrl
-        }]
-      })
-    });
-
-    if(!resp.ok){
-      const errText=await resp.text();
-      throw new Error('API 오류 '+resp.status+': '+errText.slice(0,100));
-    }
-
-    const apiData=await resp.json();
-    let rawText='';
-    (apiData.content||[]).forEach(b=>{if(b.type==='text')rawText+=b.text;});
-
-    // JSON 블록 추출
-    let eco=null;
-    const fenced=rawText.match(/```(?:json)?\s*(\{[\s\S]*?\})\s*```/);
-    if(fenced){try{eco=JSON.parse(fenced[1]);}catch(e){}}
-    if(!eco){
-      const plain=rawText.match(/\{[\s\S]*"code"[\s\S]*\}/);
-      if(plain){try{eco=JSON.parse(plain[0]);}catch(e){}}
-    }
-    if(!eco) throw new Error('JSON 파싱 실패. 응답: '+rawText.slice(0,120));
+    const r=await fetch(proxyUrl);
+    if(!r.ok) throw new Error('프록시 응답 오류: '+r.status);
+    const eco=await r.json();
     if(eco.code!==0) throw new Error('Ecowitt 오류 (code '+eco.code+'): '+(eco.msg||''));
     _applyEcowittData(eco.data, status, k);
-
   }catch(err){
     console.error('Ecowitt fetch error:',err);
-    // 마지막 수단: corsproxy.io 시도
-    try{
-      if(status)status.textContent='대체 경로로 재시도 중...';
-      const proxy2='https://corsproxy.io/?'+encodeURIComponent(ecowittUrl);
-      const r2=await fetch(proxy2);
-      const eco2=await r2.json();
-      if(eco2.code!==0) throw new Error('Ecowitt 오류 (code '+eco2.code+'): '+(eco2.msg||''));
-      _applyEcowittData(eco2.data, status, k);
-      return;
-    }catch(err2){
-      console.error('fallback error:',err2);
-    }
     const msg=(err.message||'').slice(0,120);
     if(status)status.textContent='⚠ 실패: '+msg;
-    showAlert('Ecowitt 데이터를 불러오지 못했습니다.\n\n원인: '+msg+'\n\n확인 사항\n· API Key / Application Key 정확한지\n· MAC 형식: AA:BB:CC:DD:EE:FF\n· 기기 온라인 여부\n· ecowitt.net에서 데이터 수신 여부');
+    showAlert('Ecowitt 데이터를 불러오지 못했습니다.\n\n원인: '+msg+'\n\n→ 설정 탭 Ecowitt 연동에서 프록시 URL을 설정해 주세요.');
   }finally{
     if(btn){btn.disabled=false;btn.innerHTML='⇩ Ecowitt';}
   }
@@ -4638,6 +4600,7 @@ function renderSettings(){
   fillIfEmpty('eco-settings-appkey', ek.appKey);
   fillIfEmpty('eco-settings-apikey', ek.apiKey);
   fillIfEmpty('eco-settings-mac', ek.mac);
+  fillIfEmpty('eco-settings-proxy', ek.proxyUrl);
   // 매핑 셀렉트는 저장된 값으로 항상 복원 (select는 타이핑 없음)
   const m=ek.mapping||{'outdoor-temp':'temp','outdoor-humi':'humidity','solar':'sunlight'};
   const setV=(id,v)=>{const el=document.getElementById(id);if(el&&v!==undefined)el.value=v;};
@@ -4678,13 +4641,15 @@ function saveEcowittSettingsFromTab(){
     'wind':         document.getElementById('eco-map-wind')?.value||'',
     'pressure':     document.getElementById('eco-map-pressure')?.value||'',
   };
-  const k={appKey,apiKey,mac,mapping};
+  const proxyUrl=(document.getElementById('eco-settings-proxy')?.value||'').trim();
+  const k={appKey,apiKey,mac,mapping,proxyUrl};
   saveEcowittKeys(k);
   // 저장 후에도 입력칸에 값 유지
   const forceV=(id,v)=>{const el=document.getElementById(id);if(el)el.value=v;};
   forceV('eco-settings-appkey', appKey);
   forceV('eco-settings-apikey', apiKey);
   forceV('eco-settings-mac', mac);
+  forceV('eco-settings-proxy', proxyUrl);
   const st=document.getElementById('eco-settings-status');
   if(st)st.textContent='✓ 저장 완료 · 육묘 탭에서 "Ecowitt" 버튼을 눌러보세요';
   showSaveToast('✓ Ecowitt 설정 저장');
