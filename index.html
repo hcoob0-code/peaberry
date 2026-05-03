@@ -851,16 +851,17 @@ canvas { max-width: 100%; }
   <div class="sec-label">데일리 피드백</div>
   <div class="nm-flat" style="padding:14px 16px;margin-bottom:10px;">
     <div style="margin-bottom:10px;padding-bottom:10px;border-bottom:1px solid var(--border);">
-      <div style="font-size:10px;font-weight:600;color:var(--text-secondary);margin-bottom:4px;">날짜/시간 선택 <span style="font-weight:400;color:var(--text-tertiary)">(최근 3일)</span></div>
-      <select id="sl-feedback-datetime-sel" onchange="onFeedbackDtSel()" style="width:100%;padding:10px 12px;font-size:13px;font-family:'Noto Sans KR',sans-serif;background:var(--bg);border:1px solid var(--border);border-radius:var(--radius-md);color:var(--text-primary);appearance:none;-webkit-appearance:none;">
-        <option value="">날짜/시간 선택...</option>
+      <div style="font-size:10px;font-weight:600;color:var(--text-secondary);margin-bottom:4px;">날짜/시간 <span style="font-weight:400;color:var(--text-tertiary)">(최근 3일)</span></div>
+      <select id="sl-feedback-datetime-sel" onchange="onFeedbackDtSel();this.style.color=this.value?'var(--text-primary)':'#9CA3AF'" style="width:100%;padding:10px 12px;font-size:13px;font-family:'Noto Sans KR',sans-serif;background:var(--bg);border:1px solid var(--border);border-radius:var(--radius-md);color:#9CA3AF;appearance:none;-webkit-appearance:none;">
+        <option value="" disabled selected style="color:#9CA3AF;">선택하세요</option>
       </select>
       <input type="hidden" id="sl-feedback-date" value="">
       <input type="hidden" id="sl-feedback-time" value="">
     </div>
-    <div style="font-size:11px;color:var(--text-secondary);margin-bottom:8px;line-height:1.6;">작물 상태, 물 조절, 특이사항, 내일 계획 (50자 이내)</div>
+    <div style="font-size:10px;font-weight:600;color:var(--text-secondary);margin-bottom:8px;">피드백 내용</div>
     <div style="position:relative;">
       <textarea id="sl-feedback" maxlength="50" placeholder="예) 1구역 건조 → 물 10% 증량. 3구역 잎 처짐 확인 필요." style="width:100%;padding:10px 12px;font-size:13px;font-family:'Noto Sans KR',sans-serif;background:var(--bg);border:1px solid var(--border);border-radius:var(--radius-md);color:var(--text-primary);resize:none;height:80px;line-height:1.6;" oninput="updateFbCount()"></textarea>
+      <style>#sl-feedback::placeholder{font-size:11px;color:#C4C9D1;}</style>
       <span id="fb-count" style="position:absolute;right:8px;bottom:6px;font-size:10px;color:var(--text-tertiary);">0/50</span>
     </div>
     <div id="recent-feedbacks" style="margin-top:8px;"></div>
@@ -878,10 +879,6 @@ canvas { max-width: 100%; }
       <button onclick="renderSeedlingEnvChart();renderSeedlingCorrChart();renderEnvRawTable();" style="padding:6px 14px;font-size:12px;font-family:'Noto Sans KR',sans-serif;font-weight:600;background:var(--text-primary);color:white;border:none;border-radius:50px;cursor:pointer;flex-shrink:0;">조회</button>
     </div>
     <div style="position:relative;height:220px;"><canvas id="seedlingEnvChart"></canvas></div>
-  </div>
-  <div class="nm-flat" style="padding:12px 16px;margin-bottom:10px;">
-    <div class="sec-label" style="margin-top:0;">환경 vs 물 사용 상관관계</div>
-    <div style="position:relative;height:180px;"><canvas id="seedlingCorrChart"></canvas></div>
   </div>
 
   <!-- 로우데이터 테이블 -->
@@ -1728,7 +1725,15 @@ function sl(k,v){localStorage.setItem(k,JSON.stringify(v));}
 function glF(k){return gl(_PB8_PREFIX+k);}
 function slF(k,v){sl(_PB8_PREFIX+k,v);}
 function fmt(n){return Math.round(n).toLocaleString()+'원';}
-function fmtM(n){return Math.round(n/10000).toLocaleString()+'만원';}
+function fmtM(n){
+  const man=Math.round(n/10000);
+  if(man>=10000){
+    const eok=Math.floor(man/10000);
+    const rem=man%10000;
+    return rem>0?eok+'억 '+rem.toLocaleString()+'만원':eok+'억원';
+  }
+  return man.toLocaleString()+'만원';
+}
 function getProgs(){return glF('progs')||[];}
 function getLoans(){return glF('loans')||[];}
 function getInvItems(){return glF('inv_items')||[];}
@@ -3071,29 +3076,29 @@ function renderLoanList(){
     <div style="font-size:10px;font-weight:700;letter-spacing:1px;color:var(--text-secondary);text-transform:uppercase;margin-bottom:10px;">전체 대출 현황</div>
     ${loans.length===0?`<div style="font-size:13px;color:var(--text-tertiary);text-align:center;padding:8px 0;">등록된 대출이 없습니다.</div>`:`
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
-      <div style="background:var(--red-soft);border:1px solid #FECACA;border-radius:10px;padding:10px 12px;">
-        <div style="font-size:9px;color:var(--text-secondary);margin-bottom:4px;">총 남은 원금</div>
-        <div style="font-size:14px;font-weight:700;color:var(--red);">${fmtM(totalBalance)}</div>
-      </div>
-      <div style="background:var(--red-soft);border:1px solid #FECACA;border-radius:10px;padding:10px 12px;">
-        <div style="font-size:9px;color:var(--text-secondary);margin-bottom:4px;">총 남은 원금+이자</div>
-        <div style="font-size:14px;font-weight:700;color:var(--red);">${fmtM(totalBalanceWithInterest)}</div>
+      <div style="background:var(--bg);border:1px solid var(--border);border-radius:10px;padding:10px 12px;">
+        <div style="font-size:9px;font-weight:600;color:var(--red);margin-bottom:4px;">총 남은 원금</div>
+        <div style="font-size:14px;font-weight:700;color:var(--text-primary);">${fmtM(totalBalance)}</div>
       </div>
       <div style="background:var(--bg);border:1px solid var(--border);border-radius:10px;padding:10px 12px;">
-        <div style="font-size:9px;color:var(--text-secondary);margin-bottom:4px;">올해 상환 예정 원금</div>
+        <div style="font-size:9px;font-weight:600;color:var(--red);margin-bottom:4px;">총 남은 원금+이자</div>
+        <div style="font-size:14px;font-weight:700;color:var(--text-primary);">${fmtM(totalBalanceWithInterest)}</div>
+      </div>
+      <div style="background:var(--bg);border:1px solid var(--border);border-radius:10px;padding:10px 12px;">
+        <div style="font-size:9px;font-weight:600;color:var(--amber);margin-bottom:4px;">올해 상환 예정 원금</div>
         <div style="font-size:14px;font-weight:700;color:var(--text-primary);">${fmtM(totalThisYearPrincipal)}</div>
       </div>
-      <div style="background:var(--amber-soft);border:1px solid #FDE68A;border-radius:10px;padding:10px 12px;">
-        <div style="font-size:9px;color:var(--text-secondary);margin-bottom:4px;">올해 상환 예정 이자</div>
-        <div style="font-size:14px;font-weight:700;color:var(--amber);">${fmtM(totalThisYearInterest)}</div>
+      <div style="background:var(--bg);border:1px solid var(--border);border-radius:10px;padding:10px 12px;">
+        <div style="font-size:9px;font-weight:600;color:var(--amber);margin-bottom:4px;">올해 상환 예정 이자</div>
+        <div style="font-size:14px;font-weight:700;color:var(--text-primary);">${fmtM(totalThisYearInterest)}</div>
       </div>
-      <div style="background:var(--green-soft);border:1px solid #A7F3D0;border-radius:10px;padding:10px 12px;">
-        <div style="font-size:9px;color:var(--text-secondary);margin-bottom:4px;">올해 상환 완료 원금</div>
-        <div style="font-size:14px;font-weight:700;color:var(--green);">${totalThisYearPaidPrincipal>0?fmtM(totalThisYearPaidPrincipal):'없음'}</div>
+      <div style="background:var(--bg);border:1px solid var(--border);border-radius:10px;padding:10px 12px;">
+        <div style="font-size:9px;font-weight:600;color:var(--green);margin-bottom:4px;">올해 상환 완료 원금</div>
+        <div style="font-size:14px;font-weight:700;color:var(--text-primary);">${totalThisYearPaidPrincipal>0?fmtM(totalThisYearPaidPrincipal):'없음'}</div>
       </div>
-      <div style="background:var(--green-soft);border:1px solid #A7F3D0;border-radius:10px;padding:10px 12px;">
-        <div style="font-size:9px;color:var(--text-secondary);margin-bottom:4px;">올해 상환 완료 이자</div>
-        <div style="font-size:14px;font-weight:700;color:var(--green);">${totalThisYearPaidInterest>0?fmtM(totalThisYearPaidInterest):'없음'}</div>
+      <div style="background:var(--bg);border:1px solid var(--border);border-radius:10px;padding:10px 12px;">
+        <div style="font-size:9px;font-weight:600;color:var(--green);margin-bottom:4px;">올해 상환 완료 이자</div>
+        <div style="font-size:14px;font-weight:700;color:var(--text-primary);">${totalThisYearPaidInterest>0?fmtM(totalThisYearPaidInterest):'없음'}</div>
       </div>
     </div>`}
   </div>`;
@@ -4162,7 +4167,7 @@ function populateFeedbackDateSelect(){
   const cutoff=`${d3.getFullYear()}-${p2(d3.getMonth()+1)}-${p2(d3.getDate())}`;
   const recs=getAllEnvRecords().filter(r=>r.dateStr>=cutoff&&r.timeStr);
   const days=['일','월','화','수','목','금','토'];
-  sel.innerHTML='<option value="">날짜/시간 선택...</option>';
+  sel.innerHTML='<option value="" disabled style="color:#9CA3AF;">선택하세요</option>';
   recs.forEach(r=>{
     const parts=r.dateStr.split('-');
     const dow=days[new Date(r.dateStr).getDay()];
@@ -4171,7 +4176,8 @@ function populateFeedbackDateSelect(){
     o.textContent=`${parseInt(parts[1])}/${parseInt(parts[2])}(${dow}) ${r.timeStr}`;
     sel.appendChild(o);
   });
-  if(recs.length>0){sel.value=recs[0].key;onFeedbackDtSel();}
+  if(recs.length>0){sel.value=recs[0].key;sel.style.color='var(--text-primary)';onFeedbackDtSel();}
+  else{sel.value='';sel.style.color='#9CA3AF';}
   renderRecentFeedbacks();
 }
 
