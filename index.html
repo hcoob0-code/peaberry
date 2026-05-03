@@ -150,7 +150,14 @@ body {
 .info-row:last-child { border-bottom: none; }
 .info-row .k { color: var(--text-secondary); }
 .info-row .v { font-weight: 700; }
-.repay-grid { display: grid; grid-template-columns: 50px 1fr 1fr 1fr 60px; gap: 4px; align-items: center; }
+.settings-accordion { border-bottom: 1px solid var(--border); }
+.settings-acc-hdr { display: flex; align-items: center; justify-content: space-between; padding: 14px 4px; cursor: pointer; user-select: none; -webkit-user-select: none; }
+.settings-acc-hdr:active { opacity: 0.7; }
+.settings-acc-title { font-size: 13px; font-weight: 600; color: var(--text-primary); }
+.settings-acc-arrow { font-size: 10px; color: var(--text-tertiary); transition: transform 0.2s; display: inline-block; }
+.settings-acc-arrow.open { transform: rotate(180deg); }
+.settings-acc-body { display: none; padding-bottom: 10px; }
+.settings-acc-body.open { display: block; }
 .repay-hdr span { font-size: 9px; color: var(--text-secondary); font-weight: 600; text-align: right; }
 .repay-hdr span:first-child { text-align: left; }
 .repay-row-item { font-size: 11px; padding: 7px 8px; border-radius: var(--radius-sm); margin-bottom: 3px; border: 1px solid transparent; min-height: 40px; box-sizing: border-box; }
@@ -770,56 +777,62 @@ canvas { max-width: 100%; }
 
 <!-- ══ 육묘 탭 ══ -->
 <div class="sec" id="sec-seedling-tab">
-  <!-- 날씨 환경 + 수도 환경 통합 날짜/시간 -->
-  <div class="sec-label">날짜 / 시간</div>
-  <div class="nm-flat" style="padding:12px 16px;margin-bottom:10px;">
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
+  <!-- 환경 통합 카드 -->
+  <div class="sec-label">환경</div>
+  <div class="nm-flat" style="padding:14px 16px;margin-bottom:10px;">
+
+    <!-- 날짜/시간 -->
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px;padding-bottom:14px;border-bottom:1px solid var(--border);">
       <div>
-        <div style="font-size:10px;font-weight:600;color:var(--text-secondary);margin-bottom:4px;">날짜</div>
-        <input type="date" id="sl-date" style="width:100%;padding:8px 6px;font-size:11px;font-family:'Noto Sans KR',sans-serif;background:var(--bg);border:1px solid var(--border);border-radius:var(--radius-md);color:var(--text-primary);box-sizing:border-box;min-height:40px;appearance:none;-webkit-appearance:none;" oninput="document.getElementById('sl-water-date').value=this.value">
+        <div style="font-size:10px;font-weight:600;color:var(--text-secondary);margin-bottom:4px;">날짜 <span style="color:var(--red);">*</span></div>
+        <input type="date" id="sl-date" style="width:100%;padding:8px 6px;font-size:11px;font-family:'Noto Sans KR',sans-serif;background:var(--bg);border:1px solid var(--border);border-radius:var(--radius-md);color:var(--text-primary);box-sizing:border-box;min-height:40px;appearance:none;-webkit-appearance:none;">
       </div>
       <div>
-        <div style="font-size:10px;font-weight:600;color:var(--text-secondary);margin-bottom:4px;">시간</div>
+        <div style="font-size:10px;font-weight:600;color:var(--text-secondary);margin-bottom:4px;">시간 <span style="color:var(--red);">*</span></div>
         <div style="display:flex;gap:4px;">
-          <input type="time" id="sl-time" style="flex:1;padding:8px 6px;font-size:11px;font-family:'Noto Sans KR',sans-serif;background:var(--bg);border:1px solid var(--border);border-radius:var(--radius-md);color:var(--text-primary);min-height:40px;appearance:none;-webkit-appearance:none;" oninput="document.getElementById('sl-water-time').value=this.value">
-          <button onclick="var t=getNowTime();document.getElementById('sl-time').value=t;document.getElementById('sl-water-time').value=t;" style="padding:0 8px;font-size:10px;font-weight:600;font-family:'Noto Sans KR',sans-serif;color:var(--accent);background:var(--accent-soft);border:1px solid #C7D2FE;border-radius:var(--radius-md);cursor:pointer;white-space:nowrap;min-height:40px;flex-shrink:0;">현재시간</button>
+          <input type="time" id="sl-time" style="flex:1;padding:8px 6px;font-size:11px;font-family:'Noto Sans KR',sans-serif;background:var(--bg);border:1px solid var(--border);border-radius:var(--radius-md);color:var(--text-primary);min-height:40px;appearance:none;-webkit-appearance:none;">
+          <button onclick="var t=getNowTime();document.getElementById('sl-time').value=t;" style="padding:0 8px;font-size:10px;font-weight:600;font-family:'Noto Sans KR',sans-serif;color:var(--accent);background:var(--accent-soft);border:1px solid #C7D2FE;border-radius:var(--radius-md);cursor:pointer;white-space:nowrap;min-height:40px;flex-shrink:0;">현재시간</button>
         </div>
       </div>
     </div>
-    <!-- hidden sync inputs for water section -->
+
+    <!-- 날씨 환경 -->
+    <div style="margin-bottom:14px;padding-bottom:14px;border-bottom:1px solid var(--border);">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">
+        <span style="font-size:11px;font-weight:600;color:var(--text-secondary);">날씨 환경</span>
+        <button onclick="fetchEcowittData()" id="ecowitt-fetch-btn" style="padding:4px 10px;font-size:10px;font-weight:600;font-family:'Noto Sans KR',sans-serif;color:white;background:#059669;border:none;border-radius:50px;cursor:pointer;">⇩ Ecowitt</button>
+      </div>
+      <div id="ecowitt-status" style="font-size:10px;color:var(--text-tertiary);margin-bottom:6px;min-height:12px;"></div>
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;">
+        <div>
+          <div style="font-size:10px;font-weight:600;color:var(--text-secondary);margin-bottom:4px;">조도 (fc) <span style="color:var(--red);">*</span></div>
+          <input type="number" id="sl-sunlight" placeholder="0" style="width:100%;padding:9px 8px;font-size:12px;font-family:'Noto Sans KR',sans-serif;background:var(--bg);border:1px solid var(--border);border-radius:var(--radius-md);color:var(--text-primary);">
+        </div>
+        <div>
+          <div style="font-size:10px;font-weight:600;color:var(--text-secondary);margin-bottom:4px;">온도 (°C) <span style="color:var(--red);">*</span></div>
+          <input type="number" id="sl-temp" placeholder="0" step="0.1" style="width:100%;padding:9px 8px;font-size:12px;font-family:'Noto Sans KR',sans-serif;background:var(--bg);border:1px solid var(--border);border-radius:var(--radius-md);color:var(--text-primary);">
+        </div>
+        <div>
+          <div style="font-size:10px;font-weight:600;color:var(--text-secondary);margin-bottom:4px;">습도 (%) <span style="color:var(--red);">*</span></div>
+          <input type="number" id="sl-humidity" placeholder="0" min="0" max="100" style="width:100%;padding:9px 8px;font-size:12px;font-family:'Noto Sans KR',sans-serif;background:var(--bg);border:1px solid var(--border);border-radius:var(--radius-md);color:var(--text-primary);">
+        </div>
+      </div>
+    </div>
+
+    <!-- 수도 환경 -->
+    <div style="margin-bottom:14px;">
+      <div style="font-size:11px;font-weight:600;color:var(--text-secondary);margin-bottom:8px;">수도 환경 <span style="color:var(--red);">*</span></div>
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:6px;" id="water-records"></div>
+      <div style="display:flex;gap:8px;margin-top:6px;">
+        <button onclick="addWaterZone()" style="flex:1;padding:5px 10px;font-size:10px;font-family:'Noto Sans KR',sans-serif;color:var(--text-tertiary);background:transparent;border:1px dashed var(--border);border-radius:var(--radius-sm);cursor:pointer;">+ 구역 추가</button>
+        <button onclick="showDeleteZonePopup()" style="flex:1;padding:5px 10px;font-size:10px;font-family:'Noto Sans KR',sans-serif;color:var(--text-tertiary);background:transparent;border:1px dashed var(--border);border-radius:var(--radius-sm);cursor:pointer;">− 구역 삭제</button>
+      </div>
+    </div>
+
+    <!-- 통합 저장 -->
+    <button onclick="saveEnvAll()" style="width:100%;padding:12px;font-size:13px;font-family:'Noto Sans KR',sans-serif;font-weight:600;background:var(--text-primary);color:white;border:none;border-radius:var(--radius-md);cursor:pointer;">저장</button>
     <input type="hidden" id="sl-water-date">
     <input type="hidden" id="sl-water-time">
-  </div>
-
-  <!-- 날씨 환경 기록 -->
-  <div class="sec-label">날씨 환경</div>
-  <div class="nm-flat" style="padding:14px 16px;margin-bottom:10px;">
-    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:10px;">
-      <div>
-        <div style="font-size:10px;font-weight:600;color:var(--text-secondary);margin-bottom:4px;">조도 (fc) <span style="color:var(--red);">*</span></div>
-        <input type="number" id="sl-sunlight" placeholder="0" style="width:100%;padding:9px 8px;font-size:12px;font-family:'Noto Sans KR',sans-serif;background:var(--bg);border:1px solid var(--border);border-radius:var(--radius-md);color:var(--text-primary);">
-      </div>
-      <div>
-        <div style="font-size:10px;font-weight:600;color:var(--text-secondary);margin-bottom:4px;">온도 (°C) <span style="color:var(--red);">*</span></div>
-        <input type="number" id="sl-temp" placeholder="0" step="0.1" style="width:100%;padding:9px 8px;font-size:12px;font-family:'Noto Sans KR',sans-serif;background:var(--bg);border:1px solid var(--border);border-radius:var(--radius-md);color:var(--text-primary);">
-      </div>
-      <div>
-        <div style="font-size:10px;font-weight:600;color:var(--text-secondary);margin-bottom:4px;">습도 (%) <span style="color:var(--red);">*</span></div>
-        <input type="number" id="sl-humidity" placeholder="0" min="0" max="100" style="width:100%;padding:9px 8px;font-size:12px;font-family:'Noto Sans KR',sans-serif;background:var(--bg);border:1px solid var(--border);border-radius:var(--radius-md);color:var(--text-primary);">
-      </div>
-    </div>
-    <button onclick="saveWeatherSection()" style="width:100%;margin-top:4px;padding:11px;font-size:13px;font-family:'Noto Sans KR',sans-serif;font-weight:600;background:var(--text-primary);color:white;border:none;border-radius:var(--radius-md);cursor:pointer;">저장</button>
-  </div>
-
-  <!-- 수도 환경 -->
-  <div class="sec-label">수도 환경</div>
-  <div class="nm-flat" style="padding:14px 16px;margin-bottom:10px;">
-    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:6px;" id="water-records"></div>
-    <div style="display:flex;gap:8px;margin-top:6px;">
-      <button onclick="addWaterZone()" style="flex:1;padding:5px 10px;font-size:10px;font-family:'Noto Sans KR',sans-serif;color:var(--text-tertiary);background:transparent;border:1px dashed var(--border);border-radius:var(--radius-sm);cursor:pointer;">+ 구역 추가</button>
-      <button onclick="showDeleteZonePopup()" style="flex:1;padding:5px 10px;font-size:10px;font-family:'Noto Sans KR',sans-serif;color:var(--text-tertiary);background:transparent;border:1px dashed var(--border);border-radius:var(--radius-sm);cursor:pointer;">− 구역 삭제</button>
-    </div>
-    <button onclick="saveWaterSection()" style="width:100%;margin-top:10px;padding:11px;font-size:13px;font-family:'Noto Sans KR',sans-serif;font-weight:600;background:var(--text-primary);color:white;border:none;border-radius:var(--radius-md);cursor:pointer;">저장</button>
   </div>
 
   <!-- 데일리 피드백 -->
@@ -868,54 +881,263 @@ canvas { max-width: 100%; }
 
 <!-- ══ 기본관리 ══ -->
 <div class="sec" id="sec-settings">
-  <div class="sec-label">체험 프로그램</div>
-  <div class="nm-flat" style="padding:14px 18px;margin-bottom:10px;"><div id="prog-list"></div><button class="add-btn" onclick="openModal('prog')" style="margin-top:6px;">+ 추가</button></div>
-  <div class="sec-label">체험 경로 관리</div>
-  <div class="nm-flat" style="padding:12px 14px;margin-bottom:10px;">
-    <div id="visit-route-list"></div>
-    <div style="display:flex;gap:6px;margin-top:7px;">
-      <input type="text" id="new-visit-route" placeholder="새 체험 경로" style="flex:1;padding:7px 10px;font-size:12px;font-family:'Noto Sans KR',sans-serif;background:var(--bg);border:1px solid var(--border);border-radius:999px;color:var(--text-primary);">
-      <button onclick="addVisitRoute()" style="padding:7px 12px;font-size:11px;font-family:'Noto Sans KR',sans-serif;font-weight:600;background:#F3F4F6;color:var(--text-secondary);border:1px solid var(--border);border-radius:999px;cursor:pointer;">추가</button>
+
+  <!-- 체험 프로그램 -->
+  <div class="settings-accordion" id="acc-prog">
+    <div class="settings-acc-hdr" onclick="toggleAcc('prog')">
+      <span class="settings-acc-title">체험 프로그램</span>
+      <span class="settings-acc-arrow" id="acc-arrow-prog">▼</span>
+    </div>
+    <div class="settings-acc-body" id="acc-body-prog">
+      <div class="nm-flat" style="padding:14px 18px;margin-bottom:4px;"><div id="prog-list"></div><button class="add-btn" onclick="openModal('prog')" style="margin-top:6px;">+ 추가</button></div>
     </div>
   </div>
-  <div class="sec-label">데이터 내보내기</div>
-  <div class="nm-flat" style="padding:16px 18px;margin-bottom:10px;">
-    <div style="display:flex;gap:6px;align-items:center;margin-bottom:12px;flex-wrap:wrap;">
-      <input type="date" id="xl-from" style="flex:1;min-width:0;padding:9px 10px;font-size:12px;font-family:'Noto Sans KR',sans-serif;background:var(--bg);border:1px solid var(--border);border-radius:var(--radius-md);color:var(--text-primary);">
-      <span style="color:var(--text-tertiary);font-size:12px;flex-shrink:0;">~</span>
-      <input type="date" id="xl-to" style="flex:1;min-width:0;padding:9px 10px;font-size:12px;font-family:'Noto Sans KR',sans-serif;background:var(--bg);border:1px solid var(--border);border-radius:var(--radius-md);color:var(--text-primary);">
+
+  <!-- 체험 경로 관리 -->
+  <div class="settings-accordion" id="acc-route">
+    <div class="settings-acc-hdr" onclick="toggleAcc('route')">
+      <span class="settings-acc-title">체험 경로 관리</span>
+      <span class="settings-acc-arrow" id="acc-arrow-route">▼</span>
     </div>
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px;">
-      <label class="chk-row" style="padding:9px 11px;background:var(--bg);border:1px solid var(--border);border-radius:var(--radius-md);margin:0;"><input type="checkbox" id="xl-income" checked><span style="font-size:13px;color:var(--text-secondary);">수입</span></label>
-      <label class="chk-row" style="padding:9px 11px;background:var(--bg);border:1px solid var(--border);border-radius:var(--radius-md);margin:0;"><input type="checkbox" id="xl-expense" checked><span style="font-size:13px;color:var(--text-secondary);">지출</span></label>
-      <label class="chk-row" style="padding:9px 11px;background:var(--bg);border:1px solid var(--border);border-radius:var(--radius-md);margin:0;"><input type="checkbox" id="xl-env" checked><span style="font-size:13px;color:var(--text-secondary);">육묘</span></label>
-      <label class="chk-row" style="padding:9px 11px;background:var(--bg);border:1px solid var(--border);border-radius:var(--radius-md);margin:0;"><input type="checkbox" id="xl-price" checked><span style="font-size:13px;color:var(--text-secondary);">시세</span></label>
-    </div>
-    <button class="nm-btn-primary" onclick="downloadExcelCustom()" style="width:100%;padding:13px;font-size:13px;font-family:'Noto Sans KR',sans-serif;font-weight:700;">⬇ 엑셀 다운로드</button>
-  </div>
-  <div class="sec-label">데이터 기간 삭제</div>
-  <div class="nm-flat" style="padding:16px 18px;margin-bottom:10px;">
-    <div style="display:flex;gap:6px;align-items:center;margin-bottom:12px;flex-wrap:wrap;">
-      <input type="date" id="del-from" style="flex:1;min-width:0;padding:9px 10px;font-size:12px;font-family:'Noto Sans KR',sans-serif;background:var(--bg);border:1px solid var(--border);border-radius:var(--radius-md);color:var(--text-primary);">
-      <span style="color:var(--text-tertiary);font-size:12px;flex-shrink:0;">~</span>
-      <input type="date" id="del-to" style="flex:1;min-width:0;padding:9px 10px;font-size:12px;font-family:'Noto Sans KR',sans-serif;background:var(--bg);border:1px solid var(--border);border-radius:var(--radius-md);color:var(--text-primary);">
-    </div>
-    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:12px;">
-      <label class="chk-row" style="padding:10px 12px;background:var(--bg);border:1px solid var(--border);border-radius:var(--radius-md);margin:0;"><input type="checkbox" id="del-income" checked><span style="font-size:13px;color:var(--text-secondary);">수입</span></label>
-      <label class="chk-row" style="padding:10px 12px;background:var(--bg);border:1px solid var(--border);border-radius:var(--radius-md);margin:0;"><input type="checkbox" id="del-expense"><span style="font-size:13px;color:var(--text-secondary);">지출</span></label>
-      <label class="chk-row" style="padding:10px 12px;background:var(--bg);border:1px solid var(--border);border-radius:var(--radius-md);margin:0;"><input type="checkbox" id="del-env"><span style="font-size:13px;color:var(--text-secondary);">육묘</span></label>
-    </div>
-    <button onclick="confirmDeleteRangeData()" style="width:100%;padding:13px;font-size:13px;font-family:'Noto Sans KR',sans-serif;font-weight:700;color:white;background:var(--red);border:none;border-radius:var(--radius-md);cursor:pointer;">선택 기간 삭제</button>
-    <div id="delete-range-result" style="min-height:18px;margin-top:10px;font-size:12px;color:var(--text-secondary);line-height:1.5;"></div>
-  </div>
-  <div class="sec-label">데이터 초기화</div>
-  <div class="nm-flat" style="padding:16px 18px;margin-bottom:10px;">
-    <p style="font-size:12px;color:var(--text-secondary);margin-bottom:12px;line-height:1.6;">농장 이름·접속 코드를 제외한 데이터를 초기화합니다.</p>
-    <div style="display:flex;flex-direction:column;gap:8px;">
-      <button onclick="resetAllData()" style="width:100%;padding:12px;font-size:13px;font-family:'Noto Sans KR',sans-serif;font-weight:700;color:white;background:#EF4444;border:none;border-radius:var(--radius-md);cursor:pointer;">수입/지출/육묘/시세/대출 전체 초기화</button>
-      <button onclick="resetSettingsData()" style="width:100%;padding:12px;font-size:13px;font-family:'Noto Sans KR',sans-serif;font-weight:600;color:var(--red);background:var(--red-soft);border:1px solid #FECACA;border-radius:var(--radius-md);cursor:pointer;">설정 초기화 (프로그램·경로·재고 등)</button>
+    <div class="settings-acc-body" id="acc-body-route">
+      <div class="nm-flat" style="padding:12px 14px;margin-bottom:4px;">
+        <div id="visit-route-list"></div>
+        <div style="display:flex;gap:6px;margin-top:7px;">
+          <input type="text" id="new-visit-route" placeholder="새 체험 경로" style="flex:1;padding:7px 10px;font-size:12px;font-family:'Noto Sans KR',sans-serif;background:var(--bg);border:1px solid var(--border);border-radius:999px;color:var(--text-primary);">
+          <button onclick="addVisitRoute()" style="padding:7px 12px;font-size:11px;font-family:'Noto Sans KR',sans-serif;font-weight:600;background:#F3F4F6;color:var(--text-secondary);border:1px solid var(--border);border-radius:999px;cursor:pointer;">추가</button>
+        </div>
+      </div>
     </div>
   </div>
+
+  <!-- 데이터 내보내기 -->
+  <!-- Ecowitt 연동 -->
+  <div class="settings-accordion" id="acc-ecowitt">
+    <div class="settings-acc-hdr" onclick="toggleAcc('ecowitt')">
+      <span class="settings-acc-title">Ecowitt 연동</span>
+      <span class="settings-acc-arrow" id="acc-arrow-ecowitt">▼</span>
+    </div>
+    <div class="settings-acc-body" id="acc-body-ecowitt">
+      <div class="nm-flat" style="padding:14px 16px;margin-bottom:4px;" id="ecowitt-settings-card">
+        <div style="display:flex;flex-direction:column;gap:8px;margin-bottom:16px;">
+          <div>
+            <div style="font-size:10px;font-weight:600;color:var(--text-secondary);margin-bottom:3px;">Application Key</div>
+            <input type="text" id="eco-settings-appkey" placeholder="XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX" autocomplete="off" autocorrect="off" spellcheck="false" style="width:100%;padding:10px 12px;font-size:12px;font-family:'Noto Sans KR',sans-serif;background:var(--bg);border:1px solid var(--border);border-radius:var(--radius-md);color:var(--text-primary);box-sizing:border-box;">
+            <div style="font-size:9px;color:var(--text-tertiary);margin-top:3px;">ecowitt.net → 우측 상단 사용자 → User Profile → API Keys</div>
+          </div>
+          <div>
+            <div style="font-size:10px;font-weight:600;color:var(--text-secondary);margin-bottom:3px;">API Key</div>
+            <input type="text" id="eco-settings-apikey" placeholder="XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX" autocomplete="off" autocorrect="off" spellcheck="false" style="width:100%;padding:10px 12px;font-size:12px;font-family:'Noto Sans KR',sans-serif;background:var(--bg);border:1px solid var(--border);border-radius:var(--radius-md);color:var(--text-primary);box-sizing:border-box;">
+            <div style="font-size:9px;color:var(--text-tertiary);margin-top:3px;">ecowitt.net → 우측 상단 사용자 → User Profile → API Keys</div>
+          </div>
+          <div>
+            <div style="font-size:10px;font-weight:600;color:var(--text-secondary);margin-bottom:3px;">장치 MAC 주소</div>
+            <input type="text" id="eco-settings-mac" placeholder="예: AA:BB:CC:DD:EE:FF" autocomplete="off" autocorrect="off" spellcheck="false" style="width:100%;padding:10px 12px;font-size:12px;font-family:'Noto Sans KR',sans-serif;background:var(--bg);border:1px solid var(--border);border-radius:var(--radius-md);color:var(--text-primary);box-sizing:border-box;">
+            <div style="font-size:9px;color:var(--text-tertiary);margin-top:3px;">ecowitt.net → 로그인 → Device → 기기 선택 → MAC Address</div>
+          </div>
+        </div>
+
+        <!-- 매핑 테이블 -->
+        <div style="font-size:11px;font-weight:700;color:var(--text-primary);margin-bottom:6px;">Ecowitt → 육묘 탭 매핑</div>
+        <div style="font-size:10px;color:var(--text-tertiary);margin-bottom:10px;">각 Ecowitt 데이터를 육묘 탭의 어떤 항목에 넣을지 선택하세요.</div>
+
+        <!-- 헤더 -->
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:0;margin-bottom:2px;">
+          <div style="font-size:9px;font-weight:700;color:var(--text-tertiary);padding:4px 6px;background:var(--border-light);border-radius:6px 0 0 0;">Ecowitt 소스</div>
+          <div style="font-size:9px;font-weight:700;color:var(--text-tertiary);padding:4px 6px;background:var(--border-light);border-radius:0 6px 0 0;text-align:right;">매핑할 육묘 항목</div>
+        </div>
+
+        <!-- 각 소스 행 -->
+        <div id="eco-mapping-rows" style="border:1px solid var(--border);border-radius:0 0 var(--radius-md) var(--radius-md);overflow:hidden;">
+          <!-- indoor temp/humi -->
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:0;align-items:center;padding:9px 10px;border-bottom:1px solid var(--border-light);background:white;">
+            <div>
+              <div style="font-size:11px;font-weight:600;color:var(--text-primary);">실내 온도</div>
+              <div style="font-size:9px;color:var(--text-tertiary);">indoor · temperature</div>
+            </div>
+            <select id="eco-map-indoor-temp" style="width:100%;padding:6px 8px;font-size:11px;font-family:'Noto Sans KR',sans-serif;background:white;border:1px solid var(--border);border-radius:var(--radius-sm);color:var(--text-primary);appearance:none;-webkit-appearance:none;text-align:center;text-align-last:center;" onchange="ecoMapColor(this)">
+              <option value="">미사용</option>
+              <option value="temp">→ 온도 (°C)</option>
+              <option value="sunlight">→ 조도 (fc)</option>
+              <option value="humidity">→ 습도 (%)</option>
+            </select>
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:0;align-items:center;padding:9px 10px;border-bottom:1px solid var(--border-light);background:white;">
+            <div>
+              <div style="font-size:11px;font-weight:600;color:var(--text-primary);">실내 습도</div>
+              <div style="font-size:9px;color:var(--text-tertiary);">indoor · humidity</div>
+            </div>
+            <select id="eco-map-indoor-humi" style="width:100%;padding:6px 8px;font-size:11px;font-family:'Noto Sans KR',sans-serif;background:white;border:1px solid var(--border);border-radius:var(--radius-sm);color:var(--text-primary);appearance:none;-webkit-appearance:none;text-align:center;text-align-last:center;" onchange="ecoMapColor(this)">
+              <option value="">미사용</option>
+              <option value="humidity">→ 습도 (%)</option>
+              <option value="temp">→ 온도 (°C)</option>
+              <option value="sunlight">→ 조도 (fc)</option>
+            </select>
+          </div>
+          <!-- outdoor temp/humi -->
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:0;align-items:center;padding:9px 10px;border-bottom:1px solid var(--border-light);background:white;">
+            <div>
+              <div style="font-size:11px;font-weight:600;color:var(--text-primary);">외부 온도</div>
+              <div style="font-size:9px;color:var(--text-tertiary);">outdoor · temperature</div>
+            </div>
+            <select id="eco-map-outdoor-temp" style="width:100%;padding:6px 8px;font-size:11px;font-family:'Noto Sans KR',sans-serif;background:white;border:1px solid var(--border);border-radius:var(--radius-sm);color:var(--text-primary);appearance:none;-webkit-appearance:none;text-align:center;text-align-last:center;" onchange="ecoMapColor(this)">
+              <option value="">미사용</option>
+              <option value="temp" selected>→ 온도 (°C)</option>
+              <option value="sunlight">→ 조도 (fc)</option>
+              <option value="humidity">→ 습도 (%)</option>
+            </select>
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:0;align-items:center;padding:9px 10px;border-bottom:1px solid var(--border-light);background:white;">
+            <div>
+              <div style="font-size:11px;font-weight:600;color:var(--text-primary);">외부 습도</div>
+              <div style="font-size:9px;color:var(--text-tertiary);">outdoor · humidity</div>
+            </div>
+            <select id="eco-map-outdoor-humi" style="width:100%;padding:6px 8px;font-size:11px;font-family:'Noto Sans KR',sans-serif;background:white;border:1px solid var(--border);border-radius:var(--radius-sm);color:var(--text-primary);appearance:none;-webkit-appearance:none;text-align:center;text-align-last:center;" onchange="ecoMapColor(this)">
+              <option value="">미사용</option>
+              <option value="humidity" selected>→ 습도 (%)</option>
+              <option value="temp">→ 온도 (°C)</option>
+              <option value="sunlight">→ 조도 (fc)</option>
+            </select>
+          </div>
+          <!-- Solar -->
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:0;align-items:center;padding:9px 10px;border-bottom:1px solid var(--border-light);background:white;">
+            <div>
+              <div style="font-size:11px;font-weight:600;color:var(--text-primary);">Solar 일사량</div>
+              <div style="font-size:9px;color:var(--text-tertiary);">solar_and_uvi · solar (W/m² → fc)</div>
+            </div>
+            <select id="eco-map-solar" style="width:100%;padding:6px 8px;font-size:11px;font-family:'Noto Sans KR',sans-serif;background:white;border:1px solid var(--border);border-radius:var(--radius-sm);color:var(--text-primary);appearance:none;-webkit-appearance:none;text-align:center;text-align-last:center;" onchange="ecoMapColor(this)">
+              <option value="">미사용</option>
+              <option value="sunlight" selected>→ 조도 (fc)</option>
+              <option value="temp">→ 온도 (°C)</option>
+              <option value="humidity">→ 습도 (%)</option>
+            </select>
+          </div>
+          <!-- UVI -->
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:0;align-items:center;padding:9px 10px;border-bottom:1px solid var(--border-light);background:white;">
+            <div>
+              <div style="font-size:11px;font-weight:600;color:var(--text-primary);">자외선 UVI</div>
+              <div style="font-size:9px;color:var(--text-tertiary);">solar_and_uvi · uvi (지수)</div>
+            </div>
+            <select id="eco-map-uvi" style="width:100%;padding:6px 8px;font-size:11px;font-family:'Noto Sans KR',sans-serif;background:white;border:1px solid var(--border);border-radius:var(--radius-sm);color:var(--text-primary);appearance:none;-webkit-appearance:none;text-align:center;text-align-last:center;" onchange="ecoMapColor(this)">
+              <option value="" selected>미사용</option>
+              <option value="sunlight">→ 조도 (fc)</option>
+              <option value="temp">→ 온도 (°C)</option>
+              <option value="humidity">→ 습도 (%)</option>
+            </select>
+          </div>
+          <!-- Rainfall -->
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:0;align-items:center;padding:9px 10px;border-bottom:1px solid var(--border-light);background:white;">
+            <div>
+              <div style="font-size:11px;font-weight:600;color:var(--text-primary);">강우량</div>
+              <div style="font-size:9px;color:var(--text-tertiary);">rainfall · rain_rate (mm/hr)</div>
+            </div>
+            <select id="eco-map-rain" style="width:100%;padding:6px 8px;font-size:11px;font-family:'Noto Sans KR',sans-serif;background:white;border:1px solid var(--border);border-radius:var(--radius-sm);color:var(--text-primary);appearance:none;-webkit-appearance:none;text-align:center;text-align-last:center;" onchange="ecoMapColor(this)">
+              <option value="" selected>미사용</option>
+              <option value="sunlight">→ 조도 (fc)</option>
+              <option value="temp">→ 온도 (°C)</option>
+              <option value="humidity">→ 습도 (%)</option>
+            </select>
+          </div>
+          <!-- Wind -->
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:0;align-items:center;padding:9px 10px;border-bottom:1px solid var(--border-light);background:white;">
+            <div>
+              <div style="font-size:11px;font-weight:600;color:var(--text-primary);">풍속</div>
+              <div style="font-size:9px;color:var(--text-tertiary);">wind · wind_speed (km/h)</div>
+            </div>
+            <select id="eco-map-wind" style="width:100%;padding:6px 8px;font-size:11px;font-family:'Noto Sans KR',sans-serif;background:white;border:1px solid var(--border);border-radius:var(--radius-sm);color:var(--text-primary);appearance:none;-webkit-appearance:none;text-align:center;text-align-last:center;" onchange="ecoMapColor(this)">
+              <option value="" selected>미사용</option>
+              <option value="sunlight">→ 조도 (fc)</option>
+              <option value="temp">→ 온도 (°C)</option>
+              <option value="humidity">→ 습도 (%)</option>
+            </select>
+          </div>
+          <!-- Pressure -->
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:0;align-items:center;padding:9px 10px;background:white;">
+            <div>
+              <div style="font-size:11px;font-weight:600;color:var(--text-primary);">기압</div>
+              <div style="font-size:9px;color:var(--text-tertiary);">pressure · relative (hPa)</div>
+            </div>
+            <select id="eco-map-pressure" style="width:100%;padding:6px 8px;font-size:11px;font-family:'Noto Sans KR',sans-serif;background:white;border:1px solid var(--border);border-radius:var(--radius-sm);color:var(--text-primary);appearance:none;-webkit-appearance:none;text-align:center;text-align-last:center;" onchange="ecoMapColor(this)">
+              <option value="" selected>미사용</option>
+              <option value="sunlight">→ 조도 (fc)</option>
+              <option value="temp">→ 온도 (°C)</option>
+              <option value="humidity">→ 습도 (%)</option>
+            </select>
+          </div>
+        </div>
+
+        <div style="font-size:10px;color:var(--text-tertiary);margin:10px 0 12px;line-height:1.6;">💡 기본 추천 설정이 미리 선택되어 있어요. 육묘 하우스 환경에 맞게 변경하시면 됩니다.<br>예) 실내 온습도 센서가 있으면 "실내 온도 → 온도", "실내 습도 → 습도"로 바꿔보세요.</div>
+        <button onclick="saveEcowittSettingsFromTab()" style="width:100%;padding:12px;font-size:13px;font-family:'Noto Sans KR',sans-serif;font-weight:700;color:white;background:#059669;border:none;border-radius:var(--radius-md);cursor:pointer;">Ecowitt 설정 저장</button>
+        <div id="eco-settings-status" style="font-size:11px;color:var(--text-tertiary);margin-top:8px;min-height:16px;text-align:center;"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="settings-accordion" id="acc-export">
+    <div class="settings-acc-hdr" onclick="toggleAcc('export')">
+      <span class="settings-acc-title">데이터 내보내기</span>
+      <span class="settings-acc-arrow" id="acc-arrow-export">▼</span>
+    </div>
+    <div class="settings-acc-body" id="acc-body-export">
+      <div class="nm-flat" style="padding:16px 18px;margin-bottom:4px;">
+        <div style="display:flex;gap:6px;align-items:center;margin-bottom:12px;flex-wrap:wrap;">
+          <input type="date" id="xl-from" style="flex:1;min-width:0;padding:9px 10px;font-size:12px;font-family:'Noto Sans KR',sans-serif;background:var(--bg);border:1px solid var(--border);border-radius:var(--radius-md);color:var(--text-primary);">
+          <span style="color:var(--text-tertiary);font-size:12px;flex-shrink:0;">~</span>
+          <input type="date" id="xl-to" style="flex:1;min-width:0;padding:9px 10px;font-size:12px;font-family:'Noto Sans KR',sans-serif;background:var(--bg);border:1px solid var(--border);border-radius:var(--radius-md);color:var(--text-primary);">
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px;">
+          <label class="chk-row" style="padding:9px 11px;background:var(--bg);border:1px solid var(--border);border-radius:var(--radius-md);margin:0;"><input type="checkbox" id="xl-income" checked><span style="font-size:13px;color:var(--text-secondary);">수입</span></label>
+          <label class="chk-row" style="padding:9px 11px;background:var(--bg);border:1px solid var(--border);border-radius:var(--radius-md);margin:0;"><input type="checkbox" id="xl-expense" checked><span style="font-size:13px;color:var(--text-secondary);">지출</span></label>
+          <label class="chk-row" style="padding:9px 11px;background:var(--bg);border:1px solid var(--border);border-radius:var(--radius-md);margin:0;"><input type="checkbox" id="xl-env" checked><span style="font-size:13px;color:var(--text-secondary);">육묘</span></label>
+          <label class="chk-row" style="padding:9px 11px;background:var(--bg);border:1px solid var(--border);border-radius:var(--radius-md);margin:0;"><input type="checkbox" id="xl-price" checked><span style="font-size:13px;color:var(--text-secondary);">시세</span></label>
+        </div>
+        <button class="nm-btn-primary" onclick="downloadExcelCustom()" style="width:100%;padding:13px;font-size:13px;font-family:'Noto Sans KR',sans-serif;font-weight:700;">⬇ 엑셀 다운로드</button>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- 데이터 기간 삭제 -->
+  <div class="settings-accordion" id="acc-delrange">
+    <div class="settings-acc-hdr" onclick="toggleAcc('delrange')">
+      <span class="settings-acc-title">데이터 기간 삭제</span>
+      <span class="settings-acc-arrow" id="acc-arrow-delrange">▼</span>
+    </div>
+    <div class="settings-acc-body" id="acc-body-delrange">
+      <div class="nm-flat" style="padding:16px 18px;margin-bottom:4px;">
+        <div style="display:flex;gap:6px;align-items:center;margin-bottom:12px;flex-wrap:wrap;">
+          <input type="date" id="del-from" style="flex:1;min-width:0;padding:9px 10px;font-size:12px;font-family:'Noto Sans KR',sans-serif;background:var(--bg);border:1px solid var(--border);border-radius:var(--radius-md);color:var(--text-primary);">
+          <span style="color:var(--text-tertiary);font-size:12px;flex-shrink:0;">~</span>
+          <input type="date" id="del-to" style="flex:1;min-width:0;padding:9px 10px;font-size:12px;font-family:'Noto Sans KR',sans-serif;background:var(--bg);border:1px solid var(--border);border-radius:var(--radius-md);color:var(--text-primary);">
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:12px;">
+          <label class="chk-row" style="padding:10px 12px;background:var(--bg);border:1px solid var(--border);border-radius:var(--radius-md);margin:0;"><input type="checkbox" id="del-income" checked><span style="font-size:13px;color:var(--text-secondary);">수입</span></label>
+          <label class="chk-row" style="padding:10px 12px;background:var(--bg);border:1px solid var(--border);border-radius:var(--radius-md);margin:0;"><input type="checkbox" id="del-expense"><span style="font-size:13px;color:var(--text-secondary);">지출</span></label>
+          <label class="chk-row" style="padding:10px 12px;background:var(--bg);border:1px solid var(--border);border-radius:var(--radius-md);margin:0;"><input type="checkbox" id="del-env"><span style="font-size:13px;color:var(--text-secondary);">육묘</span></label>
+        </div>
+        <button onclick="confirmDeleteRangeData()" style="width:100%;padding:13px;font-size:13px;font-family:'Noto Sans KR',sans-serif;font-weight:700;color:white;background:var(--red);border:none;border-radius:var(--radius-md);cursor:pointer;">선택 기간 삭제</button>
+        <div id="delete-range-result" style="min-height:18px;margin-top:10px;font-size:12px;color:var(--text-secondary);line-height:1.5;"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 데이터 초기화 -->
+  <div class="settings-accordion" id="acc-reset">
+    <div class="settings-acc-hdr" onclick="toggleAcc('reset')">
+      <span class="settings-acc-title">데이터 초기화</span>
+      <span class="settings-acc-arrow" id="acc-arrow-reset">▼</span>
+    </div>
+    <div class="settings-acc-body" id="acc-body-reset">
+      <div class="nm-flat" style="padding:16px 18px;margin-bottom:4px;">
+        <p style="font-size:12px;color:var(--text-secondary);margin-bottom:12px;line-height:1.6;">농장 이름·접속 코드를 제외한 데이터를 초기화합니다.</p>
+        <div style="display:flex;flex-direction:column;gap:8px;">
+          <button onclick="resetAllData()" style="width:100%;padding:12px;font-size:13px;font-family:'Noto Sans KR',sans-serif;font-weight:700;color:white;background:#EF4444;border:none;border-radius:var(--radius-md);cursor:pointer;">수입/지출/육묘/시세/대출 전체 초기화</button>
+          <button onclick="resetSettingsData()" style="width:100%;padding:12px;font-size:13px;font-family:'Noto Sans KR',sans-serif;font-weight:600;color:var(--red);background:var(--red-soft);border:1px solid #FECACA;border-radius:var(--radius-md);cursor:pointer;">설정 초기화 (프로그램·경로·재고 등)</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
 </div>
 
 </div><!-- .app -->
@@ -1881,7 +2103,7 @@ function showTab(t){
   try{localStorage.setItem('pb8_active_tab',t);}catch(e){}
   if(t==='prices')renderPricesTab();
   if(t==='loan')renderLoanList();
-  if(t==='settings')renderSettings();
+  if(t==='settings'){renderSettings();restoreAccState();}
   if(t==='summary')renderAll();
   if(t==='seedling-tab')renderSeedlingTab();
 }
@@ -3441,6 +3663,165 @@ function styleXlsHeader(ws, colCount) {
   ws['!rows'][0]={hpt:18};
 }
 
+// ══════════════════════════════════════════
+// ECOWITT 연동
+// ══════════════════════════════════════════
+
+function getEcowittKeys(){
+  return gl('pb8_ecowitt_keys')||{apiKey:'',appKey:'',mac:''};
+}
+function saveEcowittKeys(k){sl('pb8_ecowitt_keys',k);}
+
+function showEcowittSettings(){
+  if(typeof showTab==='function') showTab('settings');
+  setTimeout(()=>document.getElementById('ecowitt-settings-card')?.scrollIntoView({behavior:'smooth',block:'start'}),200);
+}
+
+async function fetchEcowittData(){
+  const k=getEcowittKeys();
+  if(!k.appKey||!k.apiKey||!k.mac){
+    if(typeof showTab==='function') showTab('settings');
+    setTimeout(()=>document.getElementById('ecowitt-settings-card')?.scrollIntoView({behavior:'smooth',block:'start'}),200);
+    showSaveToast('⚙ 설정 탭에서 Ecowitt 키를 먼저 입력해 주세요');
+    return;
+  }
+  const btn=document.getElementById('ecowitt-fetch-btn');
+  const status=document.getElementById('ecowitt-status');
+  if(btn){btn.disabled=true;btn.innerHTML='⏳ 불러오는 중...';}
+  if(status)status.textContent='Ecowitt 서버에 요청 중...';
+
+  const ecowittUrl='https://api.ecowitt.net/api/v3/device/real_time'
+    +'?application_key='+encodeURIComponent(k.appKey)
+    +'&api_key='+encodeURIComponent(k.apiKey)
+    +'&mac='+encodeURIComponent(k.mac)
+    +'&call_back=all&temp_unitid=1&pressure_unitid=3&wind_speed_unitid=6&rainfall_unitid=12&solar_irradiance_unitid=16';
+
+  try{
+    // Claude API: computer_use 방식으로 URL fetch 요청
+    const resp=await fetch('https://api.anthropic.com/v1/messages',{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({
+        model:'claude-sonnet-4-20250514',
+        max_tokens:4000,
+        tools:[{
+          type:'computer_20250124',
+          name:'computer',
+          display_width_px:1280,
+          display_height_px:800
+        }],
+        messages:[{
+          role:'user',
+          content:'아래 URL의 JSON 응답을 가져와서 JSON만 출력해줘. 다른 설명은 필요없어.\n\n'+ecowittUrl
+        }]
+      })
+    });
+
+    if(!resp.ok){
+      const errText=await resp.text();
+      throw new Error('API 오류 '+resp.status+': '+errText.slice(0,100));
+    }
+
+    const apiData=await resp.json();
+    let rawText='';
+    (apiData.content||[]).forEach(b=>{if(b.type==='text')rawText+=b.text;});
+
+    // JSON 블록 추출
+    let eco=null;
+    const fenced=rawText.match(/```(?:json)?\s*(\{[\s\S]*?\})\s*```/);
+    if(fenced){try{eco=JSON.parse(fenced[1]);}catch(e){}}
+    if(!eco){
+      const plain=rawText.match(/\{[\s\S]*"code"[\s\S]*\}/);
+      if(plain){try{eco=JSON.parse(plain[0]);}catch(e){}}
+    }
+    if(!eco) throw new Error('JSON 파싱 실패. 응답: '+rawText.slice(0,120));
+    if(eco.code!==0) throw new Error('Ecowitt 오류 (code '+eco.code+'): '+(eco.msg||''));
+    _applyEcowittData(eco.data, status, k);
+
+  }catch(err){
+    console.error('Ecowitt fetch error:',err);
+    // 마지막 수단: corsproxy.io 시도
+    try{
+      if(status)status.textContent='대체 경로로 재시도 중...';
+      const proxy2='https://corsproxy.io/?'+encodeURIComponent(ecowittUrl);
+      const r2=await fetch(proxy2);
+      const eco2=await r2.json();
+      if(eco2.code!==0) throw new Error('Ecowitt 오류 (code '+eco2.code+'): '+(eco2.msg||''));
+      _applyEcowittData(eco2.data, status, k);
+      return;
+    }catch(err2){
+      console.error('fallback error:',err2);
+    }
+    const msg=(err.message||'').slice(0,120);
+    if(status)status.textContent='⚠ 실패: '+msg;
+    showAlert('Ecowitt 데이터를 불러오지 못했습니다.\n\n원인: '+msg+'\n\n확인 사항\n· API Key / Application Key 정확한지\n· MAC 형식: AA:BB:CC:DD:EE:FF\n· 기기 온라인 여부\n· ecowitt.net에서 데이터 수신 여부');
+  }finally{
+    if(btn){btn.disabled=false;btn.innerHTML='⇩ Ecowitt';}
+  }
+}
+
+function _applyEcowittData(data, status, keys){
+  if(!data){if(status)status.textContent='⚠ 응답에 data 없음';return;}
+  const cfg=keys||getEcowittKeys();
+  // 기본 매핑 (설정이 없을 때)
+  const m=cfg.mapping||{'outdoor-temp':'temp','outdoor-humi':'humidity','solar':'sunlight'};
+
+  // 각 Ecowitt 소스에서 값 추출
+  const raw={};
+  raw['indoor-temp'] = data.indoor?.temperature?.value!=null ? parseFloat(data.indoor.temperature.value) : null;
+  raw['indoor-humi'] = data.indoor?.humidity?.value!=null    ? parseFloat(data.indoor.humidity.value)    : null;
+  raw['outdoor-temp']= data.outdoor?.temperature?.value!=null? parseFloat(data.outdoor.temperature.value): null;
+  raw['outdoor-humi']= data.outdoor?.humidity?.value!=null   ? parseFloat(data.outdoor.humidity.value)   : null;
+  // Solar W/m² → fc 변환 (1 W/m² ≈ 120 lux, 1 fc = 10.764 lux)
+  raw['solar'] = data.solar_and_uvi?.solar?.value!=null
+    ? Math.round(parseFloat(data.solar_and_uvi.solar.value)*120/10.764) : null;
+  raw['uvi']      = data.solar_and_uvi?.uvi?.value!=null     ? parseFloat(data.solar_and_uvi.uvi.value)  : null;
+  raw['rain']     = data.rainfall?.rain_rate?.value!=null     ? parseFloat(data.rainfall.rain_rate.value) : null;
+  raw['wind']     = data.wind?.wind_speed?.value!=null        ? parseFloat(data.wind.wind_speed.value)    : null;
+  raw['pressure'] = data.pressure?.relative?.value!=null      ? parseFloat(data.pressure.relative.value)  : null;
+
+  // 매핑에 따라 육묘 필드에 채우기 (마지막 값 우선)
+  const result={sunlight:null, temp:null, humidity:null};
+  Object.keys(m).forEach(src=>{
+    const target=m[src]; // 'sunlight' | 'temp' | 'humidity' | ''
+    if(!target||raw[src]===null||raw[src]===undefined)return;
+    result[target]=raw[src];
+  });
+
+  // 시간 자동 입력 (비어있을 때만)
+  const nowT=getNowTime();
+  const tEl=document.getElementById('sl-time');
+  if(tEl&&!tEl.value)tEl.value=nowT;
+
+  // 입력칸 채우기
+  const filled=[];
+  if(result.sunlight!==null){
+    const el=document.getElementById('sl-sunlight');if(el)el.value=result.sunlight;
+    // 어떤 소스에서 왔는지 표시
+    const src=Object.keys(m).find(k=>m[k]==='sunlight'&&raw[k]!==null);
+    filled.push('조도 '+result.sunlight+'fc'+(src?' ('+_ecoSrcLabel(src)+')':''));
+  }
+  if(result.temp!==null){
+    const el=document.getElementById('sl-temp');if(el)el.value=Math.round(result.temp*10)/10;
+    const src=Object.keys(m).find(k=>m[k]==='temp'&&raw[k]!==null);
+    filled.push('온도 '+(Math.round(result.temp*10)/10)+'°C'+(src?' ('+_ecoSrcLabel(src)+')':''));
+  }
+  if(result.humidity!==null){
+    const el=document.getElementById('sl-humidity');if(el)el.value=Math.round(result.humidity);
+    const src=Object.keys(m).find(k=>m[k]==='humidity'&&raw[k]!==null);
+    filled.push('습도 '+Math.round(result.humidity)+'%'+(src?' ('+_ecoSrcLabel(src)+')':''));
+  }
+
+  if(status) status.textContent=filled.length?'✓ '+filled.join(' · '):'⚠ 매핑된 데이터 없음 (설정 확인)';
+  if(filled.length) showSaveToast('✓ Ecowitt 불러오기 완료');
+}
+
+function _ecoSrcLabel(src){
+  const labels={'indoor-temp':'실내온도','indoor-humi':'실내습도','outdoor-temp':'외부온도','outdoor-humi':'외부습도',
+    'solar':'Solar','uvi':'UVI','rain':'강우','wind':'풍속','pressure':'기압'};
+  return labels[src]||src;
+}
+
 // ══════════════════════════════════════════════
 // 육묘 탭
 // ══════════════════════════════════════════════
@@ -4185,6 +4566,57 @@ function resetSettingsData(){
   showSaveToast('✓ 설정이 초기화되었습니다');
 }
 
+function toggleAcc(id){
+  const body=document.getElementById('acc-body-'+id);
+  const arrow=document.getElementById('acc-arrow-'+id);
+  if(!body)return;
+  const isOpen=body.classList.contains('open');
+  body.classList.toggle('open',!isOpen);
+  if(arrow)arrow.classList.toggle('open',!isOpen);
+}
+
+// 환경 통합 저장 (날씨 + 수도 한 번에)
+function saveEnvAll(){
+  const _sd=document.getElementById('sl-date')?.value||getNowDate();
+  const _st=document.getElementById('sl-time')?.value||'';
+  if(!_st){showAlert('시간을 입력해 주세요.');return;}
+  const sunlight=document.getElementById('sl-sunlight')?.value||'';
+  const temp=document.getElementById('sl-temp')?.value||'';
+  const humidity=document.getElementById('sl-humidity')?.value||'';
+  if(!sunlight||!temp||!humidity){showAlert('조도, 온도, 습도를 모두 입력해 주세요.');return;}
+  // 수도 환경 필수: 1개 이상 값 입력 확인
+  const zoneCount=gl('pb8_water_zones')||6;
+  const waterVals=[];
+  for(let z=1;z<=zoneCount;z++){
+    const v=document.getElementById('sl-water-'+z)?.value||'';
+    waterVals.push({zone:String(z),liter:v});
+  }
+  const hasWater=waterVals.some(w=>w.liter!=='');
+  if(!hasWater){showAlert('수도 환경: 구역 중 하나 이상 값을 입력해 주세요.');return;}
+  const timeKey=_st.replace(':','h');
+  const storKey='pb8_env_'+_sd+'_'+timeKey;
+  const env=gl(storKey)||{};
+  env.sunlight=sunlight;env.temp=temp;env.humidity=humidity;
+  env.water=waterVals;
+  env.date=_sd;env.time=_st;env.waterTime=_st;
+  sl(storKey,env);
+  showSaveToast('✓ 환경 저장');
+  // 입력칸 초기화
+  ['sl-sunlight','sl-temp','sl-humidity'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
+  for(let z=1;z<=zoneCount;z++){const el=document.getElementById('sl-water-'+z);if(el)el.value='';}
+  renderSeedlingEnvChart();renderSeedlingCorrChart();renderEnvRawTable();populateFeedbackDateSelect();
+}
+
+function restoreAccState(){
+  // 항상 모두 닫힌 상태로 시작 (저장 상태 무시)
+  ['prog','route','export','ecowitt','delrange','reset'].forEach(id=>{
+    const body=document.getElementById('acc-body-'+id);
+    const arrow=document.getElementById('acc-arrow-'+id);
+    if(body)body.classList.remove('open');
+    if(arrow)arrow.classList.remove('open');
+  });
+}
+
 function renderSettings(){
   const progs=getProgs();
   const pl=document.getElementById('prog-list');
@@ -4196,6 +4628,66 @@ function renderSettings(){
       ? `<div style="display:flex;flex-wrap:wrap;gap:5px;margin-bottom:6px;">${routes.map((r,i)=>`<span style="display:inline-flex;align-items:center;gap:4px;padding:3px 8px;background:#EEF2F7;border:1px solid #E0E7EF;border-radius:999px;font-size:10px;font-weight:500;color:#6B7280;line-height:1.4;">${r}<button onclick="delVisitRoute(${i})" style="background:none;border:none;cursor:pointer;font-size:10px;color:#9CA3AF;padding:0;margin-left:2px;line-height:1;">✕</button></span>`).join('')}</div>`
       : '<p class="empty-msg" style="margin-bottom:6px;font-size:11px;">등록된 체험 경로 없음</p>';
   }
+  // Ecowitt 입력칸: 이미 사용자가 타이핑 중이면 건드리지 않음
+  // 비어있을 때만 저장된 값으로 채움
+  const ek=getEcowittKeys();
+  const fillIfEmpty=(id,v)=>{
+    const el=document.getElementById(id);
+    if(el&&!el.value&&v)el.value=v;
+  };
+  fillIfEmpty('eco-settings-appkey', ek.appKey);
+  fillIfEmpty('eco-settings-apikey', ek.apiKey);
+  fillIfEmpty('eco-settings-mac', ek.mac);
+  // 매핑 셀렉트는 저장된 값으로 항상 복원 (select는 타이핑 없음)
+  const m=ek.mapping||{'outdoor-temp':'temp','outdoor-humi':'humidity','solar':'sunlight'};
+  const setV=(id,v)=>{const el=document.getElementById(id);if(el&&v!==undefined)el.value=v;};
+  setV('eco-map-indoor-temp', m['indoor-temp']||'');
+  setV('eco-map-indoor-humi', m['indoor-humi']||'');
+  setV('eco-map-outdoor-temp', m['outdoor-temp']||'temp');
+  setV('eco-map-outdoor-humi', m['outdoor-humi']||'humidity');
+  setV('eco-map-solar',        m['solar']||'sunlight');
+  setV('eco-map-uvi',          m['uvi']||'');
+  setV('eco-map-rain',         m['rain']||'');
+  setV('eco-map-wind',         m['wind']||'');
+  setV('eco-map-pressure',     m['pressure']||'');
+  const st=document.getElementById('eco-settings-status');
+  if(st) st.textContent=ek.appKey&&ek.apiKey&&ek.mac?'✓ 설정 저장됨':'키를 입력하고 저장해 주세요.';
+  setTimeout(initEcoMapColors, 0);
+}
+
+function ecoMapColor(sel){
+  sel.style.color=sel.value?'var(--text-primary)':'var(--text-tertiary)';
+}
+function initEcoMapColors(){
+  document.querySelectorAll('[id^="eco-map-"]').forEach(ecoMapColor);
+}
+
+function saveEcowittSettingsFromTab(){
+  const appKey=(document.getElementById('eco-settings-appkey')?.value||'').trim();
+  const apiKey=(document.getElementById('eco-settings-apikey')?.value||'').trim();
+  const mac=(document.getElementById('eco-settings-mac')?.value||'').trim();
+  if(!appKey||!apiKey||!mac){showAlert('Application Key, API Key, MAC 주소를 모두 입력해 주세요.');return;}
+  const mapping={
+    'indoor-temp': document.getElementById('eco-map-indoor-temp')?.value||'',
+    'indoor-humi': document.getElementById('eco-map-indoor-humi')?.value||'',
+    'outdoor-temp': document.getElementById('eco-map-outdoor-temp')?.value||'temp',
+    'outdoor-humi': document.getElementById('eco-map-outdoor-humi')?.value||'humidity',
+    'solar':        document.getElementById('eco-map-solar')?.value||'sunlight',
+    'uvi':          document.getElementById('eco-map-uvi')?.value||'',
+    'rain':         document.getElementById('eco-map-rain')?.value||'',
+    'wind':         document.getElementById('eco-map-wind')?.value||'',
+    'pressure':     document.getElementById('eco-map-pressure')?.value||'',
+  };
+  const k={appKey,apiKey,mac,mapping};
+  saveEcowittKeys(k);
+  // 저장 후에도 입력칸에 값 유지
+  const forceV=(id,v)=>{const el=document.getElementById(id);if(el)el.value=v;};
+  forceV('eco-settings-appkey', appKey);
+  forceV('eco-settings-apikey', apiKey);
+  forceV('eco-settings-mac', mac);
+  const st=document.getElementById('eco-settings-status');
+  if(st)st.textContent='✓ 저장 완료 · 육묘 탭에서 "Ecowitt" 버튼을 눌러보세요';
+  showSaveToast('✓ Ecowitt 설정 저장');
 }
 
 function editProg(i){openModal('prog',i);}
