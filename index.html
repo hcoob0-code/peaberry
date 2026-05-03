@@ -3720,22 +3720,22 @@ async function fetchEcowittData(){
   if(status)status.textContent='Ecowitt 서버에 요청 중...';
 
   // 프록시 URL: 설정된 값 또는 기본값 사용
-  const proxyBase=(k.proxyUrl||'').replace(/\/+$/,'');
-  if(!proxyBase){
+  const proxyBase=(k.proxyUrl||'').trim().replace(/\/+$/,'').replace(/\s/g,'');
+  if(!proxyBase||!proxyBase.startsWith('http')){
     if(status)status.textContent='⚠ 프록시 URL이 설정되지 않았습니다';
     if(btn){btn.disabled=false;btn.innerHTML='⇩ Ecowitt';}
-    showAlert('설정 탭 → Ecowitt 연동에서 프록시 서버 URL을 입력하고 저장해 주세요.\n\n프록시 URL: https://peakberry-hcoob0-9559s-projects.vercel.app');
+    showAlert('설정 탭 → Ecowitt 연동에서 프록시 서버 URL을 입력하고 저장해 주세요.');
     return;
   }
   const proxyUrl=proxyBase+'/api/ecowitt'
     +'?application_key='+encodeURIComponent(k.appKey)
     +'&api_key='+encodeURIComponent(k.apiKey)
     +'&mac='+encodeURIComponent(k.mac);
-  console.log('Ecowitt proxy URL:', proxyUrl);
+  if(status)status.textContent='요청 중: '+proxyBase+'...';
 
   try{
     const r=await fetch(proxyUrl);
-    if(!r.ok) throw new Error('프록시 응답 오류: '+r.status);
+    if(!r.ok) throw new Error('HTTP 오류: '+r.status);
     const eco=await r.json();
     if(eco.code!==0) throw new Error('Ecowitt 오류 (code '+eco.code+'): '+(eco.msg||''));
     _applyEcowittData(eco.data, status, k);
