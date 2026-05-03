@@ -922,17 +922,17 @@ canvas { max-width: 100%; }
         <div style="display:flex;flex-direction:column;gap:8px;margin-bottom:16px;">
           <div>
             <div style="font-size:10px;font-weight:600;color:var(--text-secondary);margin-bottom:3px;">Application Key</div>
-            <input type="text" id="eco-settings-appkey" placeholder="XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX" autocomplete="off" autocorrect="off" spellcheck="false" style="width:100%;padding:10px 12px;font-size:12px;font-family:'Noto Sans KR',sans-serif;background:var(--bg);border:1px solid var(--border);border-radius:var(--radius-md);color:var(--text-primary);box-sizing:border-box;">
+            <input type="text" id="eco-settings-appkey" onfocus="ecoInputRestore(this.id)" placeholder="XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX" autocomplete="off" autocorrect="off" spellcheck="false" style="width:100%;padding:10px 12px;font-size:12px;font-family:'Noto Sans KR',sans-serif;background:var(--bg);border:1px solid var(--border);border-radius:var(--radius-md);color:var(--text-primary);box-sizing:border-box;">
             <div style="font-size:9px;color:var(--text-tertiary);margin-top:3px;">ecowitt.net → 우측 상단 사용자 → User Profile → API Keys</div>
           </div>
           <div>
             <div style="font-size:10px;font-weight:600;color:var(--text-secondary);margin-bottom:3px;">API Key</div>
-            <input type="text" id="eco-settings-apikey" placeholder="XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX" autocomplete="off" autocorrect="off" spellcheck="false" style="width:100%;padding:10px 12px;font-size:12px;font-family:'Noto Sans KR',sans-serif;background:var(--bg);border:1px solid var(--border);border-radius:var(--radius-md);color:var(--text-primary);box-sizing:border-box;">
+            <input type="text" id="eco-settings-apikey" onfocus="ecoInputRestore(this.id)" placeholder="XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX" autocomplete="off" autocorrect="off" spellcheck="false" style="width:100%;padding:10px 12px;font-size:12px;font-family:'Noto Sans KR',sans-serif;background:var(--bg);border:1px solid var(--border);border-radius:var(--radius-md);color:var(--text-primary);box-sizing:border-box;">
             <div style="font-size:9px;color:var(--text-tertiary);margin-top:3px;">ecowitt.net → 우측 상단 사용자 → User Profile → API Keys</div>
           </div>
           <div>
             <div style="font-size:10px;font-weight:600;color:var(--text-secondary);margin-bottom:3px;">장치 MAC 주소</div>
-            <input type="text" id="eco-settings-mac" placeholder="예: AA:BB:CC:DD:EE:FF" autocomplete="off" autocorrect="off" spellcheck="false" style="width:100%;padding:10px 12px;font-size:12px;font-family:'Noto Sans KR',sans-serif;background:var(--bg);border:1px solid var(--border);border-radius:var(--radius-md);color:var(--text-primary);box-sizing:border-box;">
+            <input type="text" id="eco-settings-mac" onfocus="ecoInputRestore(this.id)" placeholder="예: AA:BB:CC:DD:EE:FF" autocomplete="off" autocorrect="off" spellcheck="false" style="width:100%;padding:10px 12px;font-size:12px;font-family:'Noto Sans KR',sans-serif;background:var(--bg);border:1px solid var(--border);border-radius:var(--radius-md);color:var(--text-primary);box-sizing:border-box;">
             <div style="font-size:9px;color:var(--text-tertiary);margin-top:3px;">ecowitt.net → 로그인 → Device → 기기 선택 → MAC Address</div>
           </div>
         </div>
@@ -1073,7 +1073,7 @@ canvas { max-width: 100%; }
           <div style="font-size:11px;font-weight:700;color:#92400E;margin-bottom:4px;">⚠ 프록시 서버 설정 필요</div>
           <div style="font-size:10px;color:#92400E;margin-bottom:8px;line-height:1.6;">Ecowitt API는 브라우저에서 직접 호출이 차단(CORS)됩니다.<br>아래 가이드로 무료 프록시를 30초만에 배포하고 URL을 입력하세요.</div>
           <div style="font-size:10px;font-weight:600;color:#92400E;margin-bottom:3px;">프록시 서버 URL</div>
-          <input type="text" id="eco-settings-proxy" placeholder="https://your-proxy.vercel.app" autocomplete="off" spellcheck="false" style="width:100%;padding:9px 12px;font-size:12px;font-family:'Noto Sans KR',sans-serif;background:white;border:1px solid #FDE68A;border-radius:var(--radius-md);color:var(--text-primary);box-sizing:border-box;margin-bottom:6px;">
+          <input type="text" id="eco-settings-proxy" onfocus="ecoInputRestore(this.id)" placeholder="https://your-proxy.vercel.app" autocomplete="off" spellcheck="false" style="width:100%;padding:9px 12px;font-size:12px;font-family:'Noto Sans KR',sans-serif;background:white;border:1px solid #FDE68A;border-radius:var(--radius-md);color:var(--text-primary);box-sizing:border-box;margin-bottom:6px;">
           <div style="font-size:9px;color:#92400E;line-height:1.6;">배포 방법: <b>github.com/new</b> → 저장소 만들기 → <b>api/ecowitt.js</b> 파일 업로드 → <b>vercel.com</b>에서 해당 저장소 연결 → 생성된 URL 입력</div>
         </div>
         <button onclick="saveEcowittSettingsFromTab()" style="width:100%;padding:12px;font-size:13px;font-family:'Noto Sans KR',sans-serif;font-weight:700;color:white;background:#059669;border:none;border-radius:var(--radius-md);cursor:pointer;">Ecowitt 설정 저장</button>
@@ -3677,10 +3677,12 @@ function styleXlsHeader(ws, colCount) {
 // ══════════════════════════════════════════
 
 function getEcowittKeys(){
-  // farm prefix 없이 저장 (어느 농장에서도 공유)
-  return gl('pb8_ecowitt_keys')||{apiKey:'',appKey:'',mac:'',proxyUrl:''};
+  try{return JSON.parse(localStorage.getItem('pb8_ecowitt_keys')||'null')||{apiKey:'',appKey:'',mac:'',proxyUrl:''};}
+  catch(e){return {apiKey:'',appKey:'',mac:'',proxyUrl:''};}
 }
-function saveEcowittKeys(k){sl('pb8_ecowitt_keys',k);}
+function saveEcowittKeys(k){
+  localStorage.setItem('pb8_ecowitt_keys', JSON.stringify(k));
+}
 
 function showEcowittSettings(){
   if(typeof showTab==='function') showTab('settings');
@@ -3689,6 +3691,7 @@ function showEcowittSettings(){
 
 async function fetchEcowittData(){
   const k=getEcowittKeys();
+  console.log('Ecowitt keys:', JSON.stringify(k));
   if(!k.appKey||!k.apiKey||!k.mac){
     if(typeof showTab==='function') showTab('settings');
     setTimeout(()=>document.getElementById('ecowitt-settings-card')?.scrollIntoView({behavior:'smooth',block:'start'}),200);
@@ -4626,9 +4629,21 @@ function renderSettings(){
   const st=document.getElementById('eco-settings-status');
   if(st) st.textContent=ek.appKey&&ek.apiKey&&ek.mac?'✓ 설정 저장됨':'키를 입력하고 저장해 주세요.';
   setTimeout(initEcoMapColors, 0);
+  setTimeout(applyEcoSavedStyle, 0);
 }
 
-function ecoMapColor(sel){
+function ecoInputGrey(id){
+  const el=document.getElementById(id);
+  if(el&&el.value){el.style.color='var(--text-tertiary)';el.style.fontFamily="'Noto Sans KR',sans-serif";}
+}
+function ecoInputRestore(id){
+  const el=document.getElementById(id);
+  if(el)el.style.color='var(--text-primary)';
+}
+function applyEcoSavedStyle(){
+  ['eco-settings-appkey','eco-settings-apikey','eco-settings-mac','eco-settings-proxy'].forEach(ecoInputGrey);
+}
+
   sel.style.color=sel.value?'var(--text-primary)':'var(--text-tertiary)';
 }
 function initEcoMapColors(){
@@ -4663,6 +4678,7 @@ function saveEcowittSettingsFromTab(){
   const st=document.getElementById('eco-settings-status');
   if(st)st.textContent='✓ 저장 완료 · 육묘 탭에서 "Ecowitt" 버튼을 눌러보세요';
   showSaveToast('✓ Ecowitt 설정 저장');
+  setTimeout(applyEcoSavedStyle, 50);
 }
 
 function editProg(i){openModal('prog',i);}
