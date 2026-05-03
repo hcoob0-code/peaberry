@@ -3693,7 +3693,17 @@ function styleXlsHeader(ws, colCount) {
 // ══════════════════════════════════════════
 
 function getEcowittKeys(){
-  try{return JSON.parse(localStorage.getItem('pb8_ecowitt_keys')||'null')||{apiKey:'',appKey:'',mac:'',proxyUrl:''};}
+  try{
+    const k=JSON.parse(localStorage.getItem('pb8_ecowitt_keys')||'null')||{apiKey:'',appKey:'',mac:'',proxyUrl:''};
+    // 구버전 URL 자동 정리
+    if(k.proxyUrl&&k.proxyUrl.includes('hcoob0-9559s')){
+      k.proxyUrl='https://peakberry.vercel.app';
+      localStorage.setItem('pb8_ecowitt_keys', JSON.stringify(k));
+    }
+    return k;
+  }
+  catch(e){return {apiKey:'',appKey:'',mac:'',proxyUrl:''};}
+}
   catch(e){return {apiKey:'',appKey:'',mac:'',proxyUrl:''};}
 }
 function saveEcowittKeys(k){
@@ -4620,16 +4630,11 @@ function renderSettings(){
   // Ecowitt 입력칸: 이미 사용자가 타이핑 중이면 건드리지 않음
   // 비어있을 때만 저장된 값으로 채움
   const ek=getEcowittKeys();
-  const fillIfEmpty=(id,v)=>{
-    const el=document.getElementById(id);
-    if(el&&!el.value&&v)el.value=v;
-  };
+  const fillIfEmpty=(id,v)=>{const el=document.getElementById(id);if(el&&!el.value&&v)el.value=v;};
   fillIfEmpty('eco-settings-appkey', ek.appKey);
   fillIfEmpty('eco-settings-apikey', ek.apiKey);
   fillIfEmpty('eco-settings-mac', ek.mac);
-  // 프록시 URL은 항상 저장된 값으로 덮어씀
-  const proxyEl=document.getElementById('eco-settings-proxy');
-  if(proxyEl&&ek.proxyUrl)proxyEl.value=ek.proxyUrl;
+  fillIfEmpty('eco-settings-proxy', ek.proxyUrl);
   // 매핑 셀렉트는 저장된 값으로 항상 복원 (select는 타이핑 없음)
   const m=ek.mapping||{'outdoor-temp':'temp','outdoor-humi':'humidity','solar':'sunlight'};
   const setV=(id,v)=>{const el=document.getElementById(id);if(el&&v!==undefined)el.value=v;};
