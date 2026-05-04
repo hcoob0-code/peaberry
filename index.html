@@ -818,7 +818,7 @@ canvas { max-width: 100%; }
       <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;">
         <div>
           <div style="font-size:10px;font-weight:600;color:var(--text-secondary);margin-bottom:4px;">조도 (lux) <span style="color:var(--red);">*</span></div>
-          <input type="number" id="sl-sunlight" placeholder="0" step="0.1" style="width:100%;padding:9px 8px;font-size:12px;font-family:'Noto Sans KR',sans-serif;background:var(--bg);border:1px solid var(--border);border-radius:var(--radius-md);color:var(--text-primary);">
+          <input type="text" inputmode="decimal" id="sl-sunlight" placeholder="0" style="width:100%;padding:9px 8px;font-size:12px;font-family:'Noto Sans KR',sans-serif;background:var(--bg);border:1px solid var(--border);border-radius:var(--radius-md);color:var(--text-primary);">
         </div>
         <div>
           <div style="font-size:10px;font-weight:600;color:var(--text-secondary);margin-bottom:4px;">온도 (°C) <span style="color:var(--red);">*</span></div>
@@ -4050,7 +4050,7 @@ function _applyEcowittData(data, status, keys){
   if(result.sunlight!==null){
     const el=document.getElementById('sl-sunlight');
     if(el){
-      el.value=Math.round(result.sunlight*10)/10; // number input엔 숫자로
+      el.value=fmtLux(result.sunlight); // text 타입이므로 K 형태로 표시
       el.dataset.rawLux=result.sunlight;
     }
     const src=Object.keys(m).find(k=>m[k]==='sunlight'&&raw[k]!==null);
@@ -4250,7 +4250,11 @@ function saveWeatherSection(){
   const _st=document.getElementById('sl-time')?.value||'';
   if(!_st){showAlert('시간을 입력해 주세요.');return;}
   const sunlightEl=document.getElementById('sl-sunlight');
-  const sunlight=sunlightEl?.dataset.rawLux||sunlightEl?.value||'';
+  const rawVal=sunlightEl?.dataset.rawLux||sunlightEl?.value||'';
+  // K 형태(14.5K) 또는 숫자 모두 처리
+  const sunlight=rawVal.toUpperCase().includes('K')
+    ? String(parseFloat(rawVal)*1000)
+    : rawVal;
   const temp=document.getElementById('sl-temp')?.value||'';
   const humidity=document.getElementById('sl-humidity')?.value||'';
   if(!sunlight||!temp||!humidity){showAlert('조도, 온도, 습도를 모두 입력해 주세요.');return;}  // 11
@@ -4464,7 +4468,10 @@ function loadEnvRecordToForm(key){
   const setV=(id,v)=>{const el=document.getElementById(id);if(el)el.value=v||'';};
   setV('sl-date',dateStr);setV('sl-time',timeStr);
   setV('sl-water-date',dateStr);setV('sl-water-time',timeStr);
-  setV('sl-sunlight',env.sunlight);setV('sl-temp',env.temp);setV('sl-humidity',env.humidity);
+  // 조도는 K 형태로 복원
+  const sunEl=document.getElementById('sl-sunlight');
+  if(sunEl){sunEl.value=env.sunlight?fmtLux(parseFloat(env.sunlight)):'';sunEl.dataset.rawLux=env.sunlight||'';}
+  setV('sl-temp',env.temp);setV('sl-humidity',env.humidity);
   const zoneCount=gl('pb8_water_zones')||6;
   renderWaterRecords(env.water||[],zoneCount);
   document.getElementById('sec-seedling-tab')?.scrollIntoView({behavior:'smooth',block:'start'});
