@@ -485,6 +485,159 @@ canvas { max-width: 100%; }
 .icon-choice-btn { padding:8px 0; border-radius:10px; border:1px solid var(--border); background:var(--bg); font-size:18px; cursor:pointer; font-family:'Noto Sans KR',sans-serif; }
 .icon-choice-btn.active { background:var(--text-primary); color:white; border-color:var(--text-primary); }
 
+
+
+
+/* ── 스마트팜 ── */
+.sf-card {
+  background: var(--surface);
+  border: 1px solid #EAECF0;
+  border-radius: 14px;
+  padding: 10px 12px;
+  margin-bottom: 8px;
+}
+.sf-switch-grid-3 { display: grid; grid-template-columns: repeat(3,1fr); gap: 8px; }
+.sf-switch-grid-2 { display: grid; grid-template-columns: repeat(2,1fr); gap: 8px; }
+
+/* ── 3-way 슬라이드 토글 카드 ── */
+.sf-sw {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 5px;
+  padding: 10px 6px 8px;
+  background: #F9FAFB;
+  border: 1.5px solid #E5E7EB;
+  border-radius: 14px;
+  cursor: pointer;
+  user-select: none; -webkit-user-select: none;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: none;   /* pan-y 제거 → 수평 스와이프 방해 없앰 */
+  transition: background 0.2s, border-color 0.2s;
+}
+.sf-sw.on   { background: #F0FDF4; border-color: #86EFAC; }
+.sf-sw.stop { background: #FFFBEB; border-color: #FCD34D; }
+.sf-sw.off  { background: #F9FAFB; border-color: #E5E7EB; }
+
+/* 번호/이름 */
+.sf-sw-num {
+  font-size: 10px; font-weight: 800;
+  color: #9CA3AF;
+  letter-spacing: 0.2px; text-align: center;
+  line-height: 1.2;
+}
+.sf-sw.on   .sf-sw-num { color: #16A34A; }
+.sf-sw.stop .sf-sw-num { color: #D97706; }
+
+/* ── 3-way 트랙 (더 크게) ── */
+.sf-track-wrap {
+  position: relative;
+  width: 72px; height: 32px;   /* 넓고 높게 */
+}
+.sf-track-bg {
+  position: absolute; inset: 0;
+  border-radius: 16px;
+  background: #E5E7EB;
+  border: 1.5px solid #D1D5DB;
+  transition: background 0.25s, border-color 0.25s;
+}
+.sf-sw.on   .sf-track-bg { background: #DCFCE7; border-color: #86EFAC; }
+.sf-sw.stop .sf-track-bg { background: #FEF3C7; border-color: #FCD34D; }
+
+/* 트랙 내 텍스트 — 열림/닫힘/정지 모두 트랙 안에 */
+.sf-track-txt {
+  position: absolute;
+  top: 50%; transform: translateY(-50%);
+  font-size: 8px; font-weight: 800;
+  pointer-events: none;
+  white-space: nowrap;
+  opacity: 0;
+  transition: opacity 0.2s;
+}
+/* 닫힘: off 상태 → 오른쪽 공간에 표시 */
+.sf-track-txt.txt-close { right: 6px; color: #6B7280; }
+.sf-sw.off .sf-track-txt.txt-close { opacity: 1; }
+/* 열림: on 상태 → 왼쪽 공간에 표시 */
+.sf-track-txt.txt-open  { left: 6px;  color: #16A34A; }
+.sf-sw.on  .sf-track-txt.txt-open  { opacity: 1; }
+/* 정지: stop 상태 → 오른쪽 공간에 표시 (노브가 가운데이므로 오른쪽 비어있음) */
+.sf-track-txt.txt-stop  { right: 6px; color: #D97706; }
+.sf-sw.stop .sf-track-txt.txt-stop { opacity: 1; }
+
+/* 노브 — 크게, 부드럽게 */
+.sf-knob {
+  position: absolute;
+  top: 3px; left: 3px;
+  width: 24px; height: 24px;
+  border-radius: 50%;
+  background: white;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.22);
+  /* iOS 슬라이더 느낌: 빠르게 출발, 부드럽게 감속 */
+  transition: left 0.32s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  will-change: left;
+}
+/* off=닫힘(왼쪽), stop=가운데, on=열림(오른쪽) */
+.sf-sw.off  .sf-knob { left: 3px; }
+.sf-sw.stop .sf-knob { left: 24px; }
+.sf-sw.on   .sf-knob { left: 44px; }
+
+/* Ecowitt 환경 바 */
+.sf-env-bar {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr auto;
+  gap: 6px;
+  padding: 10px 14px;
+  background: var(--surface);
+  border: 1px solid #EAECF0;
+  border-radius: 14px;
+  margin-bottom: 8px;
+  align-items: center;
+}
+.sf-env-cell { text-align: center; }
+.sf-env-label { font-size: 9px; font-weight: 600; color: var(--text-tertiary); margin-bottom: 2px; }
+.sf-env-val   { font-size: 17px; font-weight: 800; letter-spacing: -0.5px; line-height: 1; }
+.sf-env-unit  { font-size: 8px; color: var(--text-tertiary); margin-top: 1px; }
+
+/* 전원 상태바 */
+.sf-status-bar {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 10px 14px;
+  background: var(--surface);
+  border: 1px solid #EAECF0;
+  border-radius: 14px;
+  margin-bottom: 8px;
+}
+.sf-power-dot {
+  width: 9px; height: 9px; border-radius: 50%;
+  background: #9CA3AF; flex-shrink: 0;
+  box-shadow: 0 0 0 3px rgba(156,163,175,0.18);
+  transition: background 0.3s, box-shadow 0.3s;
+}
+.sf-power-dot.on { background: #22C55E; box-shadow: 0 0 0 3px rgba(34,197,94,0.18); }
+.sf-power-btn {
+  padding: 6px 14px; font-size: 11px; font-weight: 700;
+  font-family: 'Noto Sans KR', sans-serif;
+  color: white; background: #6B7280;
+  border: none; border-radius: 50px;
+  cursor: pointer; transition: background 0.2s;
+}
+.sf-power-btn.on { background: #EF4444; }
+
+/* 구역 헤더 */
+.sf-section-hdr {
+  display: flex; align-items: flex-start; justify-content: space-between;
+  gap: 6px; margin-bottom: 8px;
+}
+.sf-zone-btns { display: flex; gap: 3px; flex-wrap: wrap; justify-content: flex-end; }
+.sf-zone-btn {
+  font-size: 8px; font-weight: 700; padding: 3px 7px;
+  border-radius: 50px; white-space: nowrap;
+  border: 1px solid #E5E7EB; background: #F9FAFB; color: #6B7280;
+  font-family: 'Noto Sans KR', sans-serif; cursor: pointer;
+}
+.sf-zone-btn.t-open  { background: #F0FDF4; border-color: #86EFAC; color: #15803D; }
+.sf-zone-btn.t-close { background: #F9FAFB; border-color: #D1D5DB; color: #374151; }
+.sf-zone-btn.t-stop  { background: #FFFBEB; border-color: #FCD34D; color: #B45309; }
 </style>
 </head>
 <body>
@@ -692,6 +845,20 @@ canvas { max-width: 100%; }
 
 <!-- ══ 수입 ══ -->
 <div class="sec" id="sec-income">
+  <div id="inc-stats-bar" style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin:14px 0 4px;">
+    <div class="nm-flat" style="padding:10px 8px;text-align:center;">
+      <div style="font-size:9px;font-weight:600;color:var(--text-tertiary);margin-bottom:3px;">총 수입</div>
+      <div id="inc-stat-inc" style="font-size:15px;font-weight:800;color:#10B981;letter-spacing:-0.5px;">0원</div>
+    </div>
+    <div class="nm-flat" style="padding:10px 8px;text-align:center;">
+      <div style="font-size:9px;font-weight:600;color:var(--text-tertiary);margin-bottom:3px;">총 지출</div>
+      <div id="inc-stat-exp" style="font-size:15px;font-weight:800;color:#EF4444;letter-spacing:-0.5px;">0원</div>
+    </div>
+    <div class="nm-flat" style="padding:10px 8px;text-align:center;">
+      <div style="font-size:9px;font-weight:600;color:var(--text-tertiary);margin-bottom:3px;">순수익</div>
+      <div id="inc-stat-profit" style="font-size:15px;font-weight:800;color:var(--text-primary);letter-spacing:-0.5px;">0원</div>
+    </div>
+  </div>
   <div class="top-bar">
     <select id="inc-mode" onchange="onModeChange('inc')"><option value="day" selected>일간</option><option value="month">월간</option><option value="year">연간</option></select>
     <input type="date" id="inc-date" onchange="renderIncExp()" style="flex-shrink:0;padding:6px 10px;font-size:12px;font-family:'Noto Sans KR',sans-serif;color:var(--text-primary);background:var(--surface);border:1px solid var(--border);border-radius:50px;">
@@ -713,6 +880,20 @@ canvas { max-width: 100%; }
 
 <!-- ══ 지출 ══ -->
 <div class="sec" id="sec-expense">
+  <div id="exp-stats-bar" style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin:14px 0 4px;">
+    <div class="nm-flat" style="padding:10px 8px;text-align:center;">
+      <div style="font-size:9px;font-weight:600;color:var(--text-tertiary);margin-bottom:3px;">총 수입</div>
+      <div id="exp-stat-inc" style="font-size:15px;font-weight:800;color:#10B981;letter-spacing:-0.5px;">0원</div>
+    </div>
+    <div class="nm-flat" style="padding:10px 8px;text-align:center;">
+      <div style="font-size:9px;font-weight:600;color:var(--text-tertiary);margin-bottom:3px;">총 지출</div>
+      <div id="exp-stat-exp" style="font-size:15px;font-weight:800;color:#EF4444;letter-spacing:-0.5px;">0원</div>
+    </div>
+    <div class="nm-flat" style="padding:10px 8px;text-align:center;">
+      <div style="font-size:9px;font-weight:600;color:var(--text-tertiary);margin-bottom:3px;">순수익</div>
+      <div id="exp-stat-profit" style="font-size:15px;font-weight:800;color:var(--text-primary);letter-spacing:-0.5px;">0원</div>
+    </div>
+  </div>
   <div class="top-bar">
     <select id="exp-mode" onchange="onModeChange('exp')"><option value="day" selected>일간</option><option value="month">월간</option><option value="year">연간</option></select>
     <input type="date" id="exp-date" onchange="renderIncExp()" style="flex-shrink:0;padding:6px 10px;font-size:12px;font-family:'Noto Sans KR',sans-serif;color:var(--text-primary);background:var(--surface);border:1px solid var(--border);border-radius:50px;">
@@ -787,6 +968,103 @@ canvas { max-width: 100%; }
   <button class="add-btn" onclick="openAddLoanModal()" style="margin-top:4px;margin-bottom:16px;">+ 대출 추가</button>
 </div>
 
+
+<!-- ══ 스마트팜 제어 탭 ══ -->
+<div class="sec" id="sec-smartfarm">
+
+  <!-- Ecowitt 환경 데이터 (자동 로드) -->
+  <div class="sf-env-bar" id="sf-env-bar" style="margin-top:14px;">
+    <div class="sf-env-cell">
+      <div class="sf-env-label">조도</div>
+      <div class="sf-env-val" id="sf-env-light" style="color:#F59E0B;">—</div>
+      <div class="sf-env-unit">lux</div>
+    </div>
+    <div class="sf-env-cell">
+      <div class="sf-env-label">온도</div>
+      <div class="sf-env-val" id="sf-env-temp" style="color:#EF4444;">—</div>
+      <div class="sf-env-unit">°C</div>
+    </div>
+    <div class="sf-env-cell">
+      <div class="sf-env-label">습도</div>
+      <div class="sf-env-val" id="sf-env-hum" style="color:#0EA5E9;">—</div>
+      <div class="sf-env-unit">%</div>
+    </div>
+    <div style="display:flex;flex-direction:column;align-items:flex-end;justify-content:center;gap:3px;">
+      <span id="sf-env-time" style="font-size:8px;color:var(--text-tertiary);">—</span>
+      <button onclick="sfFetchEcowittNow()" style="padding:3px 9px;font-size:9px;font-weight:700;font-family:'Noto Sans KR',sans-serif;color:white;background:#059669;border:none;border-radius:50px;cursor:pointer;">새로고침</button>
+    </div>
+  </div>
+
+  <!-- 전원 상태바 -->
+  <div class="sf-status-bar">
+    <div style="display:flex;align-items:center;gap:10px;">
+      <div class="sf-power-dot" id="sf-power-dot"></div>
+      <div>
+        <div style="font-size:13px;font-weight:700;color:var(--text-primary);">컨트롤 패널</div>
+        <div id="sf-status-text" style="font-size:10px;color:var(--text-tertiary);margin-top:1px;">전원 꺼짐 · 스마트 릴레이 연결 대기</div>
+      </div>
+    </div>
+    <button class="sf-power-btn" id="sf-main-power-btn" onclick="sfToggleMainPower()">전원 켜기</button>
+  </div>
+
+  <!-- ① 일중 전창 -->
+  <div class="sec-label" id="sf-zone-label-zone1">① 일중 전창</div>
+  <div class="sf-card">
+    <div class="sf-section-hdr">
+      <span style="font-size:10px;color:var(--text-tertiary);padding-top:3px;">SW 1–6</span>
+      <div class="sf-zone-btns">
+        <button class="sf-zone-btn t-open"  onclick="sfZoneAll('zone1','on')">전체 열기</button>
+        <button class="sf-zone-btn t-close" onclick="sfZoneAll('zone1','off')">전체 닫기</button>
+        <button class="sf-zone-btn t-stop"  onclick="sfZoneAll('zone1','stop')">전체 정지</button>
+      </div>
+    </div>
+    <div class="sf-switch-grid-3" id="sf-zone1"></div>
+  </div>
+
+  <!-- ② 이중 전창 -->
+  <div class="sec-label" id="sf-zone-label-zone2">② 이중 전창</div>
+  <div class="sf-card">
+    <div class="sf-section-hdr">
+      <span style="font-size:10px;color:var(--text-tertiary);padding-top:3px;">SW 7–12</span>
+      <div class="sf-zone-btns">
+        <button class="sf-zone-btn t-open"  onclick="sfZoneAll('zone2','on')">전체 열기</button>
+        <button class="sf-zone-btn t-close" onclick="sfZoneAll('zone2','off')">전체 닫기</button>
+        <button class="sf-zone-btn t-stop"  onclick="sfZoneAll('zone2','stop')">전체 정지</button>
+      </div>
+    </div>
+    <div class="sf-switch-grid-3" id="sf-zone2"></div>
+  </div>
+
+  <!-- ③ 측이블 -->
+  <div class="sec-label" id="sf-zone-label-zone3">③ 측이블 · 이중측창</div>
+  <div class="sf-card">
+    <div class="sf-section-hdr">
+      <span style="font-size:10px;color:var(--text-tertiary);padding-top:3px;">문천 1–4</span>
+      <div class="sf-zone-btns">
+        <button class="sf-zone-btn t-open"  onclick="sfZoneAll('zone3','on')">전체 열기</button>
+        <button class="sf-zone-btn t-close" onclick="sfZoneAll('zone3','off')">전체 닫기</button>
+        <button class="sf-zone-btn t-stop"  onclick="sfZoneAll('zone3','stop')">전체 정지</button>
+      </div>
+    </div>
+    <div class="sf-switch-grid-2" id="sf-zone3"></div>
+  </div>
+
+  <!-- ④ 워이블·환기 -->
+  <div class="sec-label" id="sf-zone-label-zone4">④ 워이블 · 환기</div>
+  <div class="sf-card" style="margin-bottom:18px;">
+    <div class="sf-section-hdr">
+      <span style="font-size:10px;color:var(--text-tertiary);padding-top:3px;">커텐 · 환기</span>
+      <div class="sf-zone-btns">
+        <button class="sf-zone-btn t-open"  onclick="sfZoneAll('zone4','on')">전체 열기</button>
+        <button class="sf-zone-btn t-close" onclick="sfZoneAll('zone4','off')">전체 닫기</button>
+        <button class="sf-zone-btn t-stop"  onclick="sfZoneAll('zone4','stop')">전체 정지</button>
+      </div>
+    </div>
+    <div class="sf-switch-grid-2" id="sf-zone4"></div>
+  </div>
+
+</div>
+
 <!-- ══ 육묘 탭 ══ -->
 <div class="sec" id="sec-seedling-tab">
   <!-- 환경 통합 카드 -->
@@ -818,7 +1096,7 @@ canvas { max-width: 100%; }
       <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;">
         <div>
           <div style="font-size:10px;font-weight:600;color:var(--text-secondary);margin-bottom:4px;">조도 (lux) <span style="color:var(--red);">*</span></div>
-          <input type="number" id="sl-sunlight" placeholder="0" step="0.1" style="width:100%;padding:9px 8px;font-size:12px;font-family:'Noto Sans KR',sans-serif;background:var(--bg);border:1px solid var(--border);border-radius:var(--radius-md);color:var(--text-primary);">
+          <input type="text" inputmode="decimal" id="sl-sunlight" placeholder="0" style="width:100%;padding:9px 8px;font-size:12px;font-family:'Noto Sans KR',sans-serif;background:var(--bg);border:1px solid var(--border);border-radius:var(--radius-md);color:var(--text-primary);">
         </div>
         <div>
           <div style="font-size:10px;font-weight:600;color:var(--text-secondary);margin-bottom:4px;">온도 (°C) <span style="color:var(--red);">*</span></div>
@@ -890,6 +1168,20 @@ canvas { max-width: 100%; }
 
 <!-- ══ 기본관리 ══ -->
 <div class="sec" id="sec-settings">
+
+  <!-- 제어 패널 이름 편집 -->
+  <div class="settings-accordion" id="acc-sfnames">
+    <div class="settings-acc-hdr" onclick="toggleAcc('sfnames')">
+      <span class="settings-acc-title">제어 패널 이름 편집</span>
+      <span class="settings-acc-arrow" id="acc-arrow-sfnames">▼</span>
+    </div>
+    <div class="settings-acc-body" id="acc-body-sfnames">
+      <div class="nm-flat" style="padding:14px 16px;margin-bottom:4px;">
+        <div id="sfnames-editor"></div>
+        <button onclick="sfNamesSave()" style="width:100%;margin-top:12px;padding:11px;font-size:13px;font-family:'Noto Sans KR',sans-serif;font-weight:700;background:var(--text-primary);color:white;border:none;border-radius:var(--radius-md);cursor:pointer;">저장</button>
+      </div>
+    </div>
+  </div>
 
   <!-- 체험 프로그램 -->
   <div class="settings-accordion" id="acc-prog">
@@ -1414,7 +1706,7 @@ function doLoginSuccess(farmId, code, remember, farm){
   document.getElementById('addVersionBg').classList.remove('open');
   var authScreen=document.getElementById('auth-screen');
   if(authScreen)authScreen.classList.add('hidden');
-  if(typeof showTab==='function') showTab('summary');
+  if(typeof showTab==='function') showTab('smartfarm');
   if(typeof window.loadAllFromFirebase==='function') window.loadAllFromFirebase();
 }
 
@@ -1448,7 +1740,7 @@ function doRegister(){
     var ai=document.getElementById('acct-farm-id');if(ai)ai.textContent='@'+farmId;
     var authScreen=document.getElementById('auth-screen');
     if(authScreen)authScreen.classList.add('hidden');
-    if(typeof showTab==='function') showTab('summary');
+    if(typeof showTab==='function') showTab('smartfarm');
     if(typeof window.loadAllFromFirebase==='function') window.loadAllFromFirebase();
   }
 
@@ -2164,15 +2456,16 @@ function getSaveKey(tab){
 
 // 탭 정의 (id, 라벨, 아이콘)
 const TAB_DEFS = [
-  {id:'summary',    label:'요약',    icon:'📊'},
-  {id:'income',     label:'수입',    icon:'💰'},
-  {id:'expense',    label:'지출',    icon:'💸'},
-  {id:'seedling-tab',label:'육묘',  icon:'🌱'},
-  {id:'prices',     label:'시세',    icon:'📈'},
-  {id:'loan',       label:'대출',    icon:'🏦'},
-  {id:'settings',   label:'⚙︎',icon:'⚙︎'},
+  {id:'smartfarm',   label:'제어',   icon:'🎛️'},
+  {id:'seedling-tab',label:'육묘',   icon:'🌱'},
+  {id:'prices',      label:'시세',   icon:'📈'},
+  {id:'income',      label:'수입',   icon:'💰'},
+  {id:'expense',     label:'지출',   icon:'💸'},
+  {id:'loan',        label:'대출',   icon:'🏦'},
+  {id:'settings',    label:'⚙︎', icon:'⚙︎'},
 ];
 const DEFAULT_TAB_ORDER = TAB_DEFS.map(t=>t.id);
+
 
 function getTabOrder(){
   const saved = gl('pb8_tab_order');
@@ -2187,16 +2480,11 @@ function renderTabs(activeId){
   container.innerHTML = order.map((id,i)=>{
     const def = TAB_DEFS.find(t=>t.id===id);
     if(!def) return '';
-    const isSummary = id==='summary';
-    const divider = i>0 && isSummary ? '<div class="tab-divider"></div>' : '';
-    const afterDivider = i<order.length-1 && order[i+1]==='summary' ? '<div class="tab-divider"></div>' : '';
-    // 요약 탭은 구분선
-    const extraStyle = isSummary ? 'font-weight:700;' : '';
-    const cls='tab'+(id==='summary'?' summary-tab':'')+(id==='settings'?' settings-tab':'')+(activeId===id?' active':'');
+    const cls='tab'+(id==='settings'?' settings-tab':'')+(activeId===id?' active':'');
     const labelHtml=id==='settings'
       ? '<span class="settings-gear-icon">⚙︎</span>'
       : def.label;
-    return `${divider}<div class="${cls}" data-tab="${id}" onclick="showTab('${id}')" draggable="true" ondragstart="onTabDragStart(event,'${id}')" ondragover="onTabDragOver(event,'${id}')" ondrop="onTabDrop(event,'${id}')" ondragend="onTabDragEnd(event)" style="${extraStyle}">${labelHtml}</div>${afterDivider}`;
+    return `<div class="${cls}" data-tab="${id}" onclick="showTab('${id}')" draggable="true" ondragstart="onTabDragStart(event,'${id}')" ondragover="onTabDragOver(event,'${id}')" ondrop="onTabDrop(event,'${id}')" ondragend="onTabDragEnd(event)">${labelHtml}</div>`;
   }).join('');
 }
 
@@ -2205,13 +2493,13 @@ function showTab(t){
   const sec=document.getElementById('sec-'+t);
   if(sec)sec.classList.add('active');
   renderTabs(t);
-  // 현재 탭 저장 (새로고침 후 복원용)
   try{localStorage.setItem('pb8_active_tab',t);}catch(e){}
   if(t==='prices')renderPricesTab();
   if(t==='loan')renderLoanList();
-  if(t==='settings'){renderSettings();restoreAccState();}
-  if(t==='summary')renderAll();
+  if(t==='settings'){renderSettings();restoreAccState();if(typeof sfNamesRender==='function')sfNamesRender();}
+  if(t==='income'||t==='expense'){renderIncExp();renderIncExpStats();}
   if(t==='seedling-tab')renderSeedlingTab();
+  if(t==='smartfarm')renderSmartfarmTab();
 }
 
 // 탭 드래그 앤 드롭
@@ -4050,7 +4338,7 @@ function _applyEcowittData(data, status, keys){
   if(result.sunlight!==null){
     const el=document.getElementById('sl-sunlight');
     if(el){
-      el.value=Math.round(result.sunlight*10)/10; // number input엔 숫자로
+      el.value=fmtLux(result.sunlight); // text 타입이므로 K 형태로 표시
       el.dataset.rawLux=result.sunlight;
     }
     const src=Object.keys(m).find(k=>m[k]==='sunlight'&&raw[k]!==null);
@@ -4250,7 +4538,11 @@ function saveWeatherSection(){
   const _st=document.getElementById('sl-time')?.value||'';
   if(!_st){showAlert('시간을 입력해 주세요.');return;}
   const sunlightEl=document.getElementById('sl-sunlight');
-  const sunlight=sunlightEl?.dataset.rawLux||sunlightEl?.value||'';
+  const rawVal=sunlightEl?.dataset.rawLux||sunlightEl?.value||'';
+  // K 형태(14.5K) 또는 숫자 모두 처리
+  const sunlight=rawVal.toUpperCase().includes('K')
+    ? String(parseFloat(rawVal)*1000)
+    : rawVal;
   const temp=document.getElementById('sl-temp')?.value||'';
   const humidity=document.getElementById('sl-humidity')?.value||'';
   if(!sunlight||!temp||!humidity){showAlert('조도, 온도, 습도를 모두 입력해 주세요.');return;}  // 11
@@ -4464,7 +4756,10 @@ function loadEnvRecordToForm(key){
   const setV=(id,v)=>{const el=document.getElementById(id);if(el)el.value=v||'';};
   setV('sl-date',dateStr);setV('sl-time',timeStr);
   setV('sl-water-date',dateStr);setV('sl-water-time',timeStr);
-  setV('sl-sunlight',env.sunlight);setV('sl-temp',env.temp);setV('sl-humidity',env.humidity);
+  // 조도는 K 형태로 복원
+  const sunEl=document.getElementById('sl-sunlight');
+  if(sunEl){sunEl.value=env.sunlight?fmtLux(parseFloat(env.sunlight)):'';sunEl.dataset.rawLux=env.sunlight||'';}
+  setV('sl-temp',env.temp);setV('sl-humidity',env.humidity);
   const zoneCount=gl('pb8_water_zones')||6;
   renderWaterRecords(env.water||[],zoneCount);
   document.getElementById('sec-seedling-tab')?.scrollIntoView({behavior:'smooth',block:'start'});
@@ -5097,7 +5392,7 @@ function delVisitRoute(i){
   initDatePickers();
   setTimeout(initSwipeDownClose, 500);
   setInitialModes();
-  // 항상 요약 탭으로 시작 (로그인 후 showTab('summary')로 재설정되지만 초기 렌더는 summary)
+  // 항상 요약 탭으로 시작 (로그인 후 showTab('smartfarm')로 재설정되지만 초기 렌더는 summary)
   renderTabs('summary');
   document.querySelectorAll('.sec').forEach(el=>el.classList.remove('active'));
   var _initSec=document.getElementById('sec-summary');
@@ -5300,5 +5595,294 @@ function delVisitRoute(i){
 })();
 </script>
 
+
+<script>
+// ═══════════════════════════════════════════
+// 스마트팜 제어 탭
+// ═══════════════════════════════════════════
+
+// ── 기본 존/스위치 정의 ──
+var SF_ZONE_DEFS = [
+  { key:'zone1', defaultName:'일중 전창', switches:[
+    {id:'z1s1',defaultLabel:'1번'},{id:'z1s2',defaultLabel:'2번'},{id:'z1s3',defaultLabel:'3번'},
+    {id:'z1s4',defaultLabel:'4번'},{id:'z1s5',defaultLabel:'5번'},{id:'z1s6',defaultLabel:'6번'}
+  ]},
+  { key:'zone2', defaultName:'이중 전창', switches:[
+    {id:'z2s1',defaultLabel:'7번'},{id:'z2s2',defaultLabel:'8번'},{id:'z2s3',defaultLabel:'9번'},
+    {id:'z2s4',defaultLabel:'10번'},{id:'z2s5',defaultLabel:'11번'},{id:'z2s6',defaultLabel:'12번'}
+  ]},
+  { key:'zone3', defaultName:'측이블·이중측창', switches:[
+    {id:'z3s1',defaultLabel:'문천 1'},{id:'z3s2',defaultLabel:'문천 2'},
+    {id:'z3s3',defaultLabel:'문천 3'},{id:'z3s4',defaultLabel:'문천 4'}
+  ]},
+  { key:'zone4', defaultName:'워이블·환기', switches:[
+    {id:'z4s1',defaultLabel:'일중커텐'},{id:'z4s2',defaultLabel:'이중커텐'},
+    {id:'z4s3',defaultLabel:'환기 1'},{id:'z4s4',defaultLabel:'환기 2'}
+  ]}
+];
+
+// 이름 불러오기
+function sfGetNames() {
+  try { return JSON.parse(localStorage.getItem('pb8_sf_names') || 'null') || {}; } catch(e) { return {}; }
+}
+function sfGetZoneName(key) {
+  var n = sfGetNames(); var def = SF_ZONE_DEFS.find(function(z){ return z.key===key; });
+  return (n[key+'_name']) || (def ? def.defaultName : key);
+}
+function sfGetSwLabel(id) {
+  var n = sfGetNames(); var label = n[id+'_label'];
+  if (label) return label;
+  for (var i=0; i<SF_ZONE_DEFS.length; i++) {
+    var sw = SF_ZONE_DEFS[i].switches.find(function(s){ return s.id===id; });
+    if (sw) return sw.defaultLabel;
+  }
+  return id;
+}
+
+// 상태
+var SF_STATE = { masterOn: false, switches: {} };
+function sfInit(id) {
+  if (!SF_STATE.switches[id]) SF_STATE.switches[id] = { state: 'off' };
+  return SF_STATE.switches[id];
+}
+function sfLoad() {
+  try { var s = JSON.parse(localStorage.getItem('pb8_sf_state') || 'null'); if (s) SF_STATE = s; } catch(e) {}
+  SF_ZONE_DEFS.forEach(function(z){ z.switches.forEach(function(sw){ sfInit(sw.id); }); });
+}
+function sfSave() {
+  try { localStorage.setItem('pb8_sf_state', JSON.stringify(SF_STATE)); } catch(e) {}
+}
+
+// ── 슬라이드 핸들러 (부드러운 수평 스와이프) ──
+function sfAttachSlide(el, id) {
+  var startX = null, startY = null, startState = null, moved = false;
+
+  function stateToPos(s) { return s==='off'?0 : s==='stop'?1 : 2; }
+  function posToState(p) { return p===0?'off' : p===1?'stop' : 'on'; }
+
+  function onStart(x, y) {
+    startX = x; startY = y;
+    startState = sfInit(id).state;
+    moved = false;
+  }
+  function onEnd(x, y) {
+    if (startX === null) return;
+    var dx = x - startX;
+    var dy = y - startY;
+    // 세로 스크롤이 더 크면 무시
+    if (Math.abs(dy) > Math.abs(dx) + 10) { startX = null; return; }
+    var p = stateToPos(startState);
+    var newP;
+    if (Math.abs(dx) < 10) {
+      // 탭: 순환
+      newP = (p + 1) % 3;
+    } else if (dx > 0) {
+      newP = Math.min(p + 1, 2);
+    } else {
+      newP = Math.max(p - 1, 0);
+    }
+    if (posToState(newP) !== sfInit(id).state) {
+      sfInit(id).state = posToState(newP);
+      sfSave(); sfDraw(id); sfUpdateHeader();
+    }
+    startX = null;
+  }
+
+  el.addEventListener('touchstart', function(e){
+    onStart(e.touches[0].clientX, e.touches[0].clientY);
+  }, {passive:true});
+  el.addEventListener('touchend', function(e){
+    onEnd(e.changedTouches[0].clientX, e.changedTouches[0].clientY);
+  }, {passive:true});
+  el.addEventListener('mousedown', function(e){
+    onStart(e.clientX, e.clientY);
+  });
+  el.addEventListener('mouseup', function(e){
+    onEnd(e.clientX, e.clientY);
+  });
+}
+
+function sfZoneAll(zone, st) {
+  var def = SF_ZONE_DEFS.find(function(z){ return z.key===zone; });
+  if (!def) return;
+  def.switches.forEach(function(s){ sfInit(s.id).state = st; sfDraw(s.id); });
+  sfSave(); sfUpdateHeader();
+}
+function sfToggleMainPower() {
+  SF_STATE.masterOn = !SF_STATE.masterOn;
+  sfSave(); sfUpdateHeader();
+}
+function sfUpdateHeader() {
+  var dot = document.getElementById('sf-power-dot');
+  var txt = document.getElementById('sf-status-text');
+  var btn = document.getElementById('sf-main-power-btn');
+  var onCount = Object.values(SF_STATE.switches).filter(function(s){ return s.state==='on'; }).length;
+  if (!SF_STATE.masterOn) {
+    if (dot) dot.className = 'sf-power-dot';
+    if (txt) txt.textContent = '전원 꺼짐 · 모든 구동기 정지';
+    if (btn) { btn.className = 'sf-power-btn'; btn.textContent = '전원 켜기'; }
+  } else {
+    if (dot) dot.className = 'sf-power-dot on';
+    if (txt) txt.textContent = '전원 켜짐 · ' + onCount + '개 구동 중';
+    if (btn) { btn.className = 'sf-power-btn on'; btn.textContent = '전원 끄기'; }
+  }
+}
+
+// ── 스위치 1개 그리기 ──
+// className만 바꿔서 CSS transition이 끊기지 않게 함 (innerHTML 재생성 금지)
+function sfDraw(id) {
+  var el = document.getElementById('sf-sw-' + id);
+  if (!el) return;
+  var st = sfInit(id).state;
+  var label = sfGetSwLabel(id);
+  // 처음 렌더: DOM이 비어있을 때만 생성
+  if (!el.querySelector('.sf-knob')) {
+    el.innerHTML =
+      '<div class="sf-sw-num"></div>' +
+      '<div class="sf-track-wrap">' +
+        '<div class="sf-track-bg">' +
+          '<span class="sf-track-txt txt-close">닫힘</span>' +
+          '<span class="sf-track-txt txt-open">열림</span>' +
+          '<span class="sf-track-txt txt-stop">정지</span>' +
+        '</div>' +
+        '<div class="sf-knob"></div>' +
+      '</div>';
+  }
+  // 상태 변경: className + 텍스트만 업데이트 → left transition 유지
+  el.className = 'sf-sw ' + st;
+  var numEl = el.querySelector('.sf-sw-num');
+  if (numEl) numEl.textContent = label;
+}
+
+// ── 탭 렌더 ──
+function renderSmartfarmTab() {
+  sfLoad();
+  // 구역 이름 및 스위치 렌더
+  SF_ZONE_DEFS.forEach(function(z) {
+    // sec-label 업데이트
+    var labelEl = document.getElementById('sf-zone-label-' + z.key);
+    if (labelEl) labelEl.textContent = sfGetZoneName(z.key);
+    var el = document.getElementById('sf-' + z.key);
+    if (!el) return;
+    el.innerHTML = z.switches.map(function(sw) {
+      return '<div id="sf-sw-' + sw.id + '"></div>';
+    }).join('');
+    z.switches.forEach(function(sw) {
+      sfDraw(sw.id);
+      var swEl = document.getElementById('sf-sw-' + sw.id);
+      if (swEl) sfAttachSlide(swEl, sw.id);
+    });
+  });
+  sfUpdateHeader();
+  sfFetchEcowittNow();
+}
+
+// ── Ecowitt 연동 체크 및 자동 로드 ──
+function sfIsEcowittLinked() {
+  try {
+    var k = JSON.parse(localStorage.getItem('pb8_ecowitt_keys') || 'null');
+    return !!(k && k.apiKey && k.appKey && k.mac);
+  } catch(e) { return false; }
+}
+
+async function sfFetchEcowittNow() {
+  var bar = document.getElementById('sf-env-bar');
+  if (!bar) return;
+  if (!sfIsEcowittLinked()) {
+    bar.innerHTML =
+      '<div onclick="showTab(\'settings\');setTimeout(function(){toggleAcc(\'ecowitt\');var el=document.getElementById(\'acc-ecowitt\');if(el)el.scrollIntoView({behavior:\'smooth\'});},250);" ' +
+      'style="grid-column:1/-1;display:flex;align-items:center;justify-content:space-between;cursor:pointer;padding:2px 0;">' +
+        '<div>' +
+          '<div style="font-size:11px;font-weight:700;color:var(--text-primary);">Ecowitt 미연동</div>' +
+          '<div style="font-size:10px;color:var(--text-tertiary);margin-top:2px;">환경 데이터를 불러오려면 연동 설정이 필요해요</div>' +
+        '</div>' +
+        '<div style="font-size:11px;font-weight:700;color:var(--accent);background:var(--accent-soft);border:1px solid #C7D2FE;border-radius:50px;padding:5px 12px;white-space:nowrap;flex-shrink:0;">연동 설정 →</div>' +
+      '</div>';
+    return;
+  }
+  var btn = document.getElementById('sf-env-refresh-btn');
+  if (btn) { btn.textContent = '…'; btn.disabled = true; }
+  try {
+    await fetchEcowittData();
+    var light = document.getElementById('sl-sunlight');
+    var temp  = document.getElementById('sl-temp');
+    var hum   = document.getElementById('sl-humidity');
+    if (light && light.value) {
+      var v = parseFloat(light.value);
+      var lEl = document.getElementById('sf-env-light');
+      if (lEl) lEl.textContent = v >= 1000 ? (Math.round(v/100)/10)+'K' : Math.round(v)+'';
+    }
+    if (temp && temp.value) { var tEl=document.getElementById('sf-env-temp'); if(tEl) tEl.textContent=parseFloat(temp.value).toFixed(1); }
+    if (hum  && hum.value)  { var hEl=document.getElementById('sf-env-hum');  if(hEl) hEl.textContent=Math.round(parseFloat(hum.value)); }
+    var now=new Date(); var tEl2=document.getElementById('sf-env-time');
+    if (tEl2) tEl2.textContent=now.getHours()+':'+String(now.getMinutes()).padStart(2,'0')+' 업데이트';
+  } catch(e) {}
+  if (btn) { btn.textContent='새로고침'; btn.disabled=false; }
+}
+
+// ── 설정 탭: 제어 이름 편집 ──
+function sfNamesRender() {
+  var container = document.getElementById('sfnames-editor');
+  if (!container) return;
+  var html = '';
+  SF_ZONE_DEFS.forEach(function(z) {
+    html += '<div style="margin-bottom:20px;padding-bottom:16px;border-bottom:1px solid var(--border);">';
+    // 구역명
+    html += '<div style="font-size:10px;font-weight:700;color:var(--text-tertiary);margin-bottom:5px;">구역명</div>';
+    html += '<input type="text" id="sfname-zone-'+z.key+'" value="'+sfGetZoneName(z.key)+'" placeholder="'+z.defaultName+'" '
+          + 'style="display:block;width:100%;box-sizing:border-box;padding:9px 12px;font-size:13px;font-family:\'Noto Sans KR\',sans-serif;'
+          + 'background:var(--bg);border:1px solid var(--border);border-radius:var(--radius-md);color:var(--text-primary);margin-bottom:10px;">';
+    // 스위치 이름: 1열짜리 목록
+    z.switches.forEach(function(sw) {
+      html += '<div style="display:flex;align-items:center;gap:8px;margin-bottom:7px;">'
+            + '<span style="font-size:10px;font-weight:600;color:var(--text-tertiary);flex-shrink:0;width:38px;">'+sw.defaultLabel+'</span>'
+            + '<input type="text" id="sfname-sw-'+sw.id+'" value="'+sfGetSwLabel(sw.id)+'" placeholder="'+sw.defaultLabel+'" '
+            + 'style="flex:1;padding:8px 11px;font-size:12px;font-family:\'Noto Sans KR\',sans-serif;'
+            + 'background:var(--bg);border:1px solid var(--border);border-radius:var(--radius-sm);color:var(--text-primary);">'
+            + '</div>';
+    });
+    html += '</div>';
+  });
+  container.innerHTML = html;
+}
+
+function sfNamesSave() {
+  var names = {};
+  SF_ZONE_DEFS.forEach(function(z) {
+    var zEl = document.getElementById('sfname-zone-'+z.key);
+    if (zEl && zEl.value.trim()) names[z.key+'_name'] = zEl.value.trim();
+    z.switches.forEach(function(sw) {
+      var sEl = document.getElementById('sfname-sw-'+sw.id);
+      if (sEl && sEl.value.trim()) names[sw.id+'_label'] = sEl.value.trim();
+    });
+  });
+  try { localStorage.setItem('pb8_sf_names', JSON.stringify(names)); } catch(e) {}
+  if (typeof showAlert === 'function') showAlert('저장되었습니다.');
+  else alert('저장되었습니다.');
+}
+
+// 수입/지출 탭 상단 통계
+function renderIncExpStats() {
+  var ctx = getCtx('sum');
+  var ti = 0, te = 0;
+  INC.forEach(function(cat) {
+    var arr = getData(cat, ctx);
+    ti += arr.reduce(function(s,e){ return s+(+e.amount||0); }, 0);
+  });
+  EXP.forEach(function(cat) {
+    var arr = getData(cat, ctx);
+    te += arr.reduce(function(s,e){ return s+(+e.amount||0); }, 0);
+  });
+  var profit = ti - te;
+  ['inc','exp'].forEach(function(prefix) {
+    var iEl=document.getElementById(prefix+'-stat-inc');
+    var eEl=document.getElementById(prefix+'-stat-exp');
+    var pEl=document.getElementById(prefix+'-stat-profit');
+    if(iEl) iEl.textContent=fmt(ti);
+    if(eEl) eEl.textContent=fmt(te);
+    if(pEl){ pEl.textContent=fmt(profit); pEl.style.color=profit<0?'#EF4444':profit>0?'#10B981':'var(--text-primary)'; }
+  });
+}
+</script>
 </body>
 </html>
