@@ -582,13 +582,14 @@ canvas { max-width: 100%; }
 .sf-mode-toggle {
   display: flex; border-radius: 50px; overflow: hidden;
   border: 1px solid var(--border); background: var(--bg);
-  flex-shrink: 0;
+  flex-shrink: 0; height: 26px; align-items: center;
 }
 .sf-mode-btn {
-  padding: 4px 11px; font-size: 10px; font-weight: 700;
+  height: 26px; padding: 0 11px; font-size: 10px; font-weight: 700;
   font-family: 'Noto Sans KR', sans-serif; cursor: pointer;
   background: transparent; border: none; color: var(--text-tertiary);
   transition: all 0.15s; white-space: nowrap;
+  display: flex; align-items: center;
 }
 .sf-mode-btn.active-manual { background: var(--text-primary); color: white; border-radius: 50px; }
 .sf-mode-btn.active-auto   { background: #7C3AED; color: white; border-radius: 50px; }
@@ -685,10 +686,12 @@ canvas { max-width: 100%; }
 }
 .sf-zone-btns { display: flex; gap: 3px; flex-wrap: nowrap; flex-shrink: 0; }
 .sf-zone-btn {
-  font-size: 8px; font-weight: 700; padding: 3px 6px;
+  font-size: 8px; font-weight: 700;
+  height: 26px; padding: 0 8px;
   border-radius: 50px; white-space: nowrap;
   border: 1px solid #E5E7EB; background: #F9FAFB; color: #6B7280;
   font-family: 'Noto Sans KR', sans-serif; cursor: pointer;
+  display: inline-flex; align-items: center;
 }
 .sf-zone-btn.t-open  { background: #F0FDF4; border-color: #86EFAC; color: #15803D; }
 .sf-zone-btn.t-close { background: #FFF1F2; border-color: #FECDD3; color: #BE123C; }
@@ -1092,8 +1095,8 @@ canvas { max-width: 100%; }
         <button class="sf-zone-btn t-stop"  onclick="sfZoneAll('zone1','stop')">전체 정지</button>
         <button class="sf-zone-btn t-close" onclick="sfZoneAll('zone1','off')">전체 닫기</button>
       </div>
-      <span id="sf-s-temp-zone1" style="font-size:11px;font-weight:700;color:#EF4444;white-space:nowrap;background:#FFF5F5;border:1px solid #FECACA;border-radius:6px;padding:3px 7px;flex-shrink:0;">— °C</span>
       <div class="sf-mode-toggle">
+        <span id="sf-s-temp-zone1" style="font-size:10px;font-weight:700;color:#EF4444;white-space:nowrap;padding:0 8px 0 4px;flex-shrink:0;height:26px;display:flex;align-items:center;">— °C</span>
         <button class="sf-mode-btn active-manual" id="mode-btn-manual-zone1" onclick="sfSetMode('zone1','manual')">수동</button>
         <button class="sf-mode-btn" id="mode-btn-auto-zone1" onclick="sfSetMode('zone1','auto')">자동</button>
       </div>
@@ -1157,8 +1160,8 @@ canvas { max-width: 100%; }
         <button class="sf-zone-btn t-stop"  onclick="sfZoneAll('zone3','stop')">전체 정지</button>
         <button class="sf-zone-btn t-close" onclick="sfZoneAll('zone3','off')">전체 닫기</button>
       </div>
-      <span id="sf-s-temp-zone3" style="font-size:11px;font-weight:700;color:#EF4444;white-space:nowrap;background:#FFF5F5;border:1px solid #FECACA;border-radius:6px;padding:3px 7px;flex-shrink:0;">— °C</span>
       <div class="sf-mode-toggle">
+        <span id="sf-s-temp-zone3" style="font-size:10px;font-weight:700;color:#EF4444;white-space:nowrap;padding:0 8px 0 4px;flex-shrink:0;height:26px;display:flex;align-items:center;">— °C</span>
         <button class="sf-mode-btn active-manual" id="mode-btn-manual-zone3" onclick="sfSetMode('zone3','manual')">수동</button>
         <button class="sf-mode-btn" id="mode-btn-auto-zone3" onclick="sfSetMode('zone3','auto')">자동</button>
       </div>
@@ -1187,8 +1190,8 @@ canvas { max-width: 100%; }
         <button class="sf-zone-btn t-stop"  onclick="sfZoneAll('zone4','stop')">전체 정지</button>
         <button class="sf-zone-btn t-close" onclick="sfZoneAll('zone4','off')">전체 닫기</button>
       </div>
-      <span id="sf-s-temp-zone4" style="font-size:11px;font-weight:700;color:#EF4444;white-space:nowrap;background:#FFF5F5;border:1px solid #FECACA;border-radius:6px;padding:3px 7px;flex-shrink:0;">— °C</span>
       <div class="sf-mode-toggle">
+        <span id="sf-s-temp-zone4" style="font-size:10px;font-weight:700;color:#EF4444;white-space:nowrap;padding:0 8px 0 4px;flex-shrink:0;height:26px;display:flex;align-items:center;">— °C</span>
         <button class="sf-mode-btn active-manual" id="mode-btn-manual-zone4" onclick="sfSetMode('zone4','manual')">수동</button>
         <button class="sf-mode-btn" id="mode-btn-auto-zone4" onclick="sfSetMode('zone4','auto')">자동</button>
       </div>
@@ -1217,8 +1220,8 @@ canvas { max-width: 100%; }
         <button class="sf-zone-btn t-stop"  onclick="sfZoneAll('zone5','stop')">전체 정지</button>
         <button class="sf-zone-btn t-close" onclick="sfZoneAll('zone5','off')">전체 닫기</button>
       </div>
-      <span id="sf-s-temp-zone5" style="font-size:11px;font-weight:700;color:#EF4444;white-space:nowrap;background:#FFF5F5;border:1px solid #FECACA;border-radius:6px;padding:3px 7px;flex-shrink:0;">— °C</span>
       <div class="sf-mode-toggle">
+        <span id="sf-s-temp-zone5" style="font-size:10px;font-weight:700;color:#EF4444;white-space:nowrap;padding:0 8px 0 4px;flex-shrink:0;height:26px;display:flex;align-items:center;">— °C</span>
         <button class="sf-mode-btn active-manual" id="mode-btn-manual-zone5" onclick="sfSetMode('zone5','manual')">수동</button>
         <button class="sf-mode-btn" id="mode-btn-auto-zone5" onclick="sfSetMode('zone5','auto')">자동</button>
       </div>
@@ -1355,7 +1358,18 @@ canvas { max-width: 100%; }
     <div class="settings-acc-body" id="acc-body-sfnames">
       <div class="nm-flat" style="padding:14px 16px;margin-bottom:4px;">
         <div id="sfnames-editor"></div>
-        <button onclick="sfNamesSave()" style="width:100%;margin-top:12px;padding:11px;font-size:13px;font-family:'Noto Sans KR',sans-serif;font-weight:700;background:var(--text-primary);color:white;border:none;border-radius:var(--radius-md);cursor:pointer;">저장</button>
+        <div style="margin-top:12px;">
+          <!-- 저장됨 버튼 (기본 보임) -->
+          <button id="sfnames-done-btn" disabled
+            style="width:100%;padding:11px;font-size:13px;font-family:'Noto Sans KR',sans-serif;font-weight:700;background:var(--bg);color:var(--text-tertiary);border:1px solid var(--border);border-radius:var(--radius-md);cursor:default;">저장됨</button>
+          <!-- 취소/저장 버튼 (편집 중에만 보임, 한 줄 2개) -->
+          <div id="sfnames-edit-btns" style="display:none;gap:8px;margin-top:8px;">
+            <button id="sfnames-cancel-btn" onclick="sfNamesCancel()"
+              style="flex:1;padding:11px;font-size:13px;font-family:'Noto Sans KR',sans-serif;font-weight:700;background:var(--bg);color:var(--text-secondary);border:1px solid var(--border);border-radius:var(--radius-md);cursor:pointer;">취소</button>
+            <button id="sfnames-save-btn" onclick="sfNamesSave()"
+              style="flex:1;padding:11px;font-size:13px;font-family:'Noto Sans KR',sans-serif;font-weight:700;background:var(--text-primary);color:white;border:none;border-radius:var(--radius-md);cursor:pointer;">저장</button>
+          </div>
+        </div>
       </div>
     </div>
   </div>
@@ -1550,7 +1564,7 @@ canvas { max-width: 100%; }
           <input type="text" id="eco-settings-proxy" onfocus="ecoInputSelectAll(this)" oninput="checkEcoAllFilled()" placeholder="https://your-proxy.vercel.app" autocomplete="off" spellcheck="false" style="width:100%;padding:9px 12px;font-size:12px;font-family:'Noto Sans KR',sans-serif;background:var(--bg);border:1px solid var(--border);border-radius:var(--radius-md);color:var(--text-primary);box-sizing:border-box;">
         </div>
         <button id="eco-save-btn" onclick="saveEcowittSettingsFromTab()" style="width:100%;padding:12px;font-size:13px;font-family:'Noto Sans KR',sans-serif;font-weight:700;color:white;background:#059669;border:none;border-radius:var(--radius-md);cursor:pointer;">Ecowitt 설정 저장</button>
-        <div id="eco-settings-status" style="font-size:11px;color:var(--text-tertiary);margin-top:8px;min-height:16px;text-align:center;"></div>
+        <div id="eco-settings-status" style="display:none;"></div>
       </div>
     </div>
   </div>
@@ -6186,50 +6200,99 @@ async function sfFetchEcowittNow() {
 function sfNamesRender() {
   var container = document.getElementById('sfnames-editor');
   if (!container) return;
+  var names = sfGetNames();
   var html = '';
-  SF_ZONE_DEFS.forEach(function(z) {
+  SF_ZONE_DEFS.forEach(function(z, zi) {
     var zoneName = sfGetZoneName(z.key);
-    var isSavedZone = !!sfGetNames()[z.key+'_name'];
+    var isSavedZone = !!names[z.key+'_name'];
     html += '<div style="margin-bottom:20px;padding-bottom:16px;border-bottom:1px solid var(--border);">';
-    // 구역명
     html += '<div style="font-size:10px;font-weight:700;color:var(--text-tertiary);margin-bottom:5px;">구역명</div>';
-    html += '<input type="text" id="sfname-zone-'+z.key+'" value="'+zoneName+'" placeholder="'+z.defaultName+'" '
-          + 'oninput="this.style.color=\'var(--text-primary)\'" '
-          + 'style="display:block;width:100%;box-sizing:border-box;padding:9px 12px;font-size:13px;font-family:\'Noto Sans KR\',sans-serif;'
+    html += '<input type="text" id="sfname-zone-'+z.key+'"'
+          + ' value="'+(isSavedZone ? zoneName : '')+'"'
+          + ' placeholder="구역명"'
+          + ' data-saved="'+(isSavedZone ? encodeURIComponent(zoneName) : '')+'"'
+          + ' onfocus="sfNameFocus(this)"'
+          + ' oninput="sfNameInput(this)"'
+          + ' style="display:block;width:100%;box-sizing:border-box;padding:9px 12px;font-size:13px;font-family:\'Noto Sans KR\',sans-serif;'
           + 'background:var(--bg);border:1px solid var(--border);border-radius:var(--radius-md);'
-          + 'color:'+(isSavedZone?'var(--text-tertiary)':'var(--text-primary)')+';margin-bottom:10px;">';
-    // 스위치 이름: 2열 그리드
+          + 'color:'+(isSavedZone ? 'var(--text-tertiary)' : 'var(--text-primary)')+';margin-bottom:10px;">';
     html += '<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">';
-    z.switches.forEach(function(sw) {
+    z.switches.forEach(function(sw, si) {
       var swLabel = sfGetSwLabel(sw.id);
-      var isSavedSw = !!sfGetNames()[sw.id+'_label'];
+      var isSavedSw = !!names[sw.id+'_label'];
+      var phNum = 'スイッチ ' + (si+1);
+      // placeholder는 '스위치 1', '스위치 2' 형태
+      var ph = '스위치 ' + (si+1);
       html += '<div>'
-            + '<div style="font-size:9px;font-weight:600;color:var(--text-tertiary);margin-bottom:3px;">'+sw.defaultLabel+'</div>'
-            + '<input type="text" id="sfname-sw-'+sw.id+'" value="'+swLabel+'" placeholder="'+sw.defaultLabel+'" '
-            + 'oninput="this.style.color=\'var(--text-primary)\'" '
-            + 'style="width:100%;padding:7px 10px;font-size:12px;font-family:\'Noto Sans KR\',sans-serif;'
+            + '<div style="font-size:9px;font-weight:600;color:var(--text-tertiary);margin-bottom:3px;">'+ph+'</div>'
+            + '<input type="text" id="sfname-sw-'+sw.id+'"'
+            + ' value="'+(isSavedSw ? swLabel : '')+'"'
+            + ' placeholder="'+ph+'"'
+            + ' data-saved="'+(isSavedSw ? encodeURIComponent(swLabel) : '')+'"'
+            + ' onfocus="sfNameFocus(this)"'
+            + ' oninput="sfNameInput(this)"'
+            + ' style="width:100%;box-sizing:border-box;padding:8px 10px;font-size:12px;font-family:\'Noto Sans KR\',sans-serif;'
             + 'background:var(--bg);border:1px solid var(--border);border-radius:var(--radius-sm);'
-            + 'color:'+(isSavedSw?'var(--text-tertiary)':'var(--text-primary)')+';">'
+            + 'color:'+(isSavedSw ? 'var(--text-tertiary)' : 'var(--text-primary)')+';">'
             + '</div>';
     });
-    html += '</div></div>';
+    html += '</div>';
+    html += '</div>';
   });
   container.innerHTML = html;
+  // 저장 버튼 상태 초기화
+  sfNamesBtnReset();
+}
+
+// input에 포커스 → 저장된 값이면 지우고 검정색으로
+function sfNameFocus(el) {
+  if (el.style.color === 'var(--text-tertiary)' || el.style.color.includes('tertiary')) {
+    el.value = '';
+    el.style.color = 'var(--text-primary)';
+    sfNamesShowEditBtns();
+  }
+}
+// 타이핑 시 검정색 유지 + 편집 버튼 표시
+function sfNameInput(el) {
+  el.style.color = 'var(--text-primary)';
+  sfNamesShowEditBtns();
+}
+
+function sfNamesShowEditBtns() {
+  var editBtns = document.getElementById('sfnames-edit-btns');
+  var doneBtn  = document.getElementById('sfnames-done-btn');
+  if (editBtns) editBtns.style.display = 'flex';
+  if (doneBtn)  doneBtn.style.display  = 'none';
+}
+function sfNamesBtnReset() {
+  var editBtns = document.getElementById('sfnames-edit-btns');
+  var doneBtn  = document.getElementById('sfnames-done-btn');
+  if (editBtns) editBtns.style.display = 'none';
+  if (doneBtn)  doneBtn.style.display  = 'block';
+}
+
+function sfNamesCancel() {
+  sfNamesRender(); // 저장된 상태로 원복
 }
 
 function sfNamesSave() {
   var names = {};
   SF_ZONE_DEFS.forEach(function(z) {
     var zEl = document.getElementById('sfname-zone-'+z.key);
-    if (zEl && zEl.value.trim()) names[z.key+'_name'] = zEl.value.trim();
+    if (zEl) {
+      var v = zEl.value.trim();
+      if (v) names[z.key+'_name'] = v;
+    }
     z.switches.forEach(function(sw) {
       var sEl = document.getElementById('sfname-sw-'+sw.id);
-      if (sEl && sEl.value.trim()) names[sw.id+'_label'] = sEl.value.trim();
+      if (sEl) {
+        var v = sEl.value.trim();
+        if (v) names[sw.id+'_label'] = v;
+      }
     });
   });
   try { localStorage.setItem('pb8_sf_names', JSON.stringify(names)); } catch(e) {}
-  if (typeof showAlert === 'function') showAlert('저장되었습니다.');
-  else alert('저장되었습니다.');
+  sfNamesRender(); // 저장 후 회색으로 재렌더
 }
 
 // 수입/지출 탭 상단 통계
