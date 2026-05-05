@@ -498,6 +498,7 @@ canvas { max-width: 100%; }
   overflow: hidden;
 }
 .sf-switch-grid-3 { display: grid; grid-template-columns: repeat(3,1fr); gap: 8px; }
+.sf-switch-grid-1 { display: grid; grid-template-columns: 1fr; gap: 5px; }
 .sf-switch-grid-2 { display: grid; grid-template-columns: repeat(2,1fr); gap: 8px; }
 
 /* ── 3-way 슬라이드 토글 카드 ── */
@@ -1091,14 +1092,16 @@ canvas { max-width: 100%; }
     <!-- 전체버튼 + 수동/자동 한 줄 — 자동패널 열려도 위치 고정 -->
     <div style="display:flex;align-items:center;justify-content:space-between;gap:6px;margin-bottom:8px;">
       <div class="sf-zone-btns" id="sf-zone-all-btns-zone1">
-        <button class="sf-zone-btn t-open"  onclick="sfZoneAll('zone1','on')">전체 열기</button>
-        <button class="sf-zone-btn t-stop"  onclick="sfZoneAll('zone1','stop')">전체 정지</button>
         <button class="sf-zone-btn t-close" onclick="sfZoneAll('zone1','off')">전체 닫기</button>
+        <button class="sf-zone-btn t-stop"  onclick="sfZoneAll('zone1','stop')">전체 정지</button>
+        <button class="sf-zone-btn t-open"  onclick="sfZoneAll('zone1','on')">전체 열기</button>
       </div>
-      <div class="sf-mode-toggle">
-        <span id="sf-s-temp-zone1" style="font-size:10px;font-weight:700;color:#EF4444;white-space:nowrap;padding:0 8px 0 4px;flex-shrink:0;height:26px;display:flex;align-items:center;">— °C</span>
-        <button class="sf-mode-btn active-manual" id="mode-btn-manual-zone1" onclick="sfSetMode('zone1','manual')">수동</button>
-        <button class="sf-mode-btn" id="mode-btn-auto-zone1" onclick="sfSetMode('zone1','auto')">자동</button>
+      <div style="display:flex;align-items:center;gap:4px;flex-shrink:0;">
+        <span id="sf-s-temp-zone1" style="font-size:10px;font-weight:700;color:#EF4444;white-space:nowrap;margin-right:2px;margin-left:8px;">— °C</span>
+        <div class="sf-mode-toggle">
+          <button class="sf-mode-btn active-manual" id="mode-btn-manual-zone1" onclick="sfSetMode('zone1','manual')">수동</button>
+          <button class="sf-mode-btn" id="mode-btn-auto-zone1" onclick="sfSetMode('zone1','auto')">자동</button>
+        </div>
       </div>
     </div>
     <div class="sf-auto-panel" id="sf-auto-panel-zone1">
@@ -1124,9 +1127,9 @@ canvas { max-width: 100%; }
   <div class="sf-card">
     <div style="display:flex;align-items:center;justify-content:space-between;gap:6px;margin-bottom:8px;">
       <div class="sf-zone-btns" id="sf-zone-all-btns-zone2">
-        <button class="sf-zone-btn t-open"  onclick="sfZoneAll('zone2','on')">전체 열기</button>
-        <button class="sf-zone-btn t-stop"  onclick="sfZoneAll('zone2','stop')">전체 정지</button>
         <button class="sf-zone-btn t-close" onclick="sfZoneAll('zone2','off')">전체 닫기</button>
+        <button class="sf-zone-btn t-stop"  onclick="sfZoneAll('zone2','stop')">전체 정지</button>
+        <button class="sf-zone-btn t-open"  onclick="sfZoneAll('zone2','on')">전체 열기</button>
       </div>
       <div class="sf-mode-toggle">
         <button class="sf-mode-btn active-manual" id="mode-btn-manual-zone2" onclick="sfSetMode('zone2','manual')">수동</button>
@@ -1156,14 +1159,16 @@ canvas { max-width: 100%; }
   <div class="sf-card">
     <div style="display:flex;align-items:center;justify-content:space-between;gap:6px;margin-bottom:8px;">
       <div class="sf-zone-btns" id="sf-zone-all-btns-zone3">
-        <button class="sf-zone-btn t-open"  onclick="sfZoneAll('zone3','on')">전체 열기</button>
-        <button class="sf-zone-btn t-stop"  onclick="sfZoneAll('zone3','stop')">전체 정지</button>
         <button class="sf-zone-btn t-close" onclick="sfZoneAll('zone3','off')">전체 닫기</button>
+        <button class="sf-zone-btn t-stop"  onclick="sfZoneAll('zone3','stop')">전체 정지</button>
+        <button class="sf-zone-btn t-open"  onclick="sfZoneAll('zone3','on')">전체 열기</button>
       </div>
-      <div class="sf-mode-toggle">
-        <span id="sf-s-temp-zone3" style="font-size:10px;font-weight:700;color:#EF4444;white-space:nowrap;padding:0 8px 0 4px;flex-shrink:0;height:26px;display:flex;align-items:center;">— °C</span>
-        <button class="sf-mode-btn active-manual" id="mode-btn-manual-zone3" onclick="sfSetMode('zone3','manual')">수동</button>
-        <button class="sf-mode-btn" id="mode-btn-auto-zone3" onclick="sfSetMode('zone3','auto')">자동</button>
+      <div style="display:flex;align-items:center;gap:4px;flex-shrink:0;">
+        <span id="sf-s-temp-zone3" style="font-size:10px;font-weight:700;color:#EF4444;white-space:nowrap;margin-right:2px;margin-left:8px;">— °C</span>
+        <div class="sf-mode-toggle">
+          <button class="sf-mode-btn active-manual" id="mode-btn-manual-zone3" onclick="sfSetMode('zone3','manual')">수동</button>
+          <button class="sf-mode-btn" id="mode-btn-auto-zone3" onclick="sfSetMode('zone3','auto')">자동</button>
+        </div>
       </div>
     </div>
     <div class="sf-auto-panel" id="sf-auto-panel-zone3">
@@ -1181,65 +1186,102 @@ canvas { max-width: 100%; }
     </div>
   </div>
 
-  <!-- ④ 그룹 4 (타이머, 2스위치) -->
-  <div class="sec-label" id="sf-zone-label-zone4">④ 그룹 4</div>
-  <div class="sf-card">
-    <div style="display:flex;align-items:center;justify-content:space-between;gap:6px;margin-bottom:8px;">
-      <div class="sf-zone-btns" id="sf-zone-all-btns-zone4">
-        <button class="sf-zone-btn t-open"  onclick="sfZoneAll('zone4','on')">전체 열기</button>
-        <button class="sf-zone-btn t-stop"  onclick="sfZoneAll('zone4','stop')">전체 정지</button>
-        <button class="sf-zone-btn t-close" onclick="sfZoneAll('zone4','off')">전체 닫기</button>
-      </div>
-      <div class="sf-mode-toggle">
-        <span id="sf-s-temp-zone4" style="font-size:10px;font-weight:700;color:#EF4444;white-space:nowrap;padding:0 8px 0 4px;flex-shrink:0;height:26px;display:flex;align-items:center;">— °C</span>
-        <button class="sf-mode-btn active-manual" id="mode-btn-manual-zone4" onclick="sfSetMode('zone4','manual')">수동</button>
-        <button class="sf-mode-btn" id="mode-btn-auto-zone4" onclick="sfSetMode('zone4','auto')">자동</button>
+  <!-- ④⑤ 그룹 4 + 그룹 5 (좌우 나란히, 스위치 1개씩) -->
+  <div style="display:flex;gap:8px;margin-bottom:8px;">
+    <!-- 그룹 4 -->
+    <div style="flex:1;min-width:0;">
+      <div class="sec-label" id="sf-zone-label-zone4" style="margin-top:0;">④ 그룹 4</div>
+      <div class="sf-card" style="margin-bottom:0;">
+        <div style="display:flex;align-items:center;justify-content:flex-end;gap:4px;margin-bottom:8px;">
+          <div style="display:flex;align-items:center;gap:4px;flex-shrink:0;">
+            <span id="sf-s-temp-zone4" style="font-size:10px;font-weight:700;color:#EF4444;white-space:nowrap;margin-right:2px;margin-left:8px;">— °C</span>
+            <div class="sf-mode-toggle">
+              <button class="sf-mode-btn active-manual" id="mode-btn-manual-zone4" onclick="sfSetMode('zone4','manual')">수동</button>
+              <button class="sf-mode-btn" id="mode-btn-auto-zone4" onclick="sfSetMode('zone4','auto')">자동</button>
+            </div>
+          </div>
+        </div>
+        <div class="sf-auto-panel" id="sf-auto-panel-zone4">
+          <div style="font-size:10px;font-weight:700;color:#5B21B6;margin-bottom:8px;">자동 설정</div>
+          <div class="sf-auto-row"><label>온도 초과</label><input type="number" step="0.1" placeholder="28.0" id="sf-auto-zone4-temp"> °C → 열기</div>
+          <div class="sf-auto-row"><label>온도 이하</label><input type="number" step="0.1" placeholder="18.0" id="sf-auto-zone4-temp-close"> °C → 닫기</div>
+          <div class="sf-auto-row"><label>열기 시간</label><input type="time" id="sf-auto-zone4-open-time"></div>
+          <div class="sf-auto-row"><label>닫기 시간</label><input type="time" id="sf-auto-zone4-close-time"></div>
+          <div style="display:flex;gap:6px;margin-top:6px;">
+            <button onclick="sfSetMode('zone4','manual')" style="flex:1;padding:6px;font-size:10px;font-weight:700;font-family:'Noto Sans KR',sans-serif;background:var(--bg);color:var(--text-secondary);border:1px solid var(--border);border-radius:8px;cursor:pointer;">취소</button>
+            <button onclick="sfSaveAutoConfig('zone4')" style="flex:2;padding:6px;font-size:10px;font-weight:700;font-family:'Noto Sans KR',sans-serif;background:#7C3AED;color:white;border:none;border-radius:8px;cursor:pointer;">저장</button>
+          </div>
+        </div>
+        <div style="position:relative;">
+          <div class="sf-switch-grid-1" id="sf-zone4"></div>
+          <div class="sf-auto-blocked-overlay" id="sf-block-zone4"></div>
+        </div>
       </div>
     </div>
-    <div class="sf-auto-panel" id="sf-auto-panel-zone4">
-      <div style="font-size:10px;font-weight:700;color:#5B21B6;margin-bottom:8px;">자동 동작 설정</div>
-      <div class="sf-auto-row"><label>열기 시간</label><input type="time" id="sf-auto-zone4-open-time"> 에 열기</div>
-      <div class="sf-auto-row"><label>닫기 시간</label><input type="time" id="sf-auto-zone4-close-time"> 에 닫기</div>
-      <div style="display:flex;gap:6px;margin-top:6px;">
-        <button onclick="sfSetMode('zone4','manual')" style="flex:1;padding:7px;font-size:11px;font-weight:700;font-family:'Noto Sans KR',sans-serif;background:var(--bg);color:var(--text-secondary);border:1px solid var(--border);border-radius:8px;cursor:pointer;">취소</button>
-        <button onclick="sfSaveAutoConfig('zone4')" style="flex:2;padding:7px;font-size:11px;font-weight:700;font-family:'Noto Sans KR',sans-serif;background:#7C3AED;color:white;border:none;border-radius:8px;cursor:pointer;">자동 설정 저장</button>
+
+    <!-- 그룹 5 -->
+    <div style="flex:1;min-width:0;">
+      <div class="sec-label" id="sf-zone-label-zone5" style="margin-top:0;">⑤ 그룹 5</div>
+      <div class="sf-card" style="margin-bottom:0;">
+        <div style="display:flex;align-items:center;justify-content:flex-end;gap:4px;margin-bottom:8px;">
+          <div style="display:flex;align-items:center;gap:4px;flex-shrink:0;">
+            <span id="sf-s-temp-zone5" style="font-size:10px;font-weight:700;color:#EF4444;white-space:nowrap;margin-right:2px;margin-left:8px;">— °C</span>
+            <div class="sf-mode-toggle">
+              <button class="sf-mode-btn active-manual" id="mode-btn-manual-zone5" onclick="sfSetMode('zone5','manual')">수동</button>
+              <button class="sf-mode-btn" id="mode-btn-auto-zone5" onclick="sfSetMode('zone5','auto')">자동</button>
+            </div>
+          </div>
+        </div>
+        <div class="sf-auto-panel" id="sf-auto-panel-zone5">
+          <div style="font-size:10px;font-weight:700;color:#5B21B6;margin-bottom:8px;">자동 설정</div>
+          <div class="sf-auto-row"><label>온도 초과</label><input type="number" step="0.1" placeholder="28.0" id="sf-auto-zone5-temp"> °C → 열기</div>
+          <div class="sf-auto-row"><label>온도 이하</label><input type="number" step="0.1" placeholder="18.0" id="sf-auto-zone5-temp-close"> °C → 닫기</div>
+          <div class="sf-auto-row"><label>열기 시간</label><input type="time" id="sf-auto-zone5-open-time"></div>
+          <div class="sf-auto-row"><label>닫기 시간</label><input type="time" id="sf-auto-zone5-close-time"></div>
+          <div style="display:flex;gap:6px;margin-top:6px;">
+            <button onclick="sfSetMode('zone5','manual')" style="flex:1;padding:6px;font-size:10px;font-weight:700;font-family:'Noto Sans KR',sans-serif;background:var(--bg);color:var(--text-secondary);border:1px solid var(--border);border-radius:8px;cursor:pointer;">취소</button>
+            <button onclick="sfSaveAutoConfig('zone5')" style="flex:2;padding:6px;font-size:10px;font-weight:700;font-family:'Noto Sans KR',sans-serif;background:#7C3AED;color:white;border:none;border-radius:8px;cursor:pointer;">저장</button>
+          </div>
+        </div>
+        <div style="position:relative;">
+          <div class="sf-switch-grid-1" id="sf-zone5"></div>
+          <div class="sf-auto-blocked-overlay" id="sf-block-zone5"></div>
+        </div>
       </div>
-    </div>
-    <div style="position:relative;">
-      <div class="sf-switch-grid-2" id="sf-zone4"></div>
-      <div class="sf-auto-blocked-overlay" id="sf-block-zone4"></div>
     </div>
   </div>
 
-  <!-- ⑤ 그룹 5 (온도센서 + 타이머, 2스위치) -->
-  <div class="sec-label" id="sf-zone-label-zone5">⑤ 그룹 5</div>
+  <!-- ⑥ 그룹 6 (온도센서 + 타이머, 2스위치) -->
+  <div class="sec-label" id="sf-zone-label-zone6">⑥ 그룹 6</div>
   <div class="sf-card" style="margin-bottom:18px;">
     <div style="display:flex;align-items:center;justify-content:space-between;gap:6px;margin-bottom:8px;">
-      <div class="sf-zone-btns" id="sf-zone-all-btns-zone5">
-        <button class="sf-zone-btn t-open"  onclick="sfZoneAll('zone5','on')">전체 열기</button>
-        <button class="sf-zone-btn t-stop"  onclick="sfZoneAll('zone5','stop')">전체 정지</button>
-        <button class="sf-zone-btn t-close" onclick="sfZoneAll('zone5','off')">전체 닫기</button>
+      <div class="sf-zone-btns" id="sf-zone-all-btns-zone6">
+        <button class="sf-zone-btn t-close" onclick="sfZoneAll('zone6','off')">전체 닫기</button>
+        <button class="sf-zone-btn t-stop"  onclick="sfZoneAll('zone6','stop')">전체 정지</button>
+        <button class="sf-zone-btn t-open"  onclick="sfZoneAll('zone6','on')">전체 열기</button>
       </div>
-      <div class="sf-mode-toggle">
-        <span id="sf-s-temp-zone5" style="font-size:10px;font-weight:700;color:#EF4444;white-space:nowrap;padding:0 8px 0 4px;flex-shrink:0;height:26px;display:flex;align-items:center;">— °C</span>
-        <button class="sf-mode-btn active-manual" id="mode-btn-manual-zone5" onclick="sfSetMode('zone5','manual')">수동</button>
-        <button class="sf-mode-btn" id="mode-btn-auto-zone5" onclick="sfSetMode('zone5','auto')">자동</button>
+      <div style="display:flex;align-items:center;gap:4px;flex-shrink:0;">
+        <span id="sf-s-temp-zone6" style="font-size:10px;font-weight:700;color:#EF4444;white-space:nowrap;margin-right:2px;margin-left:8px;">— °C</span>
+        <div class="sf-mode-toggle">
+          <button class="sf-mode-btn active-manual" id="mode-btn-manual-zone6" onclick="sfSetMode('zone6','manual')">수동</button>
+          <button class="sf-mode-btn" id="mode-btn-auto-zone6" onclick="sfSetMode('zone6','auto')">자동</button>
+        </div>
       </div>
     </div>
-    <div class="sf-auto-panel" id="sf-auto-panel-zone5">
+    <div class="sf-auto-panel" id="sf-auto-panel-zone6">
       <div style="font-size:10px;font-weight:700;color:#5B21B6;margin-bottom:8px;">자동 동작 설정</div>
-      <div class="sf-auto-row"><label>온도 초과</label><input type="number" step="0.1" placeholder="예) 28.0" id="sf-auto-zone5-temp"> °C 이상 → 열기</div>
-      <div class="sf-auto-row"><label>온도 이하</label><input type="number" step="0.1" placeholder="예) 18.0" id="sf-auto-zone5-temp-close"> °C 이하 → 닫기</div>
-      <div class="sf-auto-row"><label>열기 시간</label><input type="time" id="sf-auto-zone5-open-time"> 에 열기</div>
-      <div class="sf-auto-row"><label>닫기 시간</label><input type="time" id="sf-auto-zone5-close-time"> 에 닫기</div>
+      <div class="sf-auto-row"><label>온도 초과</label><input type="number" step="0.1" placeholder="예) 28.0" id="sf-auto-zone6-temp"> °C 이상 → 열기</div>
+      <div class="sf-auto-row"><label>온도 이하</label><input type="number" step="0.1" placeholder="예) 18.0" id="sf-auto-zone6-temp-close"> °C 이하 → 닫기</div>
+      <div class="sf-auto-row"><label>열기 시간</label><input type="time" id="sf-auto-zone6-open-time"> 에 열기</div>
+      <div class="sf-auto-row"><label>닫기 시간</label><input type="time" id="sf-auto-zone6-close-time"> 에 닫기</div>
       <div style="display:flex;gap:6px;margin-top:6px;">
-        <button onclick="sfSetMode('zone5','manual')" style="flex:1;padding:7px;font-size:11px;font-weight:700;font-family:'Noto Sans KR',sans-serif;background:var(--bg);color:var(--text-secondary);border:1px solid var(--border);border-radius:8px;cursor:pointer;">취소</button>
-        <button onclick="sfSaveAutoConfig('zone5')" style="flex:2;padding:7px;font-size:11px;font-weight:700;font-family:'Noto Sans KR',sans-serif;background:#7C3AED;color:white;border:none;border-radius:8px;cursor:pointer;">자동 설정 저장</button>
+        <button onclick="sfSetMode('zone6','manual')" style="flex:1;padding:7px;font-size:11px;font-weight:700;font-family:'Noto Sans KR',sans-serif;background:var(--bg);color:var(--text-secondary);border:1px solid var(--border);border-radius:8px;cursor:pointer;">취소</button>
+        <button onclick="sfSaveAutoConfig('zone6')" style="flex:2;padding:7px;font-size:11px;font-weight:700;font-family:'Noto Sans KR',sans-serif;background:#7C3AED;color:white;border:none;border-radius:8px;cursor:pointer;">자동 설정 저장</button>
       </div>
     </div>
     <div style="position:relative;">
-      <div class="sf-switch-grid-2" id="sf-zone5"></div>
-      <div class="sf-auto-blocked-overlay" id="sf-block-zone5"></div>
+      <div class="sf-switch-grid-2" id="sf-zone6"></div>
+      <div class="sf-auto-blocked-overlay" id="sf-block-zone6"></div>
     </div>
   </div>
 
@@ -5815,11 +5857,14 @@ var SF_ZONE_DEFS = [
     {id:'z3s1',defaultLabel:'스위치 1'},{id:'z3s2',defaultLabel:'스위치 2'},
     {id:'z3s3',defaultLabel:'스위치 3'},{id:'z3s4',defaultLabel:'스위치 4'}
   ]},
-  { key:'zone4', defaultName:'그룹 4', hasTempSensor:false, hasTimer:true,  gridCols:2, switches:[
-    {id:'z4s1',defaultLabel:'스위치 1'},{id:'z4s2',defaultLabel:'스위치 2'}
+  { key:'zone4', defaultName:'그룹 4', hasTempSensor:true, hasTimer:true, gridCols:1, switches:[
+    {id:'z4s1',defaultLabel:'스위치 1'}
   ]},
-  { key:'zone5', defaultName:'그룹 5', hasTempSensor:true,  hasTimer:true,  gridCols:2, switches:[
-    {id:'z5s1',defaultLabel:'스위치 1'},{id:'z5s2',defaultLabel:'스위치 2'}
+  { key:'zone5', defaultName:'그룹 5', hasTempSensor:true, hasTimer:true, gridCols:1, switches:[
+    {id:'z5s1',defaultLabel:'스위치 1'}
+  ]},
+  { key:'zone6', defaultName:'그룹 6', hasTempSensor:true, hasTimer:true, gridCols:2, switches:[
+    {id:'z6s1',defaultLabel:'스위치 1'},{id:'z6s2',defaultLabel:'스위치 2'}
   ]}
 ];
 
@@ -5860,6 +5905,7 @@ function sfSave() {
 function sfAttachSlide(el, id) {
   var lastTap = {side:null, time:0};
   var startX = null, startY = null, startState = null;
+  var usingTouch = false; // 터치 사용 시 mouse 이벤트 무시
 
   function stateToPos(s) { return s==='off'?0 : s==='stop'?1 : 2; }
   function posToState(p) { return p===0?'off' : p===1?'stop' : 'on'; }
@@ -5877,46 +5923,57 @@ function sfAttachSlide(el, id) {
     var dx=x-startX, dy=y-startY;
     if (Math.abs(dy)>Math.abs(dx)+10){startX=null;return;}
     var p=stateToPos(startState);
-    var trackW=el.offsetWidth||80;
-    var side=dx>0?'right':'left'; // 스와이프 방향
-    var isTap=Math.abs(dx)<10;
+    var isTap=Math.abs(dx)<10 && Math.abs(dy)<10;
 
     if(isTap){
-      // 탭: 좌측 반 누르면 왼쪽 방향, 우측 반 누르면 오른쪽 방향
       var rect=el.getBoundingClientRect();
       var tapX=x-rect.left;
-      side=tapX<rect.width/2?'left':'right';
+      var side=tapX<rect.width/2?'left':'right';
       var now=Date.now();
       var isDbl=lastTap.side===side&&(now-lastTap.time)<400;
       lastTap={side:side,time:now};
 
       if(side==='right'){
-        if(isDbl){ applyNewState('on'); }          // 오른쪽 더블탭 → 열기
+        if(isDbl){ applyNewState('on'); }
         else {
-          if(startState==='stop') applyNewState('on');   // 정지→열기
-          else if(startState==='on') applyNewState('stop'); // 열기→정지
+          if(startState==='stop') applyNewState('on');
+          else if(startState==='on') applyNewState('stop');
           else applyNewState('stop');
         }
       } else {
-        if(isDbl){ applyNewState('off'); }         // 왼쪽 더블탭 → 닫기
+        if(isDbl){ applyNewState('off'); }
         else {
-          if(startState==='stop') applyNewState('off');  // 정지→닫기
-          else if(startState==='off') applyNewState('stop'); // 닫기→정지
+          if(startState==='stop') applyNewState('off');
+          else if(startState==='off') applyNewState('stop');
           else applyNewState('stop');
         }
       }
     } else {
-      // 스와이프
       var newP=dx>0?Math.min(p+1,2):Math.max(p-1,0);
       applyNewState(posToState(newP));
     }
     startX=null;
   }
 
-  el.addEventListener('touchstart',function(e){onStart(e.touches[0].clientX,e.touches[0].clientY);},{passive:true});
-  el.addEventListener('touchend',function(e){onEnd(e.changedTouches[0].clientX,e.changedTouches[0].clientY);},{passive:true});
-  el.addEventListener('mousedown',function(e){onStart(e.clientX,e.clientY);});
-  el.addEventListener('mouseup',function(e){onEnd(e.clientX,e.clientY);});
+  el.addEventListener('touchstart',function(e){
+    usingTouch=true;
+    onStart(e.touches[0].clientX,e.touches[0].clientY);
+  },{passive:true});
+
+  el.addEventListener('touchend',function(e){
+    onEnd(e.changedTouches[0].clientX,e.changedTouches[0].clientY);
+    // 터치 후 mouse 이벤트 300ms 차단
+    setTimeout(function(){ usingTouch=false; }, 350);
+  },{passive:true});
+
+  el.addEventListener('mousedown',function(e){
+    if(usingTouch) return;
+    onStart(e.clientX,e.clientY);
+  });
+  el.addEventListener('mouseup',function(e){
+    if(usingTouch) return;
+    onEnd(e.clientX,e.clientY);
+  });
 }
 
 function sfZoneAll(zone, st) {
@@ -5989,7 +6046,7 @@ function sfSaveAutoConfig(zone) {
 function sfLoadAllModes() {
   try {
     var m=JSON.parse(localStorage.getItem('pb8_sf_modes')||'{}');
-    ['zone1','zone2','zone3','zone4','zone5'].forEach(function(z){ sfApplyModeUI(z, m[z]||'manual'); });
+    ['zone1','zone2','zone3','zone4','zone5','zone6'].forEach(function(z){ sfApplyModeUI(z, m[z]||'manual'); });
   } catch(e){}
 }
 
@@ -6055,7 +6112,7 @@ function renderSmartfarmTab() {
 
 // 온도 표시 업데이트 (zone1,3,4,5)
 function sfUpdateZoneTemps() {
-  ['zone1','zone3','zone4','zone5'].forEach(function(z) {
+  ['zone1','zone3','zone4','zone5','zone6'].forEach(function(z) {
     var el = document.getElementById('sf-s-temp-'+z);
     if (!el) return;
     try {
