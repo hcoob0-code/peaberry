@@ -506,7 +506,7 @@ canvas { max-width: 100%; }
   align-items: center;
   gap: 5px;
   padding: 10px 6px 8px;
-  background: #FFFBEB; border: 1.5px solid #FCD34D;
+  background: #F9FAFB; border: 1.5px solid #D1D5DB;
   border-radius: 14px;
   cursor: pointer;
   user-select: none; -webkit-user-select: none;
@@ -515,19 +515,19 @@ canvas { max-width: 100%; }
   transition: background 0.2s, border-color 0.2s;
 }
 .sf-sw.on   { background: #F0FDF4; border-color: #86EFAC; }
-.sf-sw.stop { background: #FFFBEB; border-color: #FCD34D; }
+.sf-sw.stop { background: #F9FAFB; border-color: #D1D5DB; }
 .sf-sw.off  { background: #FFF1F2; border-color: #FECDD3; }
 .sf-sw.blocked { opacity: 0.45; pointer-events: none; }
 
 /* 번호/이름 */
 .sf-sw-num {
   font-size: 10px; font-weight: 800;
-  color: #D97706;
+  color: #9CA3AF;
   letter-spacing: 0.2px; text-align: center;
   line-height: 1.2;
 }
 .sf-sw.on   .sf-sw-num { color: #16A34A; }
-.sf-sw.stop .sf-sw-num { color: #D97706; }
+.sf-sw.stop .sf-sw-num { color: #9CA3AF; }
 .sf-sw.off  .sf-sw-num { color: #E11D48; }
 
 /* ── 3-way 트랙 ── */
@@ -543,7 +543,7 @@ canvas { max-width: 100%; }
   transition: background 0.25s, border-color 0.25s;
 }
 .sf-sw.on   .sf-track-bg { background: #DCFCE7; border-color: #86EFAC; }
-.sf-sw.stop .sf-track-bg { background: #FEF3C7; border-color: #FCD34D; }
+.sf-sw.stop .sf-track-bg { background: #F3F4F6; border-color: #D1D5DB; }
 .sf-sw.off  .sf-track-bg { background: #FFF1F2; border-color: #FECDD3; }
 
 .sf-track-txt {
@@ -556,7 +556,7 @@ canvas { max-width: 100%; }
   transition: opacity 0.2s;
 }
 /* 정지: stop(default, 가운데) → 오른쪽 */
-.sf-track-txt.txt-stop  { right: 6px; color: #D97706; }
+.sf-track-txt.txt-stop  { right: 6px; color: #9CA3AF; }
 .sf-sw.stop .sf-track-txt.txt-stop { opacity: 1; }
 /* 열기: on(오른쪽) → 왼쪽 */
 .sf-track-txt.txt-open  { left: 6px;  color: #16A34A; }
@@ -636,7 +636,7 @@ canvas { max-width: 100%; }
 /* Ecowitt 환경 바 */
 .sf-env-bar {
   display: grid;
-  grid-template-columns: 1fr 1fr 1fr auto;
+  grid-template-columns: 1fr 1fr 1fr 1fr auto;
   gap: 6px;
   padding: 8px 12px;
   background: var(--surface);
@@ -682,7 +682,8 @@ canvas { max-width: 100%; }
 }
 .sf-zone-btn.t-open  { background: #F0FDF4; border-color: #86EFAC; color: #15803D; }
 .sf-zone-btn.t-close { background: #FFF1F2; border-color: #FECDD3; color: #BE123C; }
-.sf-zone-btn.t-stop  { background: #FFFBEB; border-color: #FCD34D; color: #B45309; }
+.sf-zone-btn.t-stop  { background: #F9FAFB; border-color: #D1D5DB; color: #6B7280; }
+.sf-switch-grid-4 { display: grid; grid-template-columns: repeat(4,1fr); gap: 8px; }
 </style>
 </head>
 <body>
@@ -1038,31 +1039,42 @@ canvas { max-width: 100%; }
         <div class="sf-env-val" id="sf-env-hum" style="color:#0EA5E9;">—</div>
         <div class="sf-env-unit">%</div>
       </div>
+      <div class="sf-env-cell">
+        <div class="sf-env-label">강우</div>
+        <div class="sf-env-val" id="sf-env-rain" style="color:#6366F1;">—</div>
+        <div class="sf-env-unit">mm/h</div>
+      </div>
       <div style="display:flex;flex-direction:column;align-items:flex-end;justify-content:center;gap:3px;">
         <span id="sf-env-time" style="font-size:8px;color:var(--text-tertiary);">—</span>
         <button id="sf-env-refresh-btn" onclick="sfFetchEcowittNow()" style="padding:3px 9px;font-size:9px;font-weight:700;font-family:'Noto Sans KR',sans-serif;color:white;background:#059669;border:none;border-radius:50px;cursor:pointer;">새로고침</button>
       </div>
     </div>
 
-    <!-- 전원 상태 (인디케이터만 — 끄고 켜는 게 아님) -->
+    <!-- 전원 상태 (인디케이터만) -->
     <div class="sf-status-bar">
-      <div style="display:flex;align-items:center;gap:10px;">
+      <div style="display:flex;align-items:center;gap:8px;">
         <div class="sf-power-dot" id="sf-power-dot"></div>
-        <div>
-          <div style="font-size:12px;font-weight:700;color:var(--text-primary);">컨트롤 패널</div>
-          <div id="sf-status-text" style="font-size:10px;color:var(--text-tertiary);margin-top:1px;">전원 상태 확인 중…</div>
-        </div>
+        <div style="font-size:12px;font-weight:700;color:var(--text-primary);">컨트롤 패널</div>
+        <div id="sf-status-text" style="font-size:10px;color:var(--text-tertiary);">—</div>
       </div>
-      <div style="font-size:10px;font-weight:600;color:var(--text-tertiary);background:var(--bg);border:1px solid var(--border);border-radius:50px;padding:4px 10px;">읽기 전용</div>
+      <button onclick="sfRainClose()" id="sf-rain-btn"
+        style="display:flex;align-items:center;gap:5px;padding:5px 11px;font-size:11px;font-weight:700;font-family:'Noto Sans KR',sans-serif;color:#1D4ED8;background:#EFF6FF;border:1.5px solid #BFDBFE;border-radius:50px;cursor:pointer;white-space:nowrap;flex-shrink:0;">
+        강우 감지 닫기
+      </button>
     </div>
   </div>
 
-  <!-- ① 일중 전창 -->
-  <div class="sec-label" id="sf-zone-label-zone1">① 일중 전창</div>
+  <!-- ① 그룹 1 -->
+  <div class="sec-label" id="sf-zone-label-zone1">① 그룹 1</div>
   <div class="sf-card">
-    <div class="sf-mode-row">
-      <span style="font-size:10px;color:var(--text-tertiary);">SW 1–6</span>
-      <div class="sf-mode-toggle">
+    <!-- 전체버튼 + 수동/자동 한 줄 -->
+    <div style="display:flex;align-items:center;justify-content:space-between;gap:6px;margin-bottom:8px;">
+      <div class="sf-zone-btns" id="sf-zone-all-btns-zone1">
+        <button class="sf-zone-btn t-open"  onclick="sfZoneAll('zone1','on')">전체 열기</button>
+        <button class="sf-zone-btn t-close" onclick="sfZoneAll('zone1','off')">전체 닫기</button>
+        <button class="sf-zone-btn t-stop"  onclick="sfZoneAll('zone1','stop')">전체 정지</button>
+      </div>
+      <div class="sf-mode-toggle" style="flex-shrink:0;">
         <button class="sf-mode-btn active-manual" id="mode-btn-manual-zone1" onclick="sfSetMode('zone1','manual')">수동</button>
         <button class="sf-mode-btn" id="mode-btn-auto-zone1" onclick="sfSetMode('zone1','auto')">자동</button>
       </div>
@@ -1076,25 +1088,22 @@ canvas { max-width: 100%; }
       <div class="sf-auto-row"><label>습도 초과</label><input type="number" placeholder="예) 85" id="sf-auto-zone1-humi"> % 이상 → 열기</div>
       <button onclick="sfSaveAutoConfig('zone1')" style="width:100%;margin-top:4px;padding:7px;font-size:11px;font-weight:700;font-family:'Noto Sans KR',sans-serif;background:#7C3AED;color:white;border:none;border-radius:8px;cursor:pointer;">자동 설정 저장</button>
     </div>
-    <div class="sf-section-hdr" style="margin-top:8px;">
-      <div class="sf-zone-btns" id="sf-zone-all-btns-zone1">
-        <button class="sf-zone-btn t-open"  onclick="sfZoneAll('zone1','on')">전체 열기</button>
-        <button class="sf-zone-btn t-close" onclick="sfZoneAll('zone1','off')">전체 닫기</button>
-        <button class="sf-zone-btn t-stop"  onclick="sfZoneAll('zone1','stop')">전체 정지</button>
-      </div>
-    </div>
     <div style="position:relative;">
-      <div class="sf-switch-grid-3" id="sf-zone1"></div>
+      <div class="sf-switch-grid-4" id="sf-zone1"></div>
       <div class="sf-auto-blocked-overlay" id="sf-block-zone1"></div>
     </div>
   </div>
 
-  <!-- ② 이중 전창 -->
-  <div class="sec-label" id="sf-zone-label-zone2">② 이중 전창</div>
+  <!-- ② 그룹 2 -->
+  <div class="sec-label" id="sf-zone-label-zone2">② 그룹 2</div>
   <div class="sf-card">
-    <div class="sf-mode-row">
-      <span style="font-size:10px;color:var(--text-tertiary);">SW 7–12</span>
-      <div class="sf-mode-toggle">
+    <div style="display:flex;align-items:center;justify-content:space-between;gap:6px;margin-bottom:8px;">
+      <div class="sf-zone-btns" id="sf-zone-all-btns-zone2">
+        <button class="sf-zone-btn t-open"  onclick="sfZoneAll('zone2','on')">전체 열기</button>
+        <button class="sf-zone-btn t-close" onclick="sfZoneAll('zone2','off')">전체 닫기</button>
+        <button class="sf-zone-btn t-stop"  onclick="sfZoneAll('zone2','stop')">전체 정지</button>
+      </div>
+      <div class="sf-mode-toggle" style="flex-shrink:0;">
         <button class="sf-mode-btn active-manual" id="mode-btn-manual-zone2" onclick="sfSetMode('zone2','manual')">수동</button>
         <button class="sf-mode-btn" id="mode-btn-auto-zone2" onclick="sfSetMode('zone2','auto')">자동</button>
       </div>
@@ -1108,25 +1117,22 @@ canvas { max-width: 100%; }
       <div class="sf-auto-row"><label>습도 초과</label><input type="number" placeholder="예) 85" id="sf-auto-zone2-humi"> % 이상 → 열기</div>
       <button onclick="sfSaveAutoConfig('zone2')" style="width:100%;margin-top:4px;padding:7px;font-size:11px;font-weight:700;font-family:'Noto Sans KR',sans-serif;background:#7C3AED;color:white;border:none;border-radius:8px;cursor:pointer;">자동 설정 저장</button>
     </div>
-    <div class="sf-section-hdr" style="margin-top:8px;">
-      <div class="sf-zone-btns" id="sf-zone-all-btns-zone2">
-        <button class="sf-zone-btn t-open"  onclick="sfZoneAll('zone2','on')">전체 열기</button>
-        <button class="sf-zone-btn t-close" onclick="sfZoneAll('zone2','off')">전체 닫기</button>
-        <button class="sf-zone-btn t-stop"  onclick="sfZoneAll('zone2','stop')">전체 정지</button>
-      </div>
-    </div>
     <div style="position:relative;">
       <div class="sf-switch-grid-3" id="sf-zone2"></div>
       <div class="sf-auto-blocked-overlay" id="sf-block-zone2"></div>
     </div>
   </div>
 
-  <!-- ③ 측이블 -->
-  <div class="sec-label" id="sf-zone-label-zone3">③ 측이블 · 이중측창</div>
+  <!-- ③ 그룹 3 -->
+  <div class="sec-label" id="sf-zone-label-zone3">③ 그룹 3</div>
   <div class="sf-card">
-    <div class="sf-mode-row">
-      <span style="font-size:10px;color:var(--text-tertiary);">문천 1–4</span>
-      <div class="sf-mode-toggle">
+    <div style="display:flex;align-items:center;justify-content:space-between;gap:6px;margin-bottom:8px;">
+      <div class="sf-zone-btns" id="sf-zone-all-btns-zone3">
+        <button class="sf-zone-btn t-open"  onclick="sfZoneAll('zone3','on')">전체 열기</button>
+        <button class="sf-zone-btn t-close" onclick="sfZoneAll('zone3','off')">전체 닫기</button>
+        <button class="sf-zone-btn t-stop"  onclick="sfZoneAll('zone3','stop')">전체 정지</button>
+      </div>
+      <div class="sf-mode-toggle" style="flex-shrink:0;">
         <button class="sf-mode-btn active-manual" id="mode-btn-manual-zone3" onclick="sfSetMode('zone3','manual')">수동</button>
         <button class="sf-mode-btn" id="mode-btn-auto-zone3" onclick="sfSetMode('zone3','auto')">자동</button>
       </div>
@@ -1140,25 +1146,22 @@ canvas { max-width: 100%; }
       <div class="sf-auto-row"><label>습도 초과</label><input type="number" placeholder="예) 85" id="sf-auto-zone3-humi"> % 이상 → 열기</div>
       <button onclick="sfSaveAutoConfig('zone3')" style="width:100%;margin-top:4px;padding:7px;font-size:11px;font-weight:700;font-family:'Noto Sans KR',sans-serif;background:#7C3AED;color:white;border:none;border-radius:8px;cursor:pointer;">자동 설정 저장</button>
     </div>
-    <div class="sf-section-hdr" style="margin-top:8px;">
-      <div class="sf-zone-btns" id="sf-zone-all-btns-zone3">
-        <button class="sf-zone-btn t-open"  onclick="sfZoneAll('zone3','on')">전체 열기</button>
-        <button class="sf-zone-btn t-close" onclick="sfZoneAll('zone3','off')">전체 닫기</button>
-        <button class="sf-zone-btn t-stop"  onclick="sfZoneAll('zone3','stop')">전체 정지</button>
-      </div>
-    </div>
     <div style="position:relative;">
       <div class="sf-switch-grid-2" id="sf-zone3"></div>
       <div class="sf-auto-blocked-overlay" id="sf-block-zone3"></div>
     </div>
   </div>
 
-  <!-- ④ 워이블·환기 -->
-  <div class="sec-label" id="sf-zone-label-zone4">④ 워이블 · 환기</div>
+  <!-- ④ 그룹 4 -->
+  <div class="sec-label" id="sf-zone-label-zone4">④ 그룹 4</div>
   <div class="sf-card" style="margin-bottom:18px;">
-    <div class="sf-mode-row">
-      <span style="font-size:10px;color:var(--text-tertiary);">커텐 · 환기</span>
-      <div class="sf-mode-toggle">
+    <div style="display:flex;align-items:center;justify-content:space-between;gap:6px;margin-bottom:8px;">
+      <div class="sf-zone-btns" id="sf-zone-all-btns-zone4">
+        <button class="sf-zone-btn t-open"  onclick="sfZoneAll('zone4','on')">전체 열기</button>
+        <button class="sf-zone-btn t-close" onclick="sfZoneAll('zone4','off')">전체 닫기</button>
+        <button class="sf-zone-btn t-stop"  onclick="sfZoneAll('zone4','stop')">전체 정지</button>
+      </div>
+      <div class="sf-mode-toggle" style="flex-shrink:0;">
         <button class="sf-mode-btn active-manual" id="mode-btn-manual-zone4" onclick="sfSetMode('zone4','manual')">수동</button>
         <button class="sf-mode-btn" id="mode-btn-auto-zone4" onclick="sfSetMode('zone4','auto')">자동</button>
       </div>
@@ -1170,13 +1173,6 @@ canvas { max-width: 100%; }
       <div class="sf-auto-row"><label>커텐 열기</label><input type="time" id="sf-auto-zone4-open-time"> 에 커텐 열기</div>
       <div class="sf-auto-row"><label>습도 초과</label><input type="number" placeholder="예) 90" id="sf-auto-zone4-humi"> % 이상 → 환기 켜기</div>
       <button onclick="sfSaveAutoConfig('zone4')" style="width:100%;margin-top:4px;padding:7px;font-size:11px;font-weight:700;font-family:'Noto Sans KR',sans-serif;background:#7C3AED;color:white;border:none;border-radius:8px;cursor:pointer;">자동 설정 저장</button>
-    </div>
-    <div class="sf-section-hdr" style="margin-top:8px;">
-      <div class="sf-zone-btns" id="sf-zone-all-btns-zone4">
-        <button class="sf-zone-btn t-open"  onclick="sfZoneAll('zone4','on')">전체 열기</button>
-        <button class="sf-zone-btn t-close" onclick="sfZoneAll('zone4','off')">전체 닫기</button>
-        <button class="sf-zone-btn t-stop"  onclick="sfZoneAll('zone4','stop')">전체 정지</button>
-      </div>
     </div>
     <div style="position:relative;">
       <div class="sf-switch-grid-2" id="sf-zone4"></div>
@@ -5731,21 +5727,23 @@ function delVisitRoute(i){
 
 // ── 기본 존/스위치 정의 ──
 var SF_ZONE_DEFS = [
-  { key:'zone1', defaultName:'일중 전창', switches:[
-    {id:'z1s1',defaultLabel:'1번'},{id:'z1s2',defaultLabel:'2번'},{id:'z1s3',defaultLabel:'3번'},
-    {id:'z1s4',defaultLabel:'4번'},{id:'z1s5',defaultLabel:'5번'},{id:'z1s6',defaultLabel:'6번'}
+  { key:'zone1', defaultName:'그룹 1', switches:[
+    {id:'z1s1',defaultLabel:'스위치 1'},{id:'z1s2',defaultLabel:'스위치 2'},{id:'z1s3',defaultLabel:'스위치 3'},
+    {id:'z1s4',defaultLabel:'스위치 4'},{id:'z1s5',defaultLabel:'스위치 5'},{id:'z1s6',defaultLabel:'스위치 6'},
+    {id:'z1s7',defaultLabel:'스위치 7'},{id:'z1s8',defaultLabel:'스위치 8'},{id:'z1s9',defaultLabel:'스위치 9'},
+    {id:'z1s10',defaultLabel:'스위치 10'},{id:'z1s11',defaultLabel:'스위치 11'},{id:'z1s12',defaultLabel:'스위치 12'}
   ]},
-  { key:'zone2', defaultName:'이중 전창', switches:[
-    {id:'z2s1',defaultLabel:'7번'},{id:'z2s2',defaultLabel:'8번'},{id:'z2s3',defaultLabel:'9번'},
-    {id:'z2s4',defaultLabel:'10번'},{id:'z2s5',defaultLabel:'11번'},{id:'z2s6',defaultLabel:'12번'}
+  { key:'zone2', defaultName:'그룹 2', switches:[
+    {id:'z2s1',defaultLabel:'스위치 1'},{id:'z2s2',defaultLabel:'스위치 2'},{id:'z2s3',defaultLabel:'스위치 3'},
+    {id:'z2s4',defaultLabel:'스위치 4'},{id:'z2s5',defaultLabel:'스위치 5'},{id:'z2s6',defaultLabel:'스위치 6'}
   ]},
-  { key:'zone3', defaultName:'측이블·이중측창', switches:[
-    {id:'z3s1',defaultLabel:'문천 1'},{id:'z3s2',defaultLabel:'문천 2'},
-    {id:'z3s3',defaultLabel:'문천 3'},{id:'z3s4',defaultLabel:'문천 4'}
+  { key:'zone3', defaultName:'그룹 3', switches:[
+    {id:'z3s1',defaultLabel:'스위치 1'},{id:'z3s2',defaultLabel:'스위치 2'},
+    {id:'z3s3',defaultLabel:'스위치 3'},{id:'z3s4',defaultLabel:'스위치 4'}
   ]},
-  { key:'zone4', defaultName:'워이블·환기', switches:[
-    {id:'z4s1',defaultLabel:'일중커텐'},{id:'z4s2',defaultLabel:'이중커텐'},
-    {id:'z4s3',defaultLabel:'환기 1'},{id:'z4s4',defaultLabel:'환기 2'}
+  { key:'zone4', defaultName:'그룹 4', switches:[
+    {id:'z4s1',defaultLabel:'스위치 1'},{id:'z4s2',defaultLabel:'스위치 2'},
+    {id:'z4s3',defaultLabel:'스위치 3'},{id:'z4s4',defaultLabel:'스위치 4'}
   ]}
 ];
 
@@ -5943,14 +5941,32 @@ function sfDraw(id) {
   if (numEl) numEl.textContent = label;
 }
 
+// 강우 감지 → 전체 닫기
+function sfRainClose() {
+  var msg = '강우 감지: 모든 그룹의 스위치를 닫기로 설정할까요?\n수동/자동 관계없이 모두 적용됩니다.';
+  if (!confirm(msg)) return;
+  SF_ZONE_DEFS.forEach(function(z) {
+    z.switches.forEach(function(s) { sfInit(s.id).state = 'off'; sfDraw(s.id); });
+  });
+  sfSave(); sfUpdateHeader();
+  if (typeof showSaveToast === 'function') showSaveToast('강우 감지 — 전체 닫기 완료');
+}
+
 // ── 탭 렌더 ──
 function renderSmartfarmTab() {
   sfLoad();
   SF_ZONE_DEFS.forEach(function(z) {
     var labelEl = document.getElementById('sf-zone-label-' + z.key);
     if (labelEl) labelEl.textContent = sfGetZoneName(z.key);
-    var el = document.getElementById('sf-' + z.key);
+    // 그리드 ID 결정 (zone1은 4열, zone2는 3열, 나머지는 2열)
+    var gridId = 'sf-' + z.key;
+    var el = document.getElementById(gridId);
     if (!el) return;
+    // 그리드 클래스 설정
+    if (z.key === 'zone1') el.className = 'sf-switch-grid-4';
+    else if (z.key === 'zone2') el.className = 'sf-switch-grid-3';
+    else el.className = 'sf-switch-grid-2';
+
     el.innerHTML = z.switches.map(function(sw) {
       return '<div id="sf-sw-' + sw.id + '"></div>';
     }).join('');
@@ -5991,20 +6007,45 @@ async function sfFetchEcowittNow() {
   var btn = document.getElementById('sf-env-refresh-btn');
   if (btn) { btn.textContent = '…'; btn.disabled = true; }
   try {
-    await fetchEcowittData();
-    var light = document.getElementById('sl-sunlight');
-    var temp  = document.getElementById('sl-temp');
-    var hum   = document.getElementById('sl-humidity');
-    if (light && light.value) {
-      var v = parseFloat(light.value);
-      var lEl = document.getElementById('sf-env-light');
-      if (lEl) lEl.textContent = v >= 1000 ? (Math.round(v/100)/10)+'K' : Math.round(v)+'';
-    }
-    if (temp && temp.value) { var tEl=document.getElementById('sf-env-temp'); if(tEl) tEl.textContent=parseFloat(temp.value).toFixed(1); }
-    if (hum  && hum.value)  { var hEl=document.getElementById('sf-env-hum');  if(hEl) hEl.textContent=Math.round(parseFloat(hum.value)); }
-    var now=new Date(); var tEl2=document.getElementById('sf-env-time');
-    if (tEl2) tEl2.textContent=now.getHours()+':'+String(now.getMinutes()).padStart(2,'0')+' 업데이트';
-  } catch(e) {}
+    // API 직접 호출 (육묘탭 input에 의존하지 않음)
+    var k = getEcowittKeys();
+    if (!k.proxyUrl || !k.appKey || !k.apiKey || !k.mac) throw new Error('키 미설정');
+    var proxyBase = k.proxyUrl.trim().replace(/\/+$/,'');
+    var url = proxyBase+'/api/ecowitt'
+      +'?application_key='+encodeURIComponent(k.appKey)
+      +'&api_key='+encodeURIComponent(k.apiKey)
+      +'&mac='+encodeURIComponent(k.mac);
+    var r = await fetch(url);
+    if (!r.ok) throw new Error('HTTP '+r.status);
+    var eco = await r.json();
+    if (eco.code !== 0) throw new Error('code '+eco.code);
+    var data = eco.data;
+
+    // raw 값 추출
+    var solar  = data.solar_and_uvi?.solar?.value != null ? parseFloat(data.solar_and_uvi.solar.value)*126.69 : null;
+    var temp   = data.outdoor?.temperature?.value != null ? parseFloat(data.outdoor.temperature.value)
+               : data.indoor?.temperature?.value  != null ? parseFloat(data.indoor.temperature.value) : null;
+    var humi   = data.outdoor?.humidity?.value != null ? parseFloat(data.outdoor.humidity.value)
+               : data.indoor?.humidity?.value  != null ? parseFloat(data.indoor.humidity.value) : null;
+    var rain   = data.rainfall?.rain_rate?.value != null ? parseFloat(data.rainfall.rain_rate.value) : null;
+
+    // 제어탭 바에 표시
+    var lEl = document.getElementById('sf-env-light');
+    if (lEl) lEl.textContent = solar != null ? (solar >= 1000 ? (Math.round(solar/100)/10)+'K' : Math.round(solar)+'') : '—';
+    var tEl = document.getElementById('sf-env-temp');
+    if (tEl) tEl.textContent = temp != null ? temp.toFixed(1) : '—';
+    var hEl = document.getElementById('sf-env-hum');
+    if (hEl) hEl.textContent = humi != null ? Math.round(humi)+'' : '—';
+    var rEl = document.getElementById('sf-env-rain');
+    if (rEl) rEl.textContent = rain != null ? rain.toFixed(1) : '—';
+
+    var now = new Date();
+    var tEl2 = document.getElementById('sf-env-time');
+    if (tEl2) tEl2.textContent = now.getHours()+':'+String(now.getMinutes()).padStart(2,'0')+' 업데이트';
+  } catch(e) {
+    var tEl3 = document.getElementById('sf-env-time');
+    if (tEl3) tEl3.textContent = '불러오기 실패';
+  }
   if (btn) { btn.textContent='새로고침'; btn.disabled=false; }
 }
 
@@ -6014,22 +6055,31 @@ function sfNamesRender() {
   if (!container) return;
   var html = '';
   SF_ZONE_DEFS.forEach(function(z) {
+    var zoneName = sfGetZoneName(z.key);
+    var isSavedZone = !!sfGetNames()[z.key+'_name'];
     html += '<div style="margin-bottom:20px;padding-bottom:16px;border-bottom:1px solid var(--border);">';
     // 구역명
     html += '<div style="font-size:10px;font-weight:700;color:var(--text-tertiary);margin-bottom:5px;">구역명</div>';
-    html += '<input type="text" id="sfname-zone-'+z.key+'" value="'+sfGetZoneName(z.key)+'" placeholder="'+z.defaultName+'" '
+    html += '<input type="text" id="sfname-zone-'+z.key+'" value="'+zoneName+'" placeholder="'+z.defaultName+'" '
+          + 'oninput="this.style.color=\'var(--text-primary)\'" '
           + 'style="display:block;width:100%;box-sizing:border-box;padding:9px 12px;font-size:13px;font-family:\'Noto Sans KR\',sans-serif;'
-          + 'background:var(--bg);border:1px solid var(--border);border-radius:var(--radius-md);color:var(--text-primary);margin-bottom:10px;">';
-    // 스위치 이름: 1열짜리 목록
+          + 'background:var(--bg);border:1px solid var(--border);border-radius:var(--radius-md);'
+          + 'color:'+(isSavedZone?'var(--text-tertiary)':'var(--text-primary)')+';margin-bottom:10px;">';
+    // 스위치 이름: 2열 그리드
+    html += '<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">';
     z.switches.forEach(function(sw) {
-      html += '<div style="display:flex;align-items:center;gap:8px;margin-bottom:7px;">'
-            + '<span style="font-size:10px;font-weight:600;color:var(--text-tertiary);flex-shrink:0;width:38px;">'+sw.defaultLabel+'</span>'
-            + '<input type="text" id="sfname-sw-'+sw.id+'" value="'+sfGetSwLabel(sw.id)+'" placeholder="'+sw.defaultLabel+'" '
-            + 'style="flex:1;padding:8px 11px;font-size:12px;font-family:\'Noto Sans KR\',sans-serif;'
-            + 'background:var(--bg);border:1px solid var(--border);border-radius:var(--radius-sm);color:var(--text-primary);">'
+      var swLabel = sfGetSwLabel(sw.id);
+      var isSavedSw = !!sfGetNames()[sw.id+'_label'];
+      html += '<div>'
+            + '<div style="font-size:9px;font-weight:600;color:var(--text-tertiary);margin-bottom:3px;">'+sw.defaultLabel+'</div>'
+            + '<input type="text" id="sfname-sw-'+sw.id+'" value="'+swLabel+'" placeholder="'+sw.defaultLabel+'" '
+            + 'oninput="this.style.color=\'var(--text-primary)\'" '
+            + 'style="width:100%;padding:7px 10px;font-size:12px;font-family:\'Noto Sans KR\',sans-serif;'
+            + 'background:var(--bg);border:1px solid var(--border);border-radius:var(--radius-sm);'
+            + 'color:'+(isSavedSw?'var(--text-tertiary)':'var(--text-primary)')+';">'
             + '</div>';
     });
-    html += '</div>';
+    html += '</div></div>';
   });
   container.innerHTML = html;
 }
