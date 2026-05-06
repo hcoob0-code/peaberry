@@ -557,8 +557,6 @@ canvas { max-width: 100%; }
   opacity: 0;
   transition: opacity 0.2s;
 }
-.sf-track-txt.txt-stop  { right: 4px; color: #9CA3AF; }
-.sf-sw.stop .sf-track-txt.txt-stop { opacity: 1; }
 .sf-track-txt.txt-open  { left: 4px;  color: #16A34A; }
 .sf-sw.on  .sf-track-txt.txt-open  { opacity: 1; }
 .sf-track-txt.txt-close { right: 4px; color: #E11D48; }
@@ -574,7 +572,16 @@ canvas { max-width: 100%; }
   box-shadow: 0 1px 4px rgba(0,0,0,0.22);
   transition: left 0.32s cubic-bezier(0.25, 0.46, 0.45, 0.94);
   will-change: left;
+  display: flex; align-items: center; justify-content: center;
 }
+.sf-knob-txt {
+  font-size: 5px; font-weight: 800;
+  color: #9CA3AF; white-space: nowrap;
+  opacity: 0; transition: opacity 0.15s;
+  pointer-events: none; line-height: 1;
+  font-family: 'Noto Sans KR', sans-serif;
+}
+.sf-sw.stop .sf-knob-txt { opacity: 1; }
 .sf-sw.off  .sf-knob { left: 2px; }
 .sf-sw.stop .sf-knob { left: calc(50% - 10px); }
 .sf-sw.on   .sf-knob { left: calc(100% - 22px); }
@@ -1099,9 +1106,10 @@ canvas { max-width: 100%; }
       <div style="display:flex;align-items:center;gap:4px;flex-shrink:0;">
         <span id="sf-s-temp-zone1" style="font-size:10px;font-weight:700;color:#EF4444;white-space:nowrap;margin-right:2px;margin-left:8px;">— °C</span>
         <div class="sf-mode-toggle">
-          <button class="sf-mode-btn active-manual" id="mode-btn-manual-zone1" onclick="sfSetMode('zone1','manual')">수동</button>
+          <button class="sf-mode-btn active-manual" id="mode-btn-manual-zone1" onclick="sfSetMode('zone1','manual');sfToggleAutoPanel('zone1')">수동</button>
           <button class="sf-mode-btn" id="mode-btn-auto-zone1" onclick="sfSetMode('zone1','auto')">자동</button>
         </div>
+        <button id="sf-arrow-zone1" onclick="sfToggleAutoPanel('zone1')" style="background:none;border:none;font-size:13px;cursor:pointer;color:var(--text-tertiary);padding:0 2px;line-height:1;">▼</button>
       </div>
     </div>
     <div class="sf-auto-panel" id="sf-auto-panel-zone1">
@@ -1112,8 +1120,8 @@ canvas { max-width: 100%; }
       <div class="sf-auto-row"><label>닫기 시간</label><input type="time" id="sf-auto-zone1-close-time"> 에 닫기</div>
       <div class="sf-auto-row"><label>습도 초과</label><input type="number" placeholder="예) 85" id="sf-auto-zone1-humi"> % 이상 → 열기</div>
       <div style="display:flex;gap:6px;margin-top:6px;">
-        <button onclick="sfSetMode('zone1','manual')" style="flex:1;padding:7px;font-size:11px;font-weight:700;font-family:'Noto Sans KR',sans-serif;background:var(--bg);color:var(--text-secondary);border:1px solid var(--border);border-radius:8px;cursor:pointer;">취소</button>
-        <button onclick="sfSaveAutoConfig('zone1')" style="flex:2;padding:7px;font-size:11px;font-weight:700;font-family:'Noto Sans KR',sans-serif;background:#7C3AED;color:white;border:none;border-radius:8px;cursor:pointer;">자동 설정 저장</button>
+        <button onclick="sfSetMode('zone1','manual');sfToggleAutoPanel('zone1')" style="flex:1;padding:7px;font-size:11px;font-weight:700;font-family:'Noto Sans KR',sans-serif;background:var(--bg);color:var(--text-secondary);border:1px solid var(--border);border-radius:8px;cursor:pointer;">취소</button>
+        <button onclick="sfSaveAutoConfig('zone1')" style="flex:1;padding:7px;font-size:11px;font-weight:700;font-family:'Noto Sans KR',sans-serif;background:#7C3AED;color:white;border:none;border-radius:8px;cursor:pointer;">저장</button>
       </div>
     </div>
     <div style="position:relative;">
@@ -1131,9 +1139,12 @@ canvas { max-width: 100%; }
         <button class="sf-zone-btn t-stop"  onclick="sfZoneAll('zone2','stop')">전체 정지</button>
         <button class="sf-zone-btn t-open"  onclick="sfZoneAll('zone2','on')">전체 열기</button>
       </div>
-      <div class="sf-mode-toggle">
-        <button class="sf-mode-btn active-manual" id="mode-btn-manual-zone2" onclick="sfSetMode('zone2','manual')">수동</button>
-        <button class="sf-mode-btn" id="mode-btn-auto-zone2" onclick="sfSetMode('zone2','auto')">자동</button>
+      <div style="display:flex;align-items:center;gap:4px;flex-shrink:0;">
+        <div class="sf-mode-toggle">
+          <button class="sf-mode-btn active-manual" id="mode-btn-manual-zone2" onclick="sfSetMode('zone2','manual');sfToggleAutoPanel('zone2')">수동</button>
+          <button class="sf-mode-btn" id="mode-btn-auto-zone2" onclick="sfSetMode('zone2','auto')">자동</button>
+        </div>
+        <button id="sf-arrow-zone2" onclick="sfToggleAutoPanel('zone2')" style="background:none;border:none;font-size:13px;cursor:pointer;color:var(--text-tertiary);padding:0 2px;line-height:1;">▼</button>
       </div>
     </div>
     <div class="sf-auto-panel" id="sf-auto-panel-zone2">
@@ -1144,8 +1155,8 @@ canvas { max-width: 100%; }
       <div class="sf-auto-row"><label>닫기 시간</label><input type="time" id="sf-auto-zone2-close-time"> 에 닫기</div>
       <div class="sf-auto-row"><label>습도 초과</label><input type="number" placeholder="예) 85" id="sf-auto-zone2-humi"> % 이상 → 열기</div>
       <div style="display:flex;gap:6px;margin-top:6px;">
-        <button onclick="sfSetMode('zone2','manual')" style="flex:1;padding:7px;font-size:11px;font-weight:700;font-family:'Noto Sans KR',sans-serif;background:var(--bg);color:var(--text-secondary);border:1px solid var(--border);border-radius:8px;cursor:pointer;">취소</button>
-        <button onclick="sfSaveAutoConfig('zone2')" style="flex:2;padding:7px;font-size:11px;font-weight:700;font-family:'Noto Sans KR',sans-serif;background:#7C3AED;color:white;border:none;border-radius:8px;cursor:pointer;">자동 설정 저장</button>
+        <button onclick="sfSetMode('zone2','manual');sfToggleAutoPanel('zone2')" style="flex:1;padding:7px;font-size:11px;font-weight:700;font-family:'Noto Sans KR',sans-serif;background:var(--bg);color:var(--text-secondary);border:1px solid var(--border);border-radius:8px;cursor:pointer;">취소</button>
+        <button onclick="sfSaveAutoConfig('zone2')" style="flex:1;padding:7px;font-size:11px;font-weight:700;font-family:'Noto Sans KR',sans-serif;background:#7C3AED;color:white;border:none;border-radius:8px;cursor:pointer;">저장</button>
       </div>
     </div>
     <div style="position:relative;">
@@ -1166,9 +1177,10 @@ canvas { max-width: 100%; }
       <div style="display:flex;align-items:center;gap:4px;flex-shrink:0;">
         <span id="sf-s-temp-zone3" style="font-size:10px;font-weight:700;color:#EF4444;white-space:nowrap;margin-right:2px;margin-left:8px;">— °C</span>
         <div class="sf-mode-toggle">
-          <button class="sf-mode-btn active-manual" id="mode-btn-manual-zone3" onclick="sfSetMode('zone3','manual')">수동</button>
+          <button class="sf-mode-btn active-manual" id="mode-btn-manual-zone3" onclick="sfSetMode('zone3','manual');sfToggleAutoPanel('zone3')">수동</button>
           <button class="sf-mode-btn" id="mode-btn-auto-zone3" onclick="sfSetMode('zone3','auto')">자동</button>
         </div>
+        <button id="sf-arrow-zone3" onclick="sfToggleAutoPanel('zone3')" style="background:none;border:none;font-size:13px;cursor:pointer;color:var(--text-tertiary);padding:0 2px;line-height:1;">▼</button>
       </div>
     </div>
     <div class="sf-auto-panel" id="sf-auto-panel-zone3">
@@ -1176,8 +1188,8 @@ canvas { max-width: 100%; }
       <div class="sf-auto-row"><label>열기 시간</label><input type="time" id="sf-auto-zone3-open-time"> 에 열기</div>
       <div class="sf-auto-row"><label>닫기 시간</label><input type="time" id="sf-auto-zone3-close-time"> 에 닫기</div>
       <div style="display:flex;gap:6px;margin-top:6px;">
-        <button onclick="sfSetMode('zone3','manual')" style="flex:1;padding:7px;font-size:11px;font-weight:700;font-family:'Noto Sans KR',sans-serif;background:var(--bg);color:var(--text-secondary);border:1px solid var(--border);border-radius:8px;cursor:pointer;">취소</button>
-        <button onclick="sfSaveAutoConfig('zone3')" style="flex:2;padding:7px;font-size:11px;font-weight:700;font-family:'Noto Sans KR',sans-serif;background:#7C3AED;color:white;border:none;border-radius:8px;cursor:pointer;">자동 설정 저장</button>
+        <button onclick="sfSetMode('zone3','manual');sfToggleAutoPanel('zone3')" style="flex:1;padding:7px;font-size:11px;font-weight:700;font-family:'Noto Sans KR',sans-serif;background:var(--bg);color:var(--text-secondary);border:1px solid var(--border);border-radius:8px;cursor:pointer;">취소</button>
+        <button onclick="sfSaveAutoConfig('zone3')" style="flex:1;padding:7px;font-size:11px;font-weight:700;font-family:'Noto Sans KR',sans-serif;background:#7C3AED;color:white;border:none;border-radius:8px;cursor:pointer;">저장</button>
       </div>
     </div>
     <div style="position:relative;">
@@ -1196,9 +1208,10 @@ canvas { max-width: 100%; }
           <div style="display:flex;align-items:center;gap:4px;flex-shrink:0;">
             <span id="sf-s-temp-zone4" style="font-size:10px;font-weight:700;color:#EF4444;white-space:nowrap;margin-right:2px;margin-left:8px;">— °C</span>
             <div class="sf-mode-toggle">
-              <button class="sf-mode-btn active-manual" id="mode-btn-manual-zone4" onclick="sfSetMode('zone4','manual')">수동</button>
+              <button class="sf-mode-btn active-manual" id="mode-btn-manual-zone4" onclick="sfSetMode('zone4','manual');sfToggleAutoPanel('zone4')">수동</button>
               <button class="sf-mode-btn" id="mode-btn-auto-zone4" onclick="sfSetMode('zone4','auto')">자동</button>
             </div>
+            <button id="sf-arrow-zone4" onclick="sfToggleAutoPanel('zone4')" style="background:none;border:none;font-size:13px;cursor:pointer;color:var(--text-tertiary);padding:0 2px;line-height:1;">▼</button>
           </div>
         </div>
         <div class="sf-auto-panel" id="sf-auto-panel-zone4">
@@ -1208,8 +1221,8 @@ canvas { max-width: 100%; }
           <div class="sf-auto-row"><label>열기 시간</label><input type="time" id="sf-auto-zone4-open-time"></div>
           <div class="sf-auto-row"><label>닫기 시간</label><input type="time" id="sf-auto-zone4-close-time"></div>
           <div style="display:flex;gap:6px;margin-top:6px;">
-            <button onclick="sfSetMode('zone4','manual')" style="flex:1;padding:6px;font-size:10px;font-weight:700;font-family:'Noto Sans KR',sans-serif;background:var(--bg);color:var(--text-secondary);border:1px solid var(--border);border-radius:8px;cursor:pointer;">취소</button>
-            <button onclick="sfSaveAutoConfig('zone4')" style="flex:2;padding:6px;font-size:10px;font-weight:700;font-family:'Noto Sans KR',sans-serif;background:#7C3AED;color:white;border:none;border-radius:8px;cursor:pointer;">저장</button>
+            <button onclick="sfSetMode('zone4','manual');sfToggleAutoPanel('zone4')" style="flex:1;padding:6px;font-size:10px;font-weight:700;font-family:'Noto Sans KR',sans-serif;background:var(--bg);color:var(--text-secondary);border:1px solid var(--border);border-radius:8px;cursor:pointer;">취소</button>
+            <button onclick="sfSaveAutoConfig('zone4')" style="flex:1;padding:6px;font-size:10px;font-weight:700;font-family:'Noto Sans KR',sans-serif;background:#7C3AED;color:white;border:none;border-radius:8px;cursor:pointer;">저장</button>
           </div>
         </div>
         <div style="position:relative;">
@@ -1227,9 +1240,10 @@ canvas { max-width: 100%; }
           <div style="display:flex;align-items:center;gap:4px;flex-shrink:0;">
             <span id="sf-s-temp-zone5" style="font-size:10px;font-weight:700;color:#EF4444;white-space:nowrap;margin-right:2px;margin-left:8px;">— °C</span>
             <div class="sf-mode-toggle">
-              <button class="sf-mode-btn active-manual" id="mode-btn-manual-zone5" onclick="sfSetMode('zone5','manual')">수동</button>
+              <button class="sf-mode-btn active-manual" id="mode-btn-manual-zone5" onclick="sfSetMode('zone5','manual');sfToggleAutoPanel('zone5')">수동</button>
               <button class="sf-mode-btn" id="mode-btn-auto-zone5" onclick="sfSetMode('zone5','auto')">자동</button>
             </div>
+            <button id="sf-arrow-zone5" onclick="sfToggleAutoPanel('zone5')" style="background:none;border:none;font-size:13px;cursor:pointer;color:var(--text-tertiary);padding:0 2px;line-height:1;">▼</button>
           </div>
         </div>
         <div class="sf-auto-panel" id="sf-auto-panel-zone5">
@@ -1239,8 +1253,8 @@ canvas { max-width: 100%; }
           <div class="sf-auto-row"><label>열기 시간</label><input type="time" id="sf-auto-zone5-open-time"></div>
           <div class="sf-auto-row"><label>닫기 시간</label><input type="time" id="sf-auto-zone5-close-time"></div>
           <div style="display:flex;gap:6px;margin-top:6px;">
-            <button onclick="sfSetMode('zone5','manual')" style="flex:1;padding:6px;font-size:10px;font-weight:700;font-family:'Noto Sans KR',sans-serif;background:var(--bg);color:var(--text-secondary);border:1px solid var(--border);border-radius:8px;cursor:pointer;">취소</button>
-            <button onclick="sfSaveAutoConfig('zone5')" style="flex:2;padding:6px;font-size:10px;font-weight:700;font-family:'Noto Sans KR',sans-serif;background:#7C3AED;color:white;border:none;border-radius:8px;cursor:pointer;">저장</button>
+            <button onclick="sfSetMode('zone5','manual');sfToggleAutoPanel('zone5')" style="flex:1;padding:6px;font-size:10px;font-weight:700;font-family:'Noto Sans KR',sans-serif;background:var(--bg);color:var(--text-secondary);border:1px solid var(--border);border-radius:8px;cursor:pointer;">취소</button>
+            <button onclick="sfSaveAutoConfig('zone5')" style="flex:1;padding:6px;font-size:10px;font-weight:700;font-family:'Noto Sans KR',sans-serif;background:#7C3AED;color:white;border:none;border-radius:8px;cursor:pointer;">저장</button>
           </div>
         </div>
         <div style="position:relative;">
@@ -1263,9 +1277,10 @@ canvas { max-width: 100%; }
       <div style="display:flex;align-items:center;gap:4px;flex-shrink:0;">
         <span id="sf-s-temp-zone6" style="font-size:10px;font-weight:700;color:#EF4444;white-space:nowrap;margin-right:2px;margin-left:8px;">— °C</span>
         <div class="sf-mode-toggle">
-          <button class="sf-mode-btn active-manual" id="mode-btn-manual-zone6" onclick="sfSetMode('zone6','manual')">수동</button>
+          <button class="sf-mode-btn active-manual" id="mode-btn-manual-zone6" onclick="sfSetMode('zone6','manual');sfToggleAutoPanel('zone6')">수동</button>
           <button class="sf-mode-btn" id="mode-btn-auto-zone6" onclick="sfSetMode('zone6','auto')">자동</button>
         </div>
+        <button id="sf-arrow-zone6" onclick="sfToggleAutoPanel('zone6')" style="background:none;border:none;font-size:13px;cursor:pointer;color:var(--text-tertiary);padding:0 2px;line-height:1;">▼</button>
       </div>
     </div>
     <div class="sf-auto-panel" id="sf-auto-panel-zone6">
@@ -1275,8 +1290,8 @@ canvas { max-width: 100%; }
       <div class="sf-auto-row"><label>열기 시간</label><input type="time" id="sf-auto-zone6-open-time"> 에 열기</div>
       <div class="sf-auto-row"><label>닫기 시간</label><input type="time" id="sf-auto-zone6-close-time"> 에 닫기</div>
       <div style="display:flex;gap:6px;margin-top:6px;">
-        <button onclick="sfSetMode('zone6','manual')" style="flex:1;padding:7px;font-size:11px;font-weight:700;font-family:'Noto Sans KR',sans-serif;background:var(--bg);color:var(--text-secondary);border:1px solid var(--border);border-radius:8px;cursor:pointer;">취소</button>
-        <button onclick="sfSaveAutoConfig('zone6')" style="flex:2;padding:7px;font-size:11px;font-weight:700;font-family:'Noto Sans KR',sans-serif;background:#7C3AED;color:white;border:none;border-radius:8px;cursor:pointer;">자동 설정 저장</button>
+        <button onclick="sfSetMode('zone6','manual');sfToggleAutoPanel('zone6')" style="flex:1;padding:7px;font-size:11px;font-weight:700;font-family:'Noto Sans KR',sans-serif;background:var(--bg);color:var(--text-secondary);border:1px solid var(--border);border-radius:8px;cursor:pointer;">취소</button>
+        <button onclick="sfSaveAutoConfig('zone6')" style="flex:1;padding:7px;font-size:11px;font-weight:700;font-family:'Noto Sans KR',sans-serif;background:#7C3AED;color:white;border:none;border-radius:8px;cursor:pointer;">저장</button>
       </div>
     </div>
     <div style="position:relative;">
@@ -1400,6 +1415,7 @@ canvas { max-width: 100%; }
     <div class="settings-acc-body" id="acc-body-sfnames">
       <div class="nm-flat" style="padding:14px 16px;margin-bottom:4px;">
         <div id="sfnames-editor"></div>
+        <style>#sfnames-editor input::placeholder{color:var(--text-tertiary);opacity:1;}</style>
         <div style="margin-top:12px;">
           <!-- 저장됨 버튼 (기본 보임) -->
           <button id="sfnames-done-btn" disabled
@@ -1411,6 +1427,8 @@ canvas { max-width: 100%; }
             <button id="sfnames-save-btn" onclick="sfNamesSave()"
               style="flex:1;padding:11px;font-size:13px;font-family:'Noto Sans KR',sans-serif;font-weight:700;background:var(--text-primary);color:white;border:none;border-radius:var(--radius-md);cursor:pointer;">저장</button>
           </div>
+          <!-- 초기화 버튼 -->
+          <button onclick="sfNamesReset()" style="width:100%;margin-top:8px;padding:9px;font-size:12px;font-family:'Noto Sans KR',sans-serif;font-weight:600;background:transparent;color:var(--text-tertiary);border:1px solid var(--border);border-radius:var(--radius-md);cursor:pointer;">이름 초기화</button>
         </div>
       </div>
     </div>
@@ -6015,17 +6033,38 @@ function sfSetMode(zone, mode) {
 function sfApplyModeUI(zone, mode) {
   var mBtn=document.getElementById('mode-btn-manual-'+zone);
   var aBtn=document.getElementById('mode-btn-auto-'+zone);
-  var panel=document.getElementById('sf-auto-panel-'+zone);
   var block=document.getElementById('sf-block-'+zone);
   var allBtns=document.getElementById('sf-zone-all-btns-'+zone);
   if(mBtn){ mBtn.className='sf-mode-btn'+(mode==='manual'?' active-manual':''); }
   if(aBtn){ aBtn.className='sf-mode-btn'+(mode==='auto'?' active-auto':''); }
-  if(panel){ panel.classList.toggle('open', mode==='auto'); }
+  // 전체버튼: 자동모드에서 보이되 비활성화
+  if(allBtns){
+    allBtns.style.visibility='visible';
+    var btns=allBtns.querySelectorAll('button');
+    btns.forEach(function(b){
+      b.disabled=mode==='auto';
+      b.style.opacity=mode==='auto'?'0.35':'1';
+      b.style.cursor=mode==='auto'?'not-allowed':'pointer';
+    });
+  }
   if(block){ block.style.display=mode==='auto'?'block':'none'; }
-  if(allBtns){ allBtns.style.display=mode==='auto'?'none':'flex'; }
+  // 자동→수동 전환 시 설정창 닫기
+  if(mode==='manual'){
+    var panel=document.getElementById('sf-auto-panel-'+zone);
+    if(panel) panel.classList.remove('open');
+    var arrow=document.getElementById('sf-arrow-'+zone);
+    if(arrow) arrow.textContent='▼';
+  }
   var def=SF_ZONE_DEFS.find(function(z){return z.key===zone;});
   if(def){ def.switches.forEach(function(sw){ var el=document.getElementById('sf-sw-'+sw.id); if(el) el.classList.toggle('blocked', mode==='auto'); }); }
   sfLoadAutoConfig(zone);
+}
+function sfToggleAutoPanel(zone) {
+  var panel=document.getElementById('sf-auto-panel-'+zone);
+  var arrow=document.getElementById('sf-arrow-'+zone);
+  if(!panel) return;
+  var isOpen=panel.classList.toggle('open');
+  if(arrow) arrow.textContent=isOpen?'▲':'▼';
 }
 function sfLoadAutoConfig(zone) {
   try {
@@ -6062,7 +6101,6 @@ function sfDraw(id) {
       '<div class="sf-track-wrap">' +
         '<div class="sf-track-bg">' +
           '<span class="sf-track-txt txt-open">열기</span>' +
-          '<span class="sf-track-txt txt-stop">정지</span>' +
           '<span class="sf-track-txt txt-close">닫기</span>' +
         '</div>' +
         '<div class="sf-knob"></div>' +
@@ -6263,16 +6301,16 @@ function sfNamesRender() {
     var zoneName = sfGetZoneName(z.key);
     var isSavedZone = !!names[z.key+'_name'];
     html += '<div style="margin-bottom:20px;padding-bottom:16px;border-bottom:1px solid var(--border);">';
-    html += '<div style="font-size:10px;font-weight:700;color:var(--text-tertiary);margin-bottom:5px;">구역명</div>';
+    html += '<div style="font-size:10px;font-weight:700;color:var(--text-tertiary);margin-bottom:5px;">'+sfGetZoneName(z.key)+'</div>';
     html += '<input type="text" id="sfname-zone-'+z.key+'"'
           + ' value="'+(isSavedZone ? zoneName : '')+'"'
-          + ' placeholder="구역명"'
+          + ' placeholder="'+z.defaultName+'"'
           + ' data-saved="'+(isSavedZone ? encodeURIComponent(zoneName) : '')+'"'
           + ' onfocus="sfNameFocus(this)"'
           + ' oninput="sfNameInput(this)"'
           + ' style="display:block;width:100%;box-sizing:border-box;padding:9px 12px;font-size:13px;font-family:\'Noto Sans KR\',sans-serif;'
           + 'background:var(--bg);border:1px solid var(--border);border-radius:var(--radius-md);'
-          + 'color:'+(isSavedZone ? 'var(--text-tertiary)' : 'var(--text-primary)')+';margin-bottom:10px;">';
+          + 'color:var(--text-tertiary);margin-bottom:10px;">';
     html += '<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">';
     z.switches.forEach(function(sw, si) {
       var swLabel = sfGetSwLabel(sw.id);
@@ -6290,7 +6328,7 @@ function sfNamesRender() {
             + ' oninput="sfNameInput(this)"'
             + ' style="width:100%;box-sizing:border-box;padding:8px 10px;font-size:12px;font-family:\'Noto Sans KR\',sans-serif;'
             + 'background:var(--bg);border:1px solid var(--border);border-radius:var(--radius-sm);'
-            + 'color:'+(isSavedSw ? 'var(--text-tertiary)' : 'var(--text-primary)')+';">'
+            + 'color:'+(isSavedSw ? 'var(--text-tertiary)' : 'var(--text-tertiary)')+';">'
             + '</div>';
     });
     html += '</div>';
@@ -6330,6 +6368,13 @@ function sfNamesBtnReset() {
 
 function sfNamesCancel() {
   sfNamesRender(); // 저장된 상태로 원복
+}
+
+function sfNamesReset() {
+  if (!confirm('모든 그룹/스위치 이름을 기본값으로 초기화할까요?')) return;
+  try { localStorage.removeItem('pb8_sf_names'); } catch(e) {}
+  sfNamesRender();
+  if (typeof showSaveToast === 'function') showSaveToast('이름이 초기화되었습니다');
 }
 
 function sfNamesSave() {
