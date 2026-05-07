@@ -513,7 +513,7 @@ canvas { max-width: 100%; }
   cursor: pointer;
   user-select: none; -webkit-user-select: none;
   -webkit-tap-highlight-color: transparent;
-  touch-action: none;
+  touch-action: pan-y; /* 수직 스크롤 허용, 수평 스와이프만 캡처 */
   min-width: 0; /* allow shrinking */
 }
 .sf-sw.on   { background: #F9FAFB; border-color: #D1D5DB; }
@@ -6011,8 +6011,15 @@ function sfAttachSlide(el, id) {
   },{passive:true});
 
   el.addEventListener('touchend',function(e){
+    var dx=e.changedTouches[0].clientX-startX;
+    var dy=e.changedTouches[0].clientY-startY;
+    // 수직 이동이 수평보다 크면 스크롤로 판단 — 무시
+    if(startX!==null && Math.abs(dy)>Math.abs(dx)+5){
+      startX=null;
+      setTimeout(function(){ usingTouch=false; }, 350);
+      return;
+    }
     onEnd(e.changedTouches[0].clientX,e.changedTouches[0].clientY);
-    // 터치 후 mouse 이벤트 300ms 차단
     setTimeout(function(){ usingTouch=false; }, 350);
   },{passive:true});
 
