@@ -738,13 +738,12 @@ canvas { max-width: 100%; }
 /* ── sticky 환경바 + 전원바 ── */
 .sf-sticky-top {
   position: sticky; top: 0; z-index: 50;
-  background: transparent;
-  backdrop-filter: none;
-  -webkit-backdrop-filter: none;
-  padding: 10px 0 6px;
+  background: rgba(238,243,248,0.88);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+  padding: 8px 0 4px;
   margin: 0 -16px;
   padding-left: 16px; padding-right: 16px;
-  border-bottom: none;
 }
 
 /* Ecowitt 환경 바 - 배경 박스 없이 플랫 */
@@ -1176,7 +1175,7 @@ canvas { max-width: 100%; }
       <!-- LED + 센서 버튼 한 줄 -->
       <div style="display:flex;align-items:center;justify-content:space-between;">
         <!-- LED 점들 -->
-        <div style="display:flex;align-items:center;gap:10px;">
+        <div style="display:flex;align-items:center;gap:16px;">
           <div style="display:flex;flex-direction:column;align-items:center;gap:2px;">
             <div class="sf-power-dot" id="sf-power-dot"></div>
             <span style="font-size:8px;color:var(--text-tertiary);line-height:1;">전원</span>
@@ -1514,6 +1513,122 @@ canvas { max-width: 100%; }
   </div>
 
 </div>
+
+<!-- ══ 육묘제어 탭 ══ -->
+<div class="sec" id="sec-smartfarm2">
+
+  <!-- 고정 상단바 -->
+  <div class="sf-sticky-top" id="sf2-sticky-top">
+    <div class="sf-card" style="margin-bottom:8px;padding:10px 14px;">
+      <!-- Ecowitt 환경 데이터 -->
+      <div class="sf-env-bar" id="sf2-env-bar">
+        <div class="sf-env-cell">
+          <div class="sf-env-label">조도</div>
+          <div class="sf-env-val" id="sf2-env-light" style="color:#F59E0B;">—</div>
+          <div class="sf-env-unit">lux</div>
+        </div>
+        <div class="sf-env-cell">
+          <div class="sf-env-label">온도</div>
+          <div class="sf-env-val" id="sf2-env-temp" style="color:#EF4444;">—</div>
+          <div class="sf-env-unit">°C</div>
+        </div>
+        <div class="sf-env-cell">
+          <div class="sf-env-label">습도</div>
+          <div class="sf-env-val" id="sf2-env-hum" style="color:#0EA5E9;">—</div>
+          <div class="sf-env-unit">%</div>
+        </div>
+        <div class="sf-env-cell">
+          <div class="sf-env-label">강우</div>
+          <div class="sf-env-val" id="sf2-env-rain" style="color:#6366F1;">—</div>
+          <div class="sf-env-unit">mm/h</div>
+        </div>
+        <div style="display:flex;flex-direction:column;align-items:flex-end;justify-content:center;gap:3px;">
+          <span id="sf2-env-time" style="font-size:8px;color:var(--text-tertiary);">—</span>
+          <button onclick="sf2FetchNow()" style="padding:3px 9px;font-size:9px;font-weight:700;font-family:'Noto Sans KR',sans-serif;color:white;background:#059669;border:none;border-radius:50px;cursor:pointer;">새로고침</button>
+        </div>
+      </div>
+      <!-- 구분선 -->
+      <div style="border-top:1px solid var(--glass-border);margin:6px 0;"></div>
+      <!-- LED + 센서 버튼 -->
+      <div style="display:flex;align-items:center;justify-content:space-between;">
+        <div style="display:flex;align-items:center;gap:16px;">
+          <div style="display:flex;flex-direction:column;align-items:center;gap:2px;">
+            <div class="sf-power-dot" id="sf2-power-dot"></div>
+            <span style="font-size:8px;color:var(--text-tertiary);line-height:1;">전원</span>
+          </div>
+          <div style="display:flex;flex-direction:column;align-items:center;gap:2px;">
+            <div id="sf2-rain-dot" style="width:8px;height:8px;border-radius:50%;background:#D1D5DB;transition:all 0.3s;"></div>
+            <span style="font-size:8px;color:var(--text-tertiary);line-height:1;">우적</span>
+          </div>
+        </div>
+        <div style="display:flex;align-items:center;gap:4px;">
+          <button onclick="sf2QuickToggleRain()" id="sf2-rain-toggle-btn"
+            style="padding:3px 7px;font-size:9px;font-weight:700;font-family:'Noto Sans KR',sans-serif;border-radius:50px;cursor:pointer;border:1.5px solid #D1D5DB;background:#F3F4F6;color:#9CA3AF;white-space:nowrap;">
+            우적센서
+          </button>
+          <button onclick="sf2OpenSensorModal()"
+            style="padding:3px 7px;font-size:9px;font-weight:700;font-family:'Noto Sans KR',sans-serif;border-radius:50px;cursor:pointer;border:1.5px solid #D1D5DB;background:#F3F4F6;color:#9CA3AF;white-space:nowrap;">
+            센서설정
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 그룹 1 — 3-way × 2 -->
+  <div class="sec-label" id="sf2-zone-label-z2a">① 그룹 1</div>
+  <div class="sf-card">
+    <div style="display:flex;align-items:center;justify-content:space-between;gap:6px;margin-bottom:8px;">
+      <div class="sf-zone-btns">
+        <button class="sf-zone-btn t-close" onclick="sf2ZoneAll('z2a','off')">전체 닫기</button>
+        <button class="sf-zone-btn t-stop"  onclick="sf2ZoneAll('z2a','stop')">전체 정지</button>
+        <button class="sf-zone-btn t-open"  onclick="sf2ZoneAll('z2a','on')">전체 열기</button>
+      </div>
+    </div>
+    <div class="sf-switch-grid-2" id="sf2-z2a"></div>
+  </div>
+
+  <!-- 그룹 2 — 3-way × 2 -->
+  <div class="sec-label" id="sf2-zone-label-z2b">② 그룹 2</div>
+  <div class="sf-card">
+    <div style="display:flex;align-items:center;justify-content:space-between;gap:6px;margin-bottom:8px;">
+      <div class="sf-zone-btns">
+        <button class="sf-zone-btn t-close" onclick="sf2ZoneAll('z2b','off')">전체 닫기</button>
+        <button class="sf-zone-btn t-stop"  onclick="sf2ZoneAll('z2b','stop')">전체 정지</button>
+        <button class="sf-zone-btn t-open"  onclick="sf2ZoneAll('z2b','on')">전체 열기</button>
+      </div>
+    </div>
+    <div class="sf-switch-grid-2" id="sf2-z2b"></div>
+  </div>
+
+  <!-- 그룹 3 — 3-way × 6 -->
+  <div class="sec-label" id="sf2-zone-label-z2c">③ 그룹 3</div>
+  <div class="sf-card">
+    <div style="display:flex;align-items:center;justify-content:space-between;gap:6px;margin-bottom:8px;">
+      <div class="sf-zone-btns">
+        <button class="sf-zone-btn t-close" onclick="sf2ZoneAll('z2c','off')">전체 닫기</button>
+        <button class="sf-zone-btn t-stop"  onclick="sf2ZoneAll('z2c','stop')">전체 정지</button>
+        <button class="sf-zone-btn t-open"  onclick="sf2ZoneAll('z2c','on')">전체 열기</button>
+      </div>
+    </div>
+    <div class="sf-switch-grid-3" id="sf2-z2c"></div>
+  </div>
+
+  <!-- 그룹 4 — 2-way × 2 (온도 표시) -->
+  <div class="sec-label" id="sf2-zone-label-z2d">④ 그룹 4</div>
+  <div class="sf-card" style="margin-bottom:18px;">
+    <div style="display:flex;align-items:center;justify-content:space-between;gap:6px;margin-bottom:8px;">
+      <div class="sf-zone-btns">
+        <button class="sf-zone-btn t-close" onclick="sf2ZoneAll('z2d','off')">전체 OFF</button>
+        <button class="sf-zone-btn t-open"  onclick="sf2ZoneAll('z2d','on')">전체 ON</button>
+      </div>
+      <span id="sf2-s-temp-z2d" style="font-size:10px;font-weight:700;color:#EF4444;white-space:nowrap;">— °C</span>
+    </div>
+    <div class="sf-switch-grid-2" id="sf2-z2d"></div>
+  </div>
+
+</div>
+
 <div class="sec" id="sec-seedling-tab">
   <!-- 환경 통합 카드 -->
   <div class="sec-label">환경</div>
@@ -2918,20 +3033,21 @@ function getSaveKey(tab){
 
 // 탭 정의 (id, 라벨, 아이콘)
 const TAB_DEFS = [
-  {id:'smartfarm',   label:'제어',   icon:'🎛️'},
-  {id:'seedling-tab',label:'육묘',   icon:'🌱'},
-  {id:'prices',      label:'시세',   icon:'📈'},
-  {id:'income',      label:'수입',   icon:'💰'},
-  {id:'expense',     label:'지출',   icon:'💸'},
-  {id:'loan',        label:'대출',   icon:'🏦'},
-  {id:'settings',    label:'⚙︎', icon:'⚙︎'},
+  {id:'smartfarm',        label:'제어',   icon:'🎛️'},
+  {id:'smartfarm2',       label:'육묘제어', icon:'🌿'},
+  {id:'seedling-tab',     label:'육묘',   icon:'🌱'},
+  {id:'prices',           label:'시세',   icon:'📈'},
+  {id:'income',           label:'수입',   icon:'💰'},
+  {id:'expense',          label:'지출',   icon:'💸'},
+  {id:'loan',             label:'대출',   icon:'🏦'},
+  {id:'settings',         label:'⚙︎', icon:'⚙︎'},
 ];
 const DEFAULT_TAB_ORDER = TAB_DEFS.map(t=>t.id);
 
 
 function getTabOrder(){
   const saved = gl('pb8_tab_order');
-  if(saved&&Array.isArray(saved)&&saved.length===DEFAULT_TAB_ORDER.length) return saved;
+  if(saved&&Array.isArray(saved)&&saved.length>=DEFAULT_TAB_ORDER.length) return saved;
   return [...DEFAULT_TAB_ORDER];
 }
 
@@ -2962,6 +3078,7 @@ function showTab(t){
   if(t==='income'||t==='expense')try{renderIncExp();renderIncExpStats();}catch(e){console.error(e);}
   if(t==='seedling-tab')try{renderSeedlingTab();}catch(e){console.error(e);}
   if(t==='smartfarm')try{renderSmartfarmTab();}catch(e){console.error(e);}
+  if(t==='smartfarm2')try{renderSmartfarm2Tab();}catch(e){console.error(e);}
 }
 
 // 탭 드래그 앤 드롭
@@ -6067,8 +6184,181 @@ function delVisitRoute(i){
 
 <script>
 // ═══════════════════════════════════════════
-// 스마트팜 제어 탭
+// 육묘제어 탭 (smartfarm2)
 // ═══════════════════════════════════════════
+var SF2_ZONE_DEFS = [
+  { key:'z2a', defaultName:'그룹 1', twoWay:false, gridCols:2, switches:[
+    {id:'sf2_a1',defaultLabel:'스위치 1'},{id:'sf2_a2',defaultLabel:'스위치 2'}
+  ]},
+  { key:'z2b', defaultName:'그룹 2', twoWay:false, gridCols:2, switches:[
+    {id:'sf2_b1',defaultLabel:'스위치 1'},{id:'sf2_b2',defaultLabel:'스위치 2'}
+  ]},
+  { key:'z2c', defaultName:'그룹 3', twoWay:false, gridCols:3, switches:[
+    {id:'sf2_c1',defaultLabel:'스위치 1'},{id:'sf2_c2',defaultLabel:'스위치 2'},
+    {id:'sf2_c3',defaultLabel:'스위치 3'},{id:'sf2_c4',defaultLabel:'스위치 4'},
+    {id:'sf2_c5',defaultLabel:'스위치 5'},{id:'sf2_c6',defaultLabel:'스위치 6'}
+  ]},
+  { key:'z2d', defaultName:'그룹 4', twoWay:true, gridCols:2, hasTempSensor:true, switches:[
+    {id:'sf2_d1',defaultLabel:'스위치 1'},{id:'sf2_d2',defaultLabel:'스위치 2'}
+  ]}
+];
+
+var SF2_STATE = { switches:{} };
+var SF2_RAIN_MODE = false;
+var SF2_RAIN_ACTIVE = false;
+
+function sf2Init(id) {
+  if (!SF2_STATE.switches[id]) SF2_STATE.switches[id] = { state:'stop' };
+  return SF2_STATE.switches[id];
+}
+function sf2Save() {
+  try { localStorage.setItem('pb8_sf2_state', JSON.stringify(SF2_STATE)); } catch(e) {}
+}
+function sf2Load() {
+  try { var s=JSON.parse(localStorage.getItem('pb8_sf2_state')||'null'); if(s) SF2_STATE=s; } catch(e) {}
+  SF2_ZONE_DEFS.forEach(function(z){ z.switches.forEach(function(sw){ sf2Init(sw.id); }); });
+}
+
+function sf2Draw(id) {
+  var el = document.getElementById('sf-sw-'+id);
+  if (!el) return;
+  var st = sf2Init(id).state;
+  var label = id; // 기본 라벨
+  SF2_ZONE_DEFS.forEach(function(z){ z.switches.forEach(function(sw){ if(sw.id===id) label=sw.defaultLabel; }); });
+  if (!el.querySelector('.sf-track-wrap')) {
+    el.innerHTML = '<div class="sf-sw-num"></div><div class="sf-track-wrap"><div class="sf-track-bg"></div><div class="sf-track-txt txt-open">열기</div><div class="sf-track-txt txt-close">닫기</div><div class="sf-knob"><span class="sf-knob-txt">정지</span></div></div>';
+  }
+  el.className = 'sf-sw ' + st;
+  el.querySelector('.sf-sw-num').textContent = label;
+}
+function sf2Draw2(id) {
+  var el = document.getElementById('sf-sw2-'+id);
+  if (!el) return;
+  var st = sf2Init(id).state;
+  var label = id;
+  SF2_ZONE_DEFS.forEach(function(z){ z.switches.forEach(function(sw){ if(sw.id===id) label=sw.defaultLabel; }); });
+  if (!el.querySelector('.sf-sw2-track')) {
+    el.innerHTML = '<div class="sf-sw2-num"></div><div class="sf-sw2-track"><div class="sf-sw2-knob"></div></div>';
+  }
+  el.className = 'sf-sw2' + (st==='on'?' on':'') + (el.classList.contains('blocked')?' blocked':'');
+  el.querySelector('.sf-sw2-num').textContent = label;
+}
+
+function renderSmartfarm2Tab() {
+  sf2Load();
+  SF2_ZONE_DEFS.forEach(function(z) {
+    var labelEl = document.getElementById('sf2-zone-label-'+z.key);
+    if (labelEl) labelEl.textContent = z.defaultName;
+    var el = document.getElementById('sf2-'+z.key);
+    if (!el) return;
+    el.className = 'sf-switch-grid-' + (z.gridCols||3);
+    if (z.twoWay) {
+      el.innerHTML = z.switches.map(function(sw){ return '<div id="sf-sw2-'+sw.id+'"></div>'; }).join('');
+      z.switches.forEach(function(sw){
+        sf2Draw2(sw.id);
+        var swEl = document.getElementById('sf-sw2-'+sw.id);
+        if (swEl) sf2AttachSlide2(swEl, sw.id);
+      });
+    } else {
+      el.innerHTML = z.switches.map(function(sw){ return '<div id="sf-sw-'+sw.id+'"></div>'; }).join('');
+      z.switches.forEach(function(sw){
+        sf2Draw(sw.id);
+        var swEl = document.getElementById('sf-sw-'+sw.id);
+        if (swEl) sf2AttachSlide(swEl, sw.id);
+      });
+    }
+  });
+  sf2UpdateTempZ2d();
+  sf2InitRain();
+  sf2FetchNow();
+}
+
+function sf2AttachSlide(el, id) {
+  var startX,startY,startState,moved=false,usingTouch=false;
+  function onStart(x,y){ startX=x; startY=y; startState=sf2Init(id).state; moved=false; }
+  function onMove(x,y){
+    var dx=x-startX, dy=Math.abs(y-startY);
+    if(dy>12) return;
+    if(dx>14){ sf2Init(id).state='on'; sf2Save(); sf2Draw(id); moved=true; }
+    else if(dx<-14){ sf2Init(id).state='off'; sf2Save(); sf2Draw(id); moved=true; }
+  }
+  function onEnd(){
+    if(!moved){ var s=sf2Init(id).state; sf2Init(id).state=(s==='stop'?'on':s==='on'?'off':'stop'); sf2Save(); sf2Draw(id); }
+  }
+  el.addEventListener('touchstart',function(e){ usingTouch=true; var t=e.touches[0]; onStart(t.clientX,t.clientY); },{passive:true});
+  el.addEventListener('touchmove',function(e){ var t=e.touches[0]; onMove(t.clientX,t.clientY); },{passive:true});
+  el.addEventListener('touchend',function(e){ e.preventDefault(); onEnd(); setTimeout(function(){usingTouch=false;},350); },{passive:false});
+  el.addEventListener('click',function(){ if(!usingTouch) onEnd(); });
+}
+function sf2AttachSlide2(el, id) {
+  var usingTouch=false;
+  function toggle(){ var cur=sf2Init(id).state; sf2Init(id).state=(cur==='on')?'stop':'on'; sf2Save(); sf2Draw2(id); }
+  el.addEventListener('touchstart',function(){ usingTouch=true; },{passive:true});
+  el.addEventListener('touchend',function(e){ e.preventDefault(); toggle(); setTimeout(function(){usingTouch=false;},350); },{passive:false});
+  el.addEventListener('click',function(){ if(!usingTouch) toggle(); });
+}
+
+function sf2ZoneAll(zone, st) {
+  var def = SF2_ZONE_DEFS.find(function(z){ return z.key===zone; });
+  if (!def) return;
+  def.switches.forEach(function(sw){
+    sf2Init(sw.id).state = st;
+    if (def.twoWay) sf2Draw2(sw.id); else sf2Draw(sw.id);
+  });
+  sf2Save();
+}
+
+function sf2UpdateTempZ2d() {
+  var el = document.getElementById('sf2-s-temp-z2d');
+  if (!el) return;
+  try {
+    var cfg = JSON.parse(localStorage.getItem('pb8_sf2_temp_z2d')||'{}');
+    el.textContent = cfg.temp ? cfg.temp+' °C' : '— °C';
+  } catch(e){ el.textContent = '— °C'; }
+}
+
+// 우적 센서 (육묘제어)
+function sf2InitRain() {
+  try { SF2_RAIN_MODE = JSON.parse(localStorage.getItem('pb8_sf2_rain_mode')||'false'); } catch(e){}
+  sf2UpdateRainUI();
+}
+function sf2UpdateRainUI() {
+  var dot = document.getElementById('sf2-rain-dot');
+  var btn = document.getElementById('sf2-rain-toggle-btn');
+  if (dot) { dot.style.background=SF2_RAIN_ACTIVE?'#3B82F6':'#D1D5DB'; dot.style.boxShadow=SF2_RAIN_ACTIVE?'0 0 0 3px rgba(59,130,246,0.25)':'none'; }
+  if (btn) {
+    if (SF2_RAIN_MODE) { btn.style.background='#DCFCE7'; btn.style.color='#16A34A'; btn.style.borderColor='#86EFAC'; }
+    else               { btn.style.background='#F3F4F6'; btn.style.color='#9CA3AF'; btn.style.borderColor='#D1D5DB'; }
+  }
+}
+function sf2QuickToggleRain() {
+  SF2_RAIN_MODE = !SF2_RAIN_MODE;
+  try { localStorage.setItem('pb8_sf2_rain_mode', JSON.stringify(SF2_RAIN_MODE)); } catch(e){}
+  sf2UpdateRainUI();
+}
+function sf2OpenSensorModal() {
+  // 기존 센서 설정 모달 재사용 (CO 없이 우적만)
+  var modal = document.getElementById('sf-sensor-config-modal');
+  if (modal) { modal.style.display='flex'; }
+}
+function sf2FetchNow() {
+  // 기존 Ecowitt fetch 재사용, 결과를 sf2 env 셀에도 반영
+  if (typeof sfFetchEcowittNow === 'function') {
+    sfFetchEcowittNow();
+    // 값 복사: 기존 env 셀 → sf2 env 셀 (fetch 완료 후 0.5초 뒤)
+    setTimeout(function(){
+      ['light','temp','hum','rain'].forEach(function(k){
+        var src = document.getElementById('sf-env-'+k);
+        var dst = document.getElementById('sf2-env-'+k);
+        if (src && dst) dst.textContent = src.textContent;
+      });
+      var srcTime = document.getElementById('sf-env-time');
+      var dstTime = document.getElementById('sf2-env-time');
+      if (srcTime && dstTime) dstTime.textContent = srcTime.textContent;
+    }, 1500);
+  }
+}
+
 
 // ── 기본 존/스위치 정의 ──
 var SF_ZONE_DEFS = [
