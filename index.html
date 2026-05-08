@@ -23,25 +23,30 @@ window.showAuthView=function(view){
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&display=swap');
 :root {
-  --bg: #F7F8FA;
-  --surface: #FFFFFF;
-  --card: #FFFFFF;
+  --bg: #EEF3F8;
+  --surface: rgba(255,255,255,0.70);
+  --card: rgba(255,255,255,0.72);
   --text-primary: #111827;
   --text-secondary: #6B7280;
   --text-tertiary: #9CA3AF;
-  --border: #E5E7EB;
-  --border-light: #F3F4F6;
+  --border: rgba(180,200,220,0.45);
+  --border-light: rgba(180,200,220,0.25);
   --red: #EF4444;
-  --red-soft: #FEF2F2;
+  --red-soft: rgba(254,242,242,0.85);
   --green: #10B981;
-  --green-soft: #ECFDF5;
+  --green-soft: rgba(236,253,245,0.85);
   --teal: #0EA5E9;
-  --teal-soft: #F0F9FF;
+  --teal-soft: rgba(240,249,255,0.85);
   --amber: #F59E0B;
-  --amber-soft: #FFFBEB;
+  --amber-soft: rgba(255,251,235,0.85);
   --accent: #6366F1;
-  --accent-soft: #EEF2FF;
+  --accent-soft: rgba(238,242,255,0.85);
   --navy: #111827;
+  --glass-bg: rgba(255,255,255,0.52);
+  --glass-bg-strong: rgba(255,255,255,0.78);
+  --glass-border: rgba(255,255,255,0.82);
+  --glass-shadow: 0 4px 28px rgba(90,120,170,0.13), 0 1px 0 rgba(255,255,255,0.9) inset;
+  --glass-blur: blur(22px);
   --radius-sm: 10px;
   --radius-md: 14px;
   --radius-lg: 18px;
@@ -53,45 +58,50 @@ window.showAuthView=function(view){
 body {
   font-family: 'Noto Sans KR', -apple-system, BlinkMacSystemFont, sans-serif;
   background: var(--bg);
+  background-image:
+    radial-gradient(ellipse at 15% 20%, rgba(99,102,241,0.16) 0%, transparent 50%),
+    radial-gradient(ellipse at 85% 10%, rgba(14,165,233,0.14) 0%, transparent 45%),
+    radial-gradient(ellipse at 60% 80%, rgba(16,185,129,0.12) 0%, transparent 45%);
+  background-attachment: fixed;
   color: var(--text-primary);
   min-height: 100vh;
   min-height: -webkit-fill-available;
   overflow-x: hidden;
   -webkit-font-smoothing: antialiased;
 }
-.nm-flat { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg); }
-.nm-inset { background: var(--bg); border-radius: var(--radius-md); border: 1px solid var(--border); }
-.nm-btn { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-sm); cursor: pointer; transition: background 0.15s, transform 0.1s; }
-.nm-btn:active { transform: scale(0.97); background: var(--bg); }
-.nm-btn-primary { background: var(--text-primary); border: none; border-radius: var(--radius-md); cursor: pointer; color: white; transition: opacity 0.15s, transform 0.1s; }
+.nm-flat { background: var(--glass-bg); backdrop-filter: blur(24px); -webkit-backdrop-filter: blur(24px); border: 1px solid var(--glass-border); border-radius: var(--radius-lg); box-shadow: var(--glass-shadow); }
+.nm-inset { background: rgba(240,245,252,0.55); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); border-radius: var(--radius-md); border: 1px solid var(--glass-border); }
+.nm-btn { background: var(--glass-bg); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); border: 1px solid var(--glass-border); border-radius: var(--radius-sm); cursor: pointer; transition: background 0.15s, transform 0.1s; }
+.nm-btn:active { transform: scale(0.97); background: rgba(255,255,255,0.45); }
+.nm-btn-primary { background: var(--text-primary); border: none; border-radius: var(--radius-md); cursor: pointer; color: white; transition: opacity 0.15s, transform 0.1s; box-shadow: 0 4px 16px rgba(17,24,39,0.22); }
 .nm-btn-primary:active { transform: scale(0.97); opacity: 0.9; }
 .app { max-width: 430px; margin: 0 auto; padding-bottom: calc(80px + var(--safe-bottom)); padding-top: var(--safe-top); }
-.hdr { padding: 18px 20px 14px; display: flex; align-items: center; justify-content: space-between; background: var(--bg); }
+.hdr { padding: 18px 20px 14px; display: flex; align-items: center; justify-content: space-between; background: transparent; }
 .hdr-main { display:flex; align-items:center; gap:9px; min-width:0; }
-.hdr-app-icon { width:34px; height:34px; border-radius:10px; display:flex; align-items:center; justify-content:center; background:var(--text-primary); color:white; font-size:18px; flex-shrink:0; }
+.hdr-app-icon { width:34px; height:34px; border-radius:10px; display:flex; align-items:center; justify-content:center; background:var(--text-primary); color:white; font-size:18px; flex-shrink:0; box-shadow: 0 4px 12px rgba(17,24,39,0.20); }
 .hdr-title { font-size: 24px; font-weight: 700; color: var(--text-primary); letter-spacing: -0.5px; cursor: pointer; }
 .hdr-sub { font-size: 12px; color: var(--text-secondary); margin-top: 3px; }
-.tabs-wrap { padding: 0 10px 14px; background: var(--bg); }
+.tabs-wrap { padding: 0 10px 14px; background: transparent; }
 .tabs-wrap::-webkit-scrollbar { display: none; }
-.tabs { display: flex; gap: 4px; width: 100%; }
-.tab { flex: 1; padding: 7px 4px; font-size: 11px; font-weight: 500; color: var(--text-secondary); border-radius: 50px; white-space: nowrap; cursor: pointer; transition: all 0.18s; background: var(--surface); border: 1px solid var(--border); text-align: center; }
-.tab.active { background: var(--text-primary); color: white; border-color: var(--text-primary); }
-.tab.summary-tab { background:#EEF2F7; border-color:#E5E7EB; }
-.tab.summary-tab.active { background: var(--text-primary); color: white; border-color: var(--text-primary); }
-.tab.settings-tab { flex: none; padding: 0 8px; min-width: 32px; height: 31px; display: flex; align-items: center; justify-content: center; background: transparent; border-color: transparent; color: var(--text-tertiary); font-size: 19px; line-height: 1; }
-.tab.settings-tab.active { background: transparent; border-color: transparent; color: var(--text-primary); }
+.tabs { display: flex; gap: 4px; width: 100%; background: rgba(255,255,255,0.45); backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px); border: 1px solid var(--glass-border); border-radius: 50px; padding: 4px; }
+.tab { flex: 1; padding: 7px 4px; font-size: 11px; font-weight: 500; color: var(--text-secondary); border-radius: 50px; white-space: nowrap; cursor: pointer; transition: all 0.18s; background: transparent; border: none; text-align: center; }
+.tab.active { background: rgba(255,255,255,0.92); color: var(--text-primary); box-shadow: 0 2px 8px rgba(100,130,180,0.15); }
+.tab.summary-tab { background: transparent; border: none; }
+.tab.summary-tab.active { background: rgba(255,255,255,0.92); color: var(--text-primary); box-shadow: 0 2px 8px rgba(100,130,180,0.15); }
+.tab.settings-tab { flex: none; padding: 0 8px; min-width: 32px; height: 31px; display: flex; align-items: center; justify-content: center; background: transparent; border: none; color: var(--text-tertiary); font-size: 19px; line-height: 1; }
+.tab.settings-tab.active { background: transparent; border: none; color: var(--text-primary); }
 .settings-gear-icon { display:inline-flex; align-items:center; justify-content:center; color:inherit; font-size:19px; line-height:1; transform:translateY(-1px); }
 .sec { display: none; padding: 0 16px; }
 .sec.active { display: block; }
 .sec-label { font-size: 10px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; color: var(--text-secondary); margin: 18px 0 10px; }
 .top-bar { display: flex; align-items: center; gap: 6px; padding: 10px 0; flex-wrap: nowrap; overflow-x: auto; -webkit-overflow-scrolling: touch; scrollbar-width: none; }
 .top-bar::-webkit-scrollbar { display: none; }
-.top-bar select { flex-shrink: 0; padding: 6px 10px; font-size: 12px; font-family: 'Noto Sans KR', sans-serif; font-weight: 500; color: var(--text-primary); background: var(--surface); border: 1px solid var(--border); border-radius: 50px; appearance: none; -webkit-appearance: none; min-width: 0; }
-.top-bar select:focus { outline: none; border-color: var(--text-secondary); }
+.top-bar select { flex-shrink: 0; padding: 6px 10px; font-size: 12px; font-family: 'Noto Sans KR', sans-serif; font-weight: 500; color: var(--text-primary); background: var(--glass-bg); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); border: 1px solid var(--glass-border); border-radius: 50px; appearance: none; -webkit-appearance: none; min-width: 0; box-shadow: var(--glass-shadow); }
+.top-bar select:focus { outline: none; border-color: rgba(99,102,241,0.4); }
 .top-bar-divider { flex-shrink: 0; width: 1px; height: 18px; background: var(--border); margin: 0 2px; }
-.top-bar-btn { flex-shrink: 0; padding: 6px 12px; font-size: 11px; font-family: 'Noto Sans KR', sans-serif; color: var(--text-secondary); background: var(--surface); border: 1px solid var(--border); border-radius: 50px; cursor: pointer; white-space: nowrap; }
+.top-bar-btn { flex-shrink: 0; padding: 6px 12px; font-size: 11px; font-family: 'Noto Sans KR', sans-serif; color: var(--text-secondary); background: var(--glass-bg); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); border: 1px solid var(--glass-border); border-radius: 50px; cursor: pointer; white-space: nowrap; box-shadow: var(--glass-shadow); }
 .period-row { display: flex; gap: 8px; align-items: center; margin-bottom: 14px; flex-wrap: wrap; }
-.period-row select { flex: 1; min-width: 80px; padding: 10px 12px; font-size: 13px; font-family: 'Noto Sans KR', sans-serif; font-weight: 500; color: var(--text-primary); background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-sm); appearance: none; -webkit-appearance: none; }
+.period-row select { flex: 1; min-width: 80px; padding: 10px 12px; font-size: 13px; font-family: 'Noto Sans KR', sans-serif; font-weight: 500; color: var(--text-primary); background: var(--glass-bg); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); border: 1px solid var(--glass-border); border-radius: var(--radius-sm); appearance: none; -webkit-appearance: none; box-shadow: var(--glass-shadow); }
 .period-row select:focus { outline: none; }
 .dash-total { padding: 22px 20px; margin-bottom: 10px; background: var(--text-primary); border: none; border-radius: var(--radius-lg); }
 .dash-total .lbl { font-size: 12px; color: rgba(255,255,255,0.6); font-weight: 500; letter-spacing: 0.3px; }
@@ -121,9 +131,9 @@ body {
 .c-badge { font-size: 11px; font-weight: 600; padding: 3px 10px; border-radius: 50px; }
 .c-badge-inc { background: var(--green-soft); color: var(--green); }
 .c-badge-exp { background: var(--red-soft); color: var(--red); }
-.card-body { display: none; padding: 0 16px 14px; border-top: 1px solid var(--border); }
+.card-body { display: none; padding: 0 16px 14px; border-top: 1px solid var(--glass-border); }
 .card-body.open { display: block; }
-.erow { padding: 10px 0; border-bottom: 1px solid var(--border); }
+.erow { padding: 10px 0; border-bottom: 1px solid var(--glass-border); }
 .erow:last-child { border-bottom: none; }
 .erow-top { display: flex; align-items: flex-start; gap: 6px; }
 .erow-left { flex: 1; min-width: 0; }
@@ -132,33 +142,33 @@ body {
 .erow-right { display: flex; flex-direction: column; align-items: flex-end; gap: 5px; flex-shrink: 0; margin-left: 4px; }
 .erow-amt { font-size: 13px; font-weight: 700; white-space: nowrap; color: var(--text-primary); }
 .erow-acts { display: flex; gap: 4px; }
-.eact { font-size: 10px; padding: 3px 8px; border-radius: 6px; border: 1px solid var(--border); font-family: 'Noto Sans KR', sans-serif; cursor: pointer; background: var(--surface); color: var(--text-secondary); }
-.eact.del { color: var(--red); border-color: #FECACA; background: var(--red-soft); }
-.add-btn { width: 100%; margin-top: 8px; padding: 7px; font-size: 12px; font-family: 'Noto Sans KR', sans-serif; font-weight: 500; color: var(--text-secondary); background: transparent; border: 1.5px dashed var(--text-tertiary); border-radius: var(--radius-sm); cursor: pointer; transition: border-color 0.15s, color 0.15s; }
+.eact { font-size: 10px; padding: 3px 8px; border-radius: 6px; border: 1px solid var(--glass-border); font-family: 'Noto Sans KR', sans-serif; cursor: pointer; background: var(--glass-bg); backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px); color: var(--text-secondary); }
+.eact.del { color: var(--red); border-color: rgba(239,68,68,0.25); background: var(--red-soft); }
+.add-btn { width: 100%; margin-top: 8px; padding: 7px; font-size: 12px; font-family: 'Noto Sans KR', sans-serif; font-weight: 500; color: var(--text-secondary); background: transparent; border: 1.5px dashed rgba(156,163,175,0.5); border-radius: var(--radius-sm); cursor: pointer; transition: border-color 0.15s, color 0.15s; }
 .add-btn:active { border-color: var(--text-secondary); color: var(--text-primary); }
 .empty-msg { font-size: 12px; color: var(--text-tertiary); padding: 10px 0; }
 .price-date-card { padding: 16px 18px; margin-bottom: 10px; }
 .price-date-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
 .price-date-top .lbl { font-size: 11px; color: var(--text-secondary); }
-.price-edit-btn { font-size: 11px; padding: 5px 13px; border-radius: 50px; border: 1px solid var(--border); font-family: 'Noto Sans KR', sans-serif; cursor: pointer; background: var(--bg); color: var(--text-secondary); }
-.price-row { display: flex; justify-content: space-between; align-items: center; padding: 8px 0; border-bottom: 1px solid var(--border); font-size: 13px; }
+.price-edit-btn { font-size: 11px; padding: 5px 13px; border-radius: 50px; border: 1px solid var(--glass-border); font-family: 'Noto Sans KR', sans-serif; cursor: pointer; background: var(--glass-bg); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); color: var(--text-secondary); }
+.price-row { display: flex; justify-content: space-between; align-items: center; padding: 8px 0; border-bottom: 1px solid var(--glass-border); font-size: 13px; }
 .price-row:last-child { border-bottom: none; }
 .price-row .lbl { color: var(--text-secondary); font-size: 12px; }
 .price-row .val { font-weight: 600; }
-.price-input { width: 100%; padding: 9px 12px; font-size: 13px; font-family: 'Noto Sans KR', sans-serif; color: var(--text-primary); background: var(--bg); border: 1px solid var(--border); border-radius: var(--radius-sm); }
+.price-input { width: 100%; padding: 9px 12px; font-size: 13px; font-family: 'Noto Sans KR', sans-serif; color: var(--text-primary); background: rgba(240,245,252,0.6); border: 1px solid var(--glass-border); border-radius: var(--radius-sm); }
 .price-input:focus { outline: none; border-color: var(--accent); }
 
 /* 대출 다중 관리 */
-.loan-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg); margin-bottom: 12px; overflow: hidden; }
+.loan-card { background: var(--glass-bg); backdrop-filter: var(--glass-blur); -webkit-backdrop-filter: var(--glass-blur); border: 1px solid var(--glass-border); border-radius: var(--radius-lg); margin-bottom: 12px; overflow: hidden; box-shadow: var(--glass-shadow); }
 .loan-card-hdr { display: flex; align-items: center; justify-content: space-between; padding: 14px 16px; cursor: pointer; }
 .loan-card-hdr .lc-name { font-size: 14px; font-weight: 600; }
 .loan-card-hdr .lc-bal { font-size: 13px; font-weight: 700; color: var(--red); }
-.loan-card-body { display: none; border-top: 1px solid var(--border); padding: 14px 16px; }
+.loan-card-body { display: none; border-top: 1px solid var(--glass-border); padding: 14px 16px; }
 .loan-card-body.open { display: block; }
 .loan-mode-bar { display: flex; gap: 8px; margin-bottom: 14px; }
-.loan-mode-btn { flex: 1; padding: 11px; font-size: 13px; font-family: 'Noto Sans KR', sans-serif; font-weight: 500; border-radius: var(--radius-md); border: 1px solid var(--border); cursor: pointer; background: var(--surface); color: var(--text-secondary); transition: all 0.18s; }
+.loan-mode-btn { flex: 1; padding: 11px; font-size: 13px; font-family: 'Noto Sans KR', sans-serif; font-weight: 500; border-radius: var(--radius-md); border: 1px solid var(--glass-border); cursor: pointer; background: var(--glass-bg); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); color: var(--text-secondary); transition: all 0.18s; }
 .loan-mode-btn.active { background: var(--text-primary); color: white; border-color: var(--text-primary); }
-.info-row { display: flex; justify-content: space-between; padding: 11px 0; border-bottom: 1px solid var(--border); font-size: 13px; }
+.info-row { display: flex; justify-content: space-between; padding: 11px 0; border-bottom: 1px solid var(--glass-border); font-size: 13px; }
 .info-row:last-child { border-bottom: none; }
 .info-row .k { color: var(--text-secondary); }
 .info-row .v { font-weight: 700; }
@@ -195,54 +205,54 @@ body {
 .prog-item-meta { font-size: 10px; color: var(--text-secondary); margin-top: 2px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .prog-item-price { font-size: 13px; font-weight: 700; color: var(--teal); white-space: nowrap; }
 .prog-item-acts { display: flex; gap: 3px; }
-.modal-bg { display: none; position: fixed; inset: 0; background: rgba(26,28,35,0.45); z-index: 300; align-items: flex-end; justify-content: center; backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px); }
+.modal-bg { display: none; position: fixed; inset: 0; background: rgba(26,28,35,0.40); z-index: 300; align-items: flex-end; justify-content: center; backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); }
 .modal-bg.open { display: flex; }
-.modal { background: var(--surface); border-radius: 22px 22px 0 0; padding: 20px 20px calc(20px + var(--safe-bottom)); width: 100%; max-width: 430px; max-height: 88vh; overflow-y: auto; -webkit-overflow-scrolling: touch; border-top: 1px solid var(--border); }
+.modal { background: rgba(255,255,255,0.88); backdrop-filter: blur(24px); -webkit-backdrop-filter: blur(24px); border-radius: 22px 22px 0 0; padding: 20px 20px calc(20px + var(--safe-bottom)); width: 100%; max-width: 430px; max-height: 88vh; overflow-y: auto; -webkit-overflow-scrolling: touch; border-top: 1px solid var(--glass-border); }
 .modal-handle { width: 36px; height: 4px; background: var(--border); border-radius: 2px; margin: 0 auto 16px; }
 .modal h3 { font-size: 17px; font-weight: 700; margin-bottom: 16px; color: var(--text-primary); }
 .fg { margin-bottom: 12px; }
 .fg label { font-size: 11px; font-weight: 600; color: var(--text-secondary); display: block; margin-bottom: 5px; letter-spacing: 0.3px; }
-.fg input, .fg select { width: 100%; padding: 12px 14px; font-size: 14px; font-family: 'Noto Sans KR', sans-serif; color: var(--text-primary); background: var(--bg); border: 1px solid var(--border); border-radius: var(--radius-md); -webkit-appearance: none; transition: border-color 0.15s; }
+.fg input, .fg select { width: 100%; padding: 12px 14px; font-size: 14px; font-family: 'Noto Sans KR', sans-serif; color: var(--text-primary); background: rgba(240,245,252,0.6); border: 1px solid var(--glass-border); border-radius: var(--radius-md); -webkit-appearance: none; transition: border-color 0.15s; }
 .fg input::placeholder { color: var(--text-tertiary); }
 .fg input:focus, .fg select:focus { outline: none; border-color: var(--accent); }
-.fg textarea { width: 100%; padding: 12px 14px; font-size: 14px; font-family: 'Noto Sans KR', sans-serif; color: var(--text-primary); background: var(--bg); border: 1px solid var(--border); border-radius: var(--radius-md); resize: none; height: auto; min-height: 0; line-height: 1.4; overflow: hidden; display: block; }
+.fg textarea { width: 100%; padding: 12px 14px; font-size: 14px; font-family: 'Noto Sans KR', sans-serif; color: var(--text-primary); background: rgba(240,245,252,0.6); border: 1px solid var(--glass-border); border-radius: var(--radius-md); resize: none; height: auto; min-height: 0; line-height: 1.4; overflow: hidden; display: block; }
 .fg textarea::placeholder { color: var(--text-tertiary); }
 .fg textarea:focus { outline: none; border-color: var(--accent); }
 .fr { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
 .fr3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; }
 .modal-btn-row { display: flex; gap: 10px; margin-top: 16px; }
-.modal-cancel { flex: 1; padding: 14px; font-size: 14px; font-weight: 600; font-family: 'Noto Sans KR', sans-serif; color: var(--text-secondary); background: var(--bg); border: 1px solid var(--border); border-radius: var(--radius-md); cursor: pointer; }
-.modal-save { flex: 1; padding: 14px; font-size: 14px; font-weight: 700; font-family: 'Noto Sans KR', sans-serif; color: white; background: var(--text-primary); border: none; border-radius: var(--radius-md); cursor: pointer; box-shadow: 0 3px 12px rgba(26,28,35,0.3); }
+.modal-cancel { flex: 1; padding: 14px; font-size: 14px; font-weight: 600; font-family: 'Noto Sans KR', sans-serif; color: var(--text-secondary); background: rgba(240,244,248,0.7); border: 1px solid var(--glass-border); border-radius: var(--radius-md); cursor: pointer; }
+.modal-save { flex: 1; padding: 14px; font-size: 14px; font-weight: 700; font-family: 'Noto Sans KR', sans-serif; color: white; background: var(--text-primary); border: none; border-radius: var(--radius-md); cursor: pointer; box-shadow: 0 4px 16px rgba(17,24,39,0.25); }
 .modal-save:active { opacity: 0.88; transform: scale(0.98); }
 .ws-hdr { display: grid; grid-template-columns: 36px 1fr 1fr 1fr; gap: 6px; margin-bottom: 4px; }
 .ws-hdr span { font-size: 10px; color: var(--text-secondary); font-weight: 600; text-align: center; }
 .ws-row-item { display: grid; grid-template-columns: 36px 1fr 1fr 1fr; gap: 6px; align-items: center; padding: 6px 0; border-bottom: 1px solid var(--border); }
 .ws-row-item:last-child { border-bottom: none; }
 .ws-lbl { font-size: 13px; font-weight: 700; color: var(--text-primary); text-align: center; }
-.ws-row-item input { padding: 10px 4px; font-size: 13px; text-align: center; font-family: 'Noto Sans KR', sans-serif; color: var(--text-primary); background: var(--bg); border: 1px solid var(--border); border-radius: 8px; width: 100%; min-width: 0; }
+.ws-row-item input { padding: 10px 4px; font-size: 13px; text-align: center; font-family: 'Noto Sans KR', sans-serif; color: var(--text-primary); background: rgba(240,245,252,0.6); border: 1px solid var(--glass-border); border-radius: 8px; width: 100%; min-width: 0; }
 .ws-row-item input::placeholder { color: var(--text-tertiary); font-size: 11px; }
 .ws-row-item input:focus { outline: none; border-color: var(--accent); }
-.pi-block { background: var(--bg); border: 1px solid var(--border); border-radius: var(--radius-md); padding: 12px; margin-bottom: 8px; }
+.pi-block { background: rgba(240,245,252,0.55); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); border: 1px solid var(--glass-border); border-radius: var(--radius-md); padding: 12px; margin-bottom: 8px; }
 .pi-block-hdr { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
 .pi-block-hdr span { font-size: 11px; font-weight: 600; color: var(--text-secondary); }
 .pi-xbtn { width: 24px; height: 24px; border-radius: 6px; border: 1px solid var(--border); font-size: 12px; cursor: pointer; background: var(--surface); color: var(--text-secondary); display: flex; align-items: center; justify-content: center; }
 .mat-row { display: grid; grid-template-columns: 1fr 80px 60px 24px; gap: 6px; margin-bottom: 6px; align-items: center; }
-.mat-row input { padding: 8px 8px; font-size: 12px; font-family: 'Noto Sans KR', sans-serif; color: var(--text-primary); background: var(--bg); border: 1px solid var(--border); border-radius: 8px; width: 100%; }
+.mat-row input { padding: 8px 8px; font-size: 12px; font-family: 'Noto Sans KR', sans-serif; color: var(--text-primary); background: rgba(240,245,252,0.6); border: 1px solid var(--glass-border); border-radius: 8px; width: 100%; }
 .mat-row input::placeholder { color: var(--text-tertiary); }
 .mat-row input:focus { outline: none; border-color: var(--accent); }
-.mat-xbtn { width: 24px; height: 28px; border-radius: 6px; border: 1px solid var(--border); font-size: 12px; cursor: pointer; background: var(--bg); color: var(--text-secondary); }
+.mat-xbtn { width: 24px; height: 28px; border-radius: 6px; border: 1px solid var(--glass-border); font-size: 12px; cursor: pointer; background: rgba(240,245,252,0.6); color: var(--text-secondary); }
 .chk-row { display: flex; align-items: center; gap: 8px; font-size: 12px; color: var(--text-secondary); padding-bottom: 8px; }
 .chk-row input[type=checkbox] { width: auto; accent-color: var(--teal); transform: scale(1.2); }
-.alert-bg { display: none; position: fixed; inset: 0; background: rgba(26,28,35,0.45); z-index: 400; align-items: center; justify-content: center; backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px); }
+.alert-bg { display: none; position: fixed; inset: 0; background: rgba(26,28,35,0.38); z-index: 400; align-items: center; justify-content: center; backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); }
 .alert-bg.open { display: flex; }
-.alert-box { background: var(--surface); border-radius: var(--radius-xl); padding: 28px 24px 20px; width: 280px; text-align: center; border: 1px solid var(--border); }
+.alert-box { background: rgba(255,255,255,0.90); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border-radius: var(--radius-xl); padding: 28px 24px 20px; width: 280px; text-align: center; border: 1px solid var(--glass-border); box-shadow: 0 8px 32px rgba(100,130,180,0.15); }
 .alert-box p { font-size: 14px; font-weight: 500; color: var(--text-primary); margin-bottom: 18px; line-height: 1.6; }
 .alert-box button { width: 100%; padding: 13px; font-size: 14px; font-weight: 700; font-family: 'Noto Sans KR', sans-serif; color: white; background: var(--text-primary); border: none; border-radius: var(--radius-md); cursor: pointer; }
 
 /* SMS 팝업 모달 */
-.sms-modal-bg { display: none; position: fixed; inset: 0; background: rgba(26,28,35,0.55); z-index: 500; align-items: center; justify-content: center; backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); }
+.sms-modal-bg { display: none; position: fixed; inset: 0; background: rgba(26,28,35,0.45); z-index: 500; align-items: center; justify-content: center; backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); }
 .sms-modal-bg.open { display: flex; }
-.sms-modal-box { background: var(--surface); border-radius: var(--radius-xl); padding: 24px 20px 20px; width: calc(100% - 40px); max-width: 390px; border: 1px solid var(--border); box-shadow: 0 20px 60px rgba(0,0,0,0.15); }
+.sms-modal-box { background: rgba(255,255,255,0.90); backdrop-filter: blur(24px); -webkit-backdrop-filter: blur(24px); border-radius: var(--radius-xl); padding: 24px 20px 20px; width: calc(100% - 40px); max-width: 390px; border: 1px solid var(--glass-border); box-shadow: 0 20px 60px rgba(100,130,180,0.18); }
 .sms-modal-title { font-size: 16px; font-weight: 700; color: var(--text-primary); margin-bottom: 6px; }
 .sms-modal-desc { font-size: 12px; color: var(--text-secondary); margin-bottom: 14px; line-height: 1.5; }
 .sms-paste-area { width: 100%; padding: 12px 14px; font-size: 12px; font-family: 'Noto Sans KR', sans-serif; color: var(--text-primary); background: var(--bg); border: 1.5px dashed var(--accent); border-radius: var(--radius-md); resize: none; height: 160px; margin-bottom: 10px; line-height: 1.6; }
@@ -269,13 +279,13 @@ canvas { max-width: 100%; }
 .tab.drag-over { border-color:var(--accent); background:var(--accent-soft); color:var(--accent); }
 .tab-divider { width:1px; height:20px; background:var(--border); flex-shrink:0; align-self:center; margin:0 2px; }
 /* 탭 순서 변경 모달 */
-.tab-order-item { display:flex; align-items:center; gap:10px; padding:10px 14px; background:var(--surface); border:1px solid var(--border); border-radius:var(--radius-md); margin-bottom:8px; cursor:grab; }
+.tab-order-item { display:flex; align-items:center; gap:10px; padding:10px 14px; background:var(--glass-bg); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); border:1px solid var(--glass-border); border-radius:var(--radius-md); margin-bottom:8px; cursor:grab; box-shadow: var(--glass-shadow); }
 .tab-order-item:active { cursor:grabbing; opacity:0.7; }
 .tab-order-handle { font-size:16px; color:var(--text-tertiary); flex-shrink:0; }
 .tab-order-name { flex:1; font-size:14px; font-weight:500; }
 /* water record row */
 .water-row { display:grid; grid-template-columns:1fr 1fr auto; gap:8px; align-items:center; margin-bottom:8px; }
-.water-row input { padding:9px 10px; font-size:13px; font-family:'Noto Sans KR',sans-serif; background:var(--bg); border:1px solid var(--border); border-radius:var(--radius-md); color:var(--text-primary); width:100%; }
+.water-row input { padding:9px 10px; font-size:13px; font-family:'Noto Sans KR',sans-serif; background:rgba(240,245,252,0.6); border:1px solid var(--glass-border); border-radius:var(--radius-md); color:var(--text-primary); width:100%; }
 .water-row input:focus { outline:none; border-color:var(--accent); }
 .water-del { width:28px; height:28px; border-radius:8px; border:1px solid #FECACA; background:var(--red-soft); color:var(--red); font-size:13px; cursor:pointer; display:flex; align-items:center; justify-content:center; flex-shrink:0; }
 
@@ -287,15 +297,18 @@ canvas { max-width: 100%; }
   font-size: 12px;
   font-family: 'Noto Sans KR', sans-serif;
   color: var(--text-primary);
-  background: var(--surface);
-  border: 1px solid var(--border);
+  background: var(--glass-bg);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid var(--glass-border);
   border-radius: 50px;
   outline: none;
   -webkit-appearance: none;
+  box-shadow: var(--glass-shadow);
 }
 .top-bar input[type=date]:focus,
 .top-bar input[type=month]:focus {
-  border-color: var(--text-secondary);
+  border-color: rgba(99,102,241,0.4);
 }
 /* 필수 입력 빨간 별표 */
 .fg label.req::after { content: ' *'; color: var(--red); font-size: 11px; }
@@ -304,7 +317,11 @@ canvas { max-width: 100%; }
 /* ── Auth Screen ── */
 #auth-screen {
   position: fixed; inset: 0; z-index: 10000;
-  background: #F7F8FA;
+  background: #EEF3F8;
+  background-image:
+    radial-gradient(ellipse at 20% 25%, rgba(99,102,241,0.18) 0%, transparent 50%),
+    radial-gradient(ellipse at 80% 15%, rgba(14,165,233,0.15) 0%, transparent 45%),
+    radial-gradient(ellipse at 55% 85%, rgba(16,185,129,0.13) 0%, transparent 45%);
   display: flex; flex-direction: column;
   align-items: center; justify-content: center;
   padding: 24px;
@@ -312,12 +329,14 @@ canvas { max-width: 100%; }
 }
 #auth-screen.hidden { display: none; }
 .auth-card {
-  background: #fff;
-  border: 1px solid #E5E7EB;
+  background: rgba(255,255,255,0.72);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border: 1px solid rgba(255,255,255,0.80);
   border-radius: 24px;
   padding: 32px 28px 28px;
   width: 100%; max-width: 360px;
-  box-shadow: 0 4px 32px rgba(0,0,0,0.06);
+  box-shadow: 0 8px 40px rgba(100,130,180,0.14), 0 1px 0 rgba(255,255,255,0.9) inset;
 }
 .auth-title-area {
   display: flex; align-items: center; gap: 12px;
@@ -338,12 +357,12 @@ canvas { max-width: 100%; }
 .auth-input {
   width: 100%; padding: 13px 14px; font-size: 14px;
   font-family: 'Noto Sans KR', sans-serif; color: #111827;
-  background: #F7F8FA; border: 1.5px solid #E5E7EB;
+  background: rgba(240,245,252,0.65); border: 1.5px solid rgba(180,200,220,0.5);
   border-radius: 12px; margin-bottom: 12px;
   box-sizing: border-box; transition: border-color 0.15s;
   -webkit-appearance: none;
 }
-.auth-input:focus { outline: none; border-color: #6366F1; background: #EEF2FF; }
+.auth-input:focus { outline: none; border-color: #6366F1; background: rgba(238,242,255,0.75); }
 .auth-input::placeholder { color: #9CA3AF; }
 .auth-btn-primary {
   width: 100%; padding: 14px; font-size: 15px; font-weight: 700;
@@ -357,11 +376,11 @@ canvas { max-width: 100%; }
 .auth-btn-secondary {
   width: 100%; padding: 13px; font-size: 14px; font-weight: 600;
   font-family: 'Noto Sans KR', sans-serif; color: #374151;
-  background: #F3F4F6; border: 1.5px solid #E5E7EB;
+  background: rgba(240,244,248,0.75); border: 1.5px solid rgba(180,200,220,0.45);
   border-radius: 12px; cursor: pointer; margin-top: 8px;
   transition: background 0.15s;
 }
-.auth-btn-secondary:active { background: #E5E7EB; }
+.auth-btn-secondary:active { background: rgba(225,232,240,0.85); }
 .auth-divider {
   display: flex; align-items: center; gap: 10px;
   margin: 16px 0; color: #9CA3AF; font-size: 12px;
@@ -391,7 +410,7 @@ canvas { max-width: 100%; }
 /* 관리자 패널 */
 #admin-panel {
   position: fixed; inset: 0; z-index: 10001;
-  background: #F7F8FA; overflow-y: auto;
+  background: #EEF3F8; overflow-y: auto;
   font-family: 'Noto Sans KR', sans-serif;
   display: none;
 }
@@ -410,16 +429,20 @@ canvas { max-width: 100%; }
   color: #6B7280; margin: 20px 0 10px; text-transform: uppercase;
 }
 .admin-farm-row {
-  background: white; border: 1px solid #E5E7EB;
+  background: rgba(255,255,255,0.72); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255,255,255,0.80);
   border-radius: 14px; padding: 14px 16px; margin-bottom: 8px;
   display: flex; align-items: center; justify-content: space-between;
+  box-shadow: 0 4px 16px rgba(100,130,180,0.08);
 }
 .admin-farm-name { font-size: 14px; font-weight: 600; color: #111827; }
 .admin-farm-code { font-size: 12px; color: #6366F1; font-weight: 600;
   background: #EEF2FF; padding: 3px 10px; border-radius: 50px; }
 .admin-version-row {
-  background: white; border: 1px solid #E5E7EB;
+  background: rgba(255,255,255,0.72); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255,255,255,0.80);
   border-radius: 14px; padding: 14px 16px; margin-bottom: 8px;
+  box-shadow: 0 4px 16px rgba(100,130,180,0.08);
 }
 .admin-version-tag {
   font-size: 11px; font-weight: 700; color: white;
@@ -442,22 +465,23 @@ canvas { max-width: 100%; }
 /* 계정 설정 모달 */
 #account-modal {
   position: fixed; inset: 0; z-index: 5000;
-  background: rgba(26,28,35,0.45); display: none;
+  background: rgba(26,28,35,0.38); display: none;
   align-items: flex-end; justify-content: center;
-  backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px);
+  backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
 }
 #account-modal.open { display: flex; }
 .account-sheet {
-  background: white; border-radius: 22px 22px 0 0;
+  background: rgba(255,255,255,0.88); backdrop-filter: blur(24px); -webkit-backdrop-filter: blur(24px);
+  border-radius: 22px 22px 0 0;
   padding: 20px 20px calc(24px + env(safe-area-inset-bottom,0px));
   width: 100%; max-width: 430px;
-  border-top: 1px solid #E5E7EB;
+  border-top: 1px solid var(--glass-border);
 }
-.account-handle { width: 36px; height: 4px; background: #E5E7EB;
+.account-handle { width: 36px; height: 4px; background: rgba(180,200,220,0.5);
   border-radius: 2px; margin: 0 auto 18px; }
 .account-farm-badge {
   display: flex; align-items: center; gap: 10px;
-  background: #F7F8FA; border: 1px solid #E5E7EB;
+  background: rgba(240,245,252,0.65); border: 1px solid var(--glass-border);
   border-radius: 14px; padding: 14px 16px; margin-bottom: 16px;
 }
 .account-farm-icon {
@@ -474,7 +498,7 @@ canvas { max-width: 100%; }
   transition: background 0.12s; margin-bottom: 4px;
   font-size: 14px; font-weight: 500; color: #111827;
 }
-.account-menu-item:active { background: #F3F4F6; }
+.account-menu-item:active { background: rgba(240,244,248,0.7); }
 .account-menu-icon { font-size: 18px; width: 24px; text-align: center; flex-shrink: 0; }
 .account-logout {
   color: #EF4444;
@@ -490,19 +514,22 @@ canvas { max-width: 100%; }
 
 /* ── 스마트팜 ── */
 .sf-card {
-  background: var(--surface);
-  border: 1px solid #EAECF0;
+  background: var(--glass-bg);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border: 1px solid var(--glass-border);
   border-radius: 14px;
   padding: 10px 12px;
   margin-bottom: 8px;
   overflow: hidden;
+  box-shadow: var(--glass-shadow);
 }
 .sf-switch-grid-3 { display: grid; grid-template-columns: repeat(3,1fr); gap: 8px; }
 .sf-switch-grid-1 { display: grid; grid-template-columns: 1fr; gap: 5px; }
 /* ── 2-way On/Off 토글 ── */
 .sf-sw2 {
   display: flex; flex-direction: column; align-items: center; gap: 4px;
-  padding: 8px 4px 6px; background: #F9FAFB; border: 1.5px solid #D1D5DB;
+  padding: 8px 4px 6px; background: rgba(249,250,251,0.75); border: 1.5px solid rgba(209,213,219,0.6);
   border-radius: 12px; cursor: pointer; user-select: none;
   -webkit-user-select: none; -webkit-tap-highlight-color: transparent;
   touch-action: pan-y; min-width: 0;
@@ -534,17 +561,17 @@ canvas { max-width: 100%; }
   align-items: center;
   gap: 4px;
   padding: 8px 4px 6px;
-  background: #F9FAFB; border: 1.5px solid #D1D5DB;
+  background: rgba(249,250,251,0.75); border: 1.5px solid rgba(209,213,219,0.6);
   border-radius: 12px;
   cursor: pointer;
   user-select: none; -webkit-user-select: none;
   -webkit-tap-highlight-color: transparent;
-  touch-action: pan-y; /* 수직 스크롤 허용, 수평 스와이프만 캡처 */
-  min-width: 0; /* allow shrinking */
+  touch-action: pan-y;
+  min-width: 0;
 }
-.sf-sw.on   { background: #F9FAFB; border-color: #D1D5DB; }
-.sf-sw.stop { background: #F9FAFB; border-color: #D1D5DB; }
-.sf-sw.off  { background: #F9FAFB; border-color: #D1D5DB; }
+.sf-sw.on   { background: rgba(249,250,251,0.75); border-color: rgba(209,213,219,0.6); }
+.sf-sw.stop { background: rgba(249,250,251,0.75); border-color: rgba(209,213,219,0.6); }
+.sf-sw.off  { background: rgba(249,250,251,0.75); border-color: rgba(209,213,219,0.6); }
 .sf-sw.blocked { opacity: 0.45; pointer-events: none; }
 
 /* 번호/이름 */
@@ -614,7 +641,7 @@ canvas { max-width: 100%; }
 
 /* ── 자동 규칙 빌더 ── */
 .sf-rule-card {
-  background: white; border: 1px solid #DDD6FE;
+  background: rgba(255,255,255,0.75); border: 1px solid #DDD6FE;
   border-radius: 10px; padding: 8px 10px;
   display: flex; flex-direction: column; gap: 6px;
 }
@@ -649,7 +676,7 @@ canvas { max-width: 100%; }
 .sf-rule-sw-lbl { font-size: 10px; color: #5B21B6; font-weight: 600; white-space: nowrap; }
 .sf-mode-toggle {
   display: flex; border-radius: 50px; overflow: hidden;
-  border: 1px solid var(--border); background: var(--bg);
+  border: 1px solid var(--glass-border); background: rgba(240,245,252,0.55);
   flex-shrink: 0; height: 26px; align-items: center;
 }
 .sf-mode-btn {
@@ -665,7 +692,8 @@ canvas { max-width: 100%; }
 /* 자동 설정 패널 */
 .sf-auto-panel {
   display: none; margin-top: 8px; padding: 10px 12px;
-  background: #F5F3FF; border: 1px solid #DDD6FE;
+  background: rgba(245,243,255,0.75); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+  border: 1px solid #DDD6FE;
   border-radius: var(--radius-md);
 }
 .sf-auto-panel.open { display: block; }
@@ -674,7 +702,7 @@ canvas { max-width: 100%; }
 .sf-sensor-bar {
   display: flex; align-items: center; justify-content: space-between;
   padding: 8px 10px; margin-bottom: 8px;
-  background: #F8FAFC; border: 1px solid #E2E8F0;
+  background: rgba(248,250,252,0.75); border: 1px solid rgba(226,232,240,0.7);
   border-radius: 10px;
 }
 .sf-sensor-item { display: flex; flex-direction: column; align-items: center; gap: 1px; }
@@ -693,7 +721,7 @@ canvas { max-width: 100%; }
 .sf-auto-row input, .sf-auto-row select {
   flex: 1; padding: 5px 8px; font-size: 11px;
   font-family: 'Noto Sans KR', sans-serif;
-  background: white; border: 1px solid #DDD6FE;
+  background: rgba(255,255,255,0.75); border: 1px solid #DDD6FE;
   border-radius: 8px; color: var(--text-primary);
 }
 .sf-auto-blocked-overlay {
@@ -706,37 +734,42 @@ canvas { max-width: 100%; }
 /* ── sticky 환경바 + 전원바 ── */
 .sf-sticky-top {
   position: sticky; top: 0; z-index: 50;
-  background: var(--bg);
-  padding: 8px 0 4px;
+  background: rgba(238,243,248,0.78);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  padding: 10px 0 6px;
   margin: 0 -16px;
   padding-left: 16px; padding-right: 16px;
+  border-bottom: 1px solid rgba(255,255,255,0.55);
 }
 
-/* Ecowitt 환경 바 */
+/* Ecowitt 환경 바 - 배경 박스 없이 플랫 */
 .sf-env-bar {
   display: grid;
   grid-template-columns: 1fr 1fr 1fr 1fr auto;
   gap: 6px;
-  padding: 8px 12px;
-  background: var(--surface);
-  border: 1px solid #EAECF0;
-  border-radius: 12px;
-  margin-bottom: 4px;
+  padding: 6px 4px;
+  background: transparent;
+  border: none;
+  border-radius: 0;
+  margin-bottom: 2px;
   align-items: center;
+  box-shadow: none;
 }
 .sf-env-cell { text-align: center; }
 .sf-env-label { font-size: 9px; font-weight: 600; color: var(--text-tertiary); margin-bottom: 2px; }
 .sf-env-val   { font-size: 15px; font-weight: 800; letter-spacing: -0.5px; line-height: 1; }
 .sf-env-unit  { font-size: 8px; color: var(--text-tertiary); margin-top: 1px; }
 
-/* 전원 상태바 */
+/* 전원 상태바 - 배경 박스 없이 플랫 */
 .sf-status-bar {
   display: flex; align-items: center; justify-content: space-between;
-  padding: 7px 12px;
-  background: var(--surface);
-  border: 1px solid #EAECF0;
-  border-radius: 12px;
-  margin-bottom: 4px;
+  padding: 4px 4px 6px;
+  background: transparent;
+  border: none;
+  border-radius: 0;
+  margin-bottom: 2px;
+  box-shadow: none;
 }
 .sf-power-dot {
   width: 9px; height: 9px; border-radius: 50%;
@@ -757,7 +790,7 @@ canvas { max-width: 100%; }
   font-size: 8px; font-weight: 700;
   height: 26px; padding: 0 8px;
   border-radius: 50px; white-space: nowrap;
-  border: 1px solid #E5E7EB; background: #F9FAFB; color: #6B7280;
+  border: 1px solid rgba(229,231,235,0.7); background: rgba(249,250,251,0.75); color: #6B7280;
   font-family: 'Noto Sans KR', sans-serif; cursor: pointer;
   display: inline-flex; align-items: center;
 }
@@ -941,12 +974,12 @@ canvas { max-width: 100%; }
     <select id="sum-mode" onchange="onModeChange('sum')">
       <option value="day" selected>일간</option><option value="month">월간</option><option value="year">연간</option><option value="range">기간</option>
     </select>
-    <input type="date" id="sum-date" onchange="renderAll()" style="flex-shrink:0;padding:6px 10px;font-size:12px;font-family:'Noto Sans KR',sans-serif;color:var(--text-primary);background:var(--surface);border:1px solid var(--border);border-radius:50px;">
-    <select id="sum-month-year-sel" onchange="renderAll()" style="display:none;flex-shrink:0;padding:6px 10px;font-size:12px;font-family:'Noto Sans KR',sans-serif;color:var(--text-primary);background:var(--surface);border:1px solid var(--border);border-radius:50px;appearance:none;-webkit-appearance:none;" id-note="month-year"></select><select id="sum-month-picker" onchange="renderAll()" style="display:none;flex-shrink:0;padding:6px 10px;font-size:12px;font-family:'Noto Sans KR',sans-serif;color:var(--text-primary);background:var(--surface);border:1px solid var(--border);border-radius:50px;appearance:none;-webkit-appearance:none;" id-note="month-sel"></select>
-    <select id="sum-year-picker" onchange="renderAll()" style="display:none;flex-shrink:0;padding:6px 10px;font-size:12px;font-family:'Noto Sans KR',sans-serif;color:var(--text-primary);background:var(--surface);border:1px solid var(--border);border-radius:50px;appearance:none;-webkit-appearance:none;" id-note="year-sel"></select>
-    <input type="date" id="sum-range-from" onchange="renderAll()" style="display:none;flex-shrink:0;padding:6px 10px;font-size:12px;font-family:'Noto Sans KR',sans-serif;color:var(--text-primary);background:var(--surface);border:1px solid var(--border);border-radius:50px;">
+    <input type="date" id="sum-date" onchange="renderAll()" style="flex-shrink:0;padding:6px 10px;font-size:12px;font-family:'Noto Sans KR',sans-serif;color:var(--text-primary);background:var(--glass-bg);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);border:1px solid var(--glass-border);border-radius:50px;">
+    <select id="sum-month-year-sel" onchange="renderAll()" style="display:none;flex-shrink:0;padding:6px 10px;font-size:12px;font-family:'Noto Sans KR',sans-serif;color:var(--text-primary);background:var(--glass-bg);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);border:1px solid var(--glass-border);border-radius:50px;appearance:none;-webkit-appearance:none;" id-note="month-year"></select><select id="sum-month-picker" onchange="renderAll()" style="display:none;flex-shrink:0;padding:6px 10px;font-size:12px;font-family:'Noto Sans KR',sans-serif;color:var(--text-primary);background:var(--glass-bg);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);border:1px solid var(--glass-border);border-radius:50px;appearance:none;-webkit-appearance:none;" id-note="month-sel"></select>
+    <select id="sum-year-picker" onchange="renderAll()" style="display:none;flex-shrink:0;padding:6px 10px;font-size:12px;font-family:'Noto Sans KR',sans-serif;color:var(--text-primary);background:var(--glass-bg);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);border:1px solid var(--glass-border);border-radius:50px;appearance:none;-webkit-appearance:none;" id-note="year-sel"></select>
+    <input type="date" id="sum-range-from" onchange="renderAll()" style="display:none;flex-shrink:0;padding:6px 10px;font-size:12px;font-family:'Noto Sans KR',sans-serif;color:var(--text-primary);background:var(--glass-bg);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);border:1px solid var(--glass-border);border-radius:50px;">
     <span id="sum-range-tilde" style="display:none;font-size:12px;color:var(--text-tertiary);flex-shrink:0;">~</span>
-    <input type="date" id="sum-range-to" onchange="renderAll()" style="display:none;flex-shrink:0;padding:6px 10px;font-size:12px;font-family:'Noto Sans KR',sans-serif;color:var(--text-primary);background:var(--surface);border:1px solid var(--border);border-radius:50px;">
+    <input type="date" id="sum-range-to" onchange="renderAll()" style="display:none;flex-shrink:0;padding:6px 10px;font-size:12px;font-family:'Noto Sans KR',sans-serif;color:var(--text-primary);background:var(--glass-bg);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);border:1px solid var(--glass-border);border-radius:50px;">
   </div>
   <div class="dash-total">
     <div class="lbl">순이익</div>
@@ -988,9 +1021,9 @@ canvas { max-width: 100%; }
   </div>
   <div class="top-bar">
     <select id="inc-mode" onchange="onModeChange('inc')"><option value="day" selected>일간</option><option value="month">월간</option><option value="year">연간</option></select>
-    <input type="date" id="inc-date" onchange="renderIncExp()" style="flex-shrink:0;padding:6px 10px;font-size:12px;font-family:'Noto Sans KR',sans-serif;color:var(--text-primary);background:var(--surface);border:1px solid var(--border);border-radius:50px;">
-    <select id="inc-month-year-sel" onchange="renderIncExp()" style="display:none;flex-shrink:0;padding:6px 10px;font-size:12px;font-family:'Noto Sans KR',sans-serif;color:var(--text-primary);background:var(--surface);border:1px solid var(--border);border-radius:50px;appearance:none;-webkit-appearance:none;" id-note="month-year"></select><select id="inc-month-picker" onchange="renderIncExp()" style="display:none;flex-shrink:0;padding:6px 10px;font-size:12px;font-family:'Noto Sans KR',sans-serif;color:var(--text-primary);background:var(--surface);border:1px solid var(--border);border-radius:50px;appearance:none;-webkit-appearance:none;" id-note="month-sel"></select>
-    <select id="inc-year-picker" onchange="renderIncExp()" style="display:none;flex-shrink:0;padding:6px 10px;font-size:12px;font-family:'Noto Sans KR',sans-serif;color:var(--text-primary);background:var(--surface);border:1px solid var(--border);border-radius:50px;appearance:none;-webkit-appearance:none;" id-note="year-sel"></select>
+    <input type="date" id="inc-date" onchange="renderIncExp()" style="flex-shrink:0;padding:6px 10px;font-size:12px;font-family:'Noto Sans KR',sans-serif;color:var(--text-primary);background:var(--glass-bg);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);border:1px solid var(--glass-border);border-radius:50px;">
+    <select id="inc-month-year-sel" onchange="renderIncExp()" style="display:none;flex-shrink:0;padding:6px 10px;font-size:12px;font-family:'Noto Sans KR',sans-serif;color:var(--text-primary);background:var(--glass-bg);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);border:1px solid var(--glass-border);border-radius:50px;appearance:none;-webkit-appearance:none;" id-note="month-year"></select><select id="inc-month-picker" onchange="renderIncExp()" style="display:none;flex-shrink:0;padding:6px 10px;font-size:12px;font-family:'Noto Sans KR',sans-serif;color:var(--text-primary);background:var(--glass-bg);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);border:1px solid var(--glass-border);border-radius:50px;appearance:none;-webkit-appearance:none;" id-note="month-sel"></select>
+    <select id="inc-year-picker" onchange="renderIncExp()" style="display:none;flex-shrink:0;padding:6px 10px;font-size:12px;font-family:'Noto Sans KR',sans-serif;color:var(--text-primary);background:var(--glass-bg);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);border:1px solid var(--glass-border);border-radius:50px;appearance:none;-webkit-appearance:none;" id-note="year-sel"></select>
     <div style="flex:1;"></div>
     <div class="top-bar-divider"></div>
     <button class="top-bar-btn" onclick="expandAll('income')">All ▼</button>
@@ -1023,9 +1056,9 @@ canvas { max-width: 100%; }
   </div>
   <div class="top-bar">
     <select id="exp-mode" onchange="onModeChange('exp')"><option value="day" selected>일간</option><option value="month">월간</option><option value="year">연간</option></select>
-    <input type="date" id="exp-date" onchange="renderIncExp()" style="flex-shrink:0;padding:6px 10px;font-size:12px;font-family:'Noto Sans KR',sans-serif;color:var(--text-primary);background:var(--surface);border:1px solid var(--border);border-radius:50px;">
-    <select id="exp-month-year-sel" onchange="renderIncExp()" style="display:none;flex-shrink:0;padding:6px 10px;font-size:12px;font-family:'Noto Sans KR',sans-serif;color:var(--text-primary);background:var(--surface);border:1px solid var(--border);border-radius:50px;appearance:none;-webkit-appearance:none;" id-note="month-year"></select><select id="exp-month-picker" onchange="renderIncExp()" style="display:none;flex-shrink:0;padding:6px 10px;font-size:12px;font-family:'Noto Sans KR',sans-serif;color:var(--text-primary);background:var(--surface);border:1px solid var(--border);border-radius:50px;appearance:none;-webkit-appearance:none;" id-note="month-sel"></select>
-    <select id="exp-year-picker" onchange="renderIncExp()" style="display:none;flex-shrink:0;padding:6px 10px;font-size:12px;font-family:'Noto Sans KR',sans-serif;color:var(--text-primary);background:var(--surface);border:1px solid var(--border);border-radius:50px;appearance:none;-webkit-appearance:none;" id-note="year-sel"></select>
+    <input type="date" id="exp-date" onchange="renderIncExp()" style="flex-shrink:0;padding:6px 10px;font-size:12px;font-family:'Noto Sans KR',sans-serif;color:var(--text-primary);background:var(--glass-bg);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);border:1px solid var(--glass-border);border-radius:50px;">
+    <select id="exp-month-year-sel" onchange="renderIncExp()" style="display:none;flex-shrink:0;padding:6px 10px;font-size:12px;font-family:'Noto Sans KR',sans-serif;color:var(--text-primary);background:var(--glass-bg);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);border:1px solid var(--glass-border);border-radius:50px;appearance:none;-webkit-appearance:none;" id-note="month-year"></select><select id="exp-month-picker" onchange="renderIncExp()" style="display:none;flex-shrink:0;padding:6px 10px;font-size:12px;font-family:'Noto Sans KR',sans-serif;color:var(--text-primary);background:var(--glass-bg);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);border:1px solid var(--glass-border);border-radius:50px;appearance:none;-webkit-appearance:none;" id-note="month-sel"></select>
+    <select id="exp-year-picker" onchange="renderIncExp()" style="display:none;flex-shrink:0;padding:6px 10px;font-size:12px;font-family:'Noto Sans KR',sans-serif;color:var(--text-primary);background:var(--glass-bg);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);border:1px solid var(--glass-border);border-radius:50px;appearance:none;-webkit-appearance:none;" id-note="year-sel"></select>
     <div style="flex:1;"></div>
     <div class="top-bar-divider"></div>
     <button class="top-bar-btn" onclick="expandAll('expense')">All ▼</button>
@@ -1046,7 +1079,7 @@ canvas { max-width: 100%; }
   <!-- 날짜별 시세 + 그래프 한 화면에 -->
   <div style="display:flex;align-items:center;gap:8px;margin-top:14px;margin-bottom:8px;">
     <input type="date" id="priceDate" onchange="renderPriceDateView()" style="flex:1;padding:7px 10px;font-size:12px;font-family:'Noto Sans KR',sans-serif;color:var(--text-primary);background:var(--bg);border:1px solid var(--border);border-radius:var(--radius-md);outline:none;">
-    <button onclick="editPriceMode()" style="padding:7px 12px;font-size:11px;font-family:'Noto Sans KR',sans-serif;font-weight:600;color:var(--text-secondary);background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-md);cursor:pointer;white-space:nowrap;flex-shrink:0;">수정</button>
+    <button onclick="editPriceMode()" style="padding:7px 12px;font-size:11px;font-family:'Noto Sans KR',sans-serif;font-weight:600;color:var(--text-secondary);background:var(--glass-bg);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);border:1px solid var(--glass-border);border-radius:var(--radius-md);cursor:pointer;white-space:nowrap;flex-shrink:0;">수정</button>
   </div>
   <!-- 날짜별 시세 (컴팩트) -->
   <div class="nm-flat" style="padding:10px 14px;margin-bottom:8px;">
@@ -1056,9 +1089,9 @@ canvas { max-width: 100%; }
   <div class="sec-label" style="margin-top:4px;">시세 그래프</div>
   <div class="nm-flat" style="padding:10px 14px;margin-bottom:8px;" id="price-chart-card">
     <div style="display:flex;gap:5px;align-items:center;margin-bottom:8px;flex-wrap:wrap;">
-      <input type="date" id="pr-from" style="padding:5px 8px;font-size:11px;font-family:'Noto Sans KR',sans-serif;background:var(--surface);border:1px solid var(--border);border-radius:50px;color:var(--text-primary);flex:1;min-width:0;">
+      <input type="date" id="pr-from" style="padding:5px 8px;font-size:11px;font-family:'Noto Sans KR',sans-serif;background:var(--glass-bg);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);border:1px solid var(--glass-border);border-radius:50px;color:var(--text-primary);flex:1;min-width:0;">
       <span style="font-size:11px;color:var(--text-tertiary);flex-shrink:0;">~</span>
-      <input type="date" id="pr-to" style="padding:5px 8px;font-size:11px;font-family:'Noto Sans KR',sans-serif;background:var(--surface);border:1px solid var(--border);border-radius:50px;color:var(--text-primary);flex:1;min-width:0;">
+      <input type="date" id="pr-to" style="padding:5px 8px;font-size:11px;font-family:'Noto Sans KR',sans-serif;background:var(--glass-bg);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);border:1px solid var(--glass-border);border-radius:50px;color:var(--text-primary);flex:1;min-width:0;">
       <button onclick="renderPriceChart()" style="padding:5px 12px;font-size:11px;font-family:'Noto Sans KR',sans-serif;font-weight:600;background:var(--text-primary);color:white;border:none;border-radius:50px;cursor:pointer;flex-shrink:0;">조회</button>
       <button onclick="toggleCompare()" id="btn-compare" style="padding:5px 10px;font-size:11px;font-family:'Noto Sans KR',sans-serif;font-weight:500;background:var(--surface);color:var(--text-secondary);border:1px solid var(--border);border-radius:50px;cursor:pointer;flex-shrink:0;">비교</button>
     </div>
@@ -1069,9 +1102,9 @@ canvas { max-width: 100%; }
     <div class="sec-label" id="compare-section-label">비교 그래프</div>
     <div class="nm-flat" style="padding:10px 14px;margin-bottom:12px;">
       <div style="display:flex;gap:5px;align-items:center;margin-bottom:8px;flex-wrap:wrap;">
-        <input type="date" id="pr-cmp-from" style="padding:5px 8px;font-size:11px;font-family:'Noto Sans KR',sans-serif;background:var(--surface);border:1px solid var(--border);border-radius:50px;color:var(--text-primary);flex:1;min-width:0;">
+        <input type="date" id="pr-cmp-from" style="padding:5px 8px;font-size:11px;font-family:'Noto Sans KR',sans-serif;background:var(--glass-bg);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);border:1px solid var(--glass-border);border-radius:50px;color:var(--text-primary);flex:1;min-width:0;">
         <span style="font-size:11px;color:var(--text-tertiary);flex-shrink:0;">~</span>
-        <input type="date" id="pr-cmp-to" style="padding:5px 8px;font-size:11px;font-family:'Noto Sans KR',sans-serif;background:var(--surface);border:1px solid var(--border);border-radius:50px;color:var(--text-primary);flex:1;min-width:0;">
+        <input type="date" id="pr-cmp-to" style="padding:5px 8px;font-size:11px;font-family:'Noto Sans KR',sans-serif;background:var(--glass-bg);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);border:1px solid var(--glass-border);border-radius:50px;color:var(--text-primary);flex:1;min-width:0;">
         <button onclick="renderComparePriceChart()" style="padding:5px 12px;font-size:11px;font-family:'Noto Sans KR',sans-serif;font-weight:600;background:var(--text-primary);color:white;border:none;border-radius:50px;cursor:pointer;flex-shrink:0;">비교 조회</button>
       </div>
       <div class="chart-wrap-price"><canvas id="priceChartCmp"></canvas></div>
@@ -1177,8 +1210,8 @@ canvas { max-width: 100%; }
   </div>
 
   <!-- 센서 설정 통합 모달 -->
-  <div id="sf-sensor-config-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.45);z-index:900;align-items:flex-end;justify-content:center;">
-    <div style="background:var(--surface);border-radius:22px 22px 0 0;width:100%;max-width:430px;padding:20px 20px calc(20px + env(safe-area-inset-bottom,0px));max-height:85vh;overflow-y:auto;">
+  <div id="sf-sensor-config-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.38);z-index:900;align-items:flex-end;justify-content:center;backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);">
+    <div style="background:rgba(255,255,255,0.88);backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px);border-radius:22px 22px 0 0;width:100%;max-width:430px;padding:20px 20px calc(20px + env(safe-area-inset-bottom,0px));max-height:85vh;overflow-y:auto;border-top:1px solid rgba(255,255,255,0.85);">
       <div style="font-size:15px;font-weight:700;margin-bottom:16px;">센서 설정</div>
 
       <!-- 강우 설정 -->
@@ -1559,9 +1592,9 @@ canvas { max-width: 100%; }
   <div class="sec-label">환경·물 사용 추이</div>
   <div class="nm-flat" style="padding:12px 16px;margin-bottom:10px;">
     <div style="display:flex;gap:6px;align-items:center;margin-bottom:10px;flex-wrap:wrap;">
-      <input type="date" id="sg-from" style="padding:6px 10px;font-size:12px;font-family:'Noto Sans KR',sans-serif;background:var(--surface);border:1px solid var(--border);border-radius:50px;color:var(--text-primary);flex:1;min-width:0;">
+      <input type="date" id="sg-from" style="padding:6px 10px;font-size:12px;font-family:'Noto Sans KR',sans-serif;background:var(--glass-bg);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);border:1px solid var(--glass-border);border-radius:50px;color:var(--text-primary);flex:1;min-width:0;">
       <span style="font-size:12px;color:var(--text-tertiary);flex-shrink:0;">~</span>
-      <input type="date" id="sg-to" style="padding:6px 10px;font-size:12px;font-family:'Noto Sans KR',sans-serif;background:var(--surface);border:1px solid var(--border);border-radius:50px;color:var(--text-primary);flex:1;min-width:0;">
+      <input type="date" id="sg-to" style="padding:6px 10px;font-size:12px;font-family:'Noto Sans KR',sans-serif;background:var(--glass-bg);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);border:1px solid var(--glass-border);border-radius:50px;color:var(--text-primary);flex:1;min-width:0;">
       <button onclick="renderSeedlingEnvChart();renderSeedlingCorrChart();renderEnvRawTable();" style="padding:6px 14px;font-size:12px;font-family:'Noto Sans KR',sans-serif;font-weight:600;background:var(--text-primary);color:white;border:none;border-radius:50px;cursor:pointer;flex-shrink:0;">조회</button>
     </div>
     <div style="position:relative;height:220px;"><canvas id="seedlingEnvChart"></canvas></div>
@@ -1981,7 +2014,7 @@ canvas { max-width: 100%; }
         <div id="farm-current-code-display" style="font-size:16px;font-weight:700;letter-spacing:5px;color:var(--text-primary);margin-bottom:10px;">——————</div>
         <div style="font-size:11px;color:var(--text-secondary);margin-bottom:4px;">변경할 코드</div>
         <input type="tel" id="farm-new-code-input" maxlength="6" placeholder="숫자 6자리" pattern="[0-9]*" inputmode="numeric" oninput="updateFarmCodePreview()"
-          style="width:100%;padding:9px 14px;font-size:16px;font-weight:700;letter-spacing:5px;font-family:'Noto Sans KR',sans-serif;color:var(--text-primary);background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-md);text-align:center;box-sizing:border-box;margin-bottom:8px;--placeholder-size:12px;">
+          style="width:100%;padding:9px 14px;font-size:16px;font-weight:700;letter-spacing:5px;font-family:'Noto Sans KR',sans-serif;color:var(--text-primary);background:var(--glass-bg);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);border:1px solid var(--glass-border);border-radius:var(--radius-md);text-align:center;box-sizing:border-box;margin-bottom:8px;--placeholder-size:12px;">
         <div id="farm-code-preview" style="display:none;"></div>
         <div id="farm-code-err" style="font-size:11px;color:#EF4444;min-height:14px;margin-bottom:6px;"></div>
         <div style="display:flex;gap:8px;">
@@ -3894,7 +3927,7 @@ function openInformalPlanModal(loanIdx, planIdx){
   const box=document.createElement('div');
   box.style.cssText='position:fixed;inset:0;z-index:600;display:flex;align-items:flex-end;justify-content:center;background:rgba(0,0,0,0.4);backdrop-filter:blur(4px);';
   const cy=NOW.getFullYear();
-  box.innerHTML=`<div style="background:var(--surface);border-radius:22px 22px 0 0;width:100%;max-width:430px;padding:20px 20px calc(20px + env(safe-area-inset-bottom,0px));">
+  box.innerHTML=`<div style="background:rgba(255,255,255,0.88);backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px);border-radius:22px 22px 0 0;width:100%;max-width:430px;padding:20px 20px calc(20px + env(safe-area-inset-bottom,0px));">
     <div style="font-size:15px;font-weight:700;margin-bottom:14px;">${planIdx>=0?'상환 계획 수정':'상환 계획 추가'}</div>
     <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:10px;">
       <div class="fg"><label style="font-size:11px;font-weight:600;color:var(--text-secondary);display:block;margin-bottom:4px;">년도</label>
@@ -3994,7 +4027,7 @@ function openInformalRepayModal(loanIdx){
   const box=document.createElement('div');
   box.style.cssText='position:fixed;inset:0;z-index:600;display:flex;align-items:flex-end;justify-content:center;background:rgba(0,0,0,0.4);backdrop-filter:blur(4px);';
   const today=`${NOW.getFullYear()}-${p2(NOW.getMonth()+1)}-${p2(NOW.getDate())}`;
-  box.innerHTML=`<div style="background:var(--surface);border-radius:22px 22px 0 0;width:100%;max-width:430px;padding:20px 20px calc(20px + env(safe-area-inset-bottom,0px));">
+  box.innerHTML=`<div style="background:rgba(255,255,255,0.88);backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px);border-radius:22px 22px 0 0;width:100%;max-width:430px;padding:20px 20px calc(20px + env(safe-area-inset-bottom,0px));">
     <div style="font-size:15px;font-weight:700;margin-bottom:14px;">상환 추가</div>
     <div class="fg"><label class="req" style="font-size:11px;font-weight:600;color:var(--text-secondary);display:block;margin-bottom:5px;">날짜</label><input type="date" id="irm-date" value="${today}" style="width:100%;padding:12px 14px;font-size:14px;font-family:'Noto Sans KR',sans-serif;background:var(--bg);border:1px solid var(--border);border-radius:var(--radius-md);"></div>
     <div class="fg" style="margin-top:10px;"><label class="req" style="font-size:11px;font-weight:600;color:var(--text-secondary);display:block;margin-bottom:5px;">상환 금액 (만원)</label><input type="number" id="irm-amount" placeholder="0" step="0.1" style="width:100%;padding:12px 14px;font-size:14px;font-family:'Noto Sans KR',sans-serif;background:var(--bg);border:1px solid var(--border);border-radius:var(--radius-md);"></div>
@@ -5070,7 +5103,7 @@ function showDeleteZonePopup(){
   box.style.cssText='position:fixed;inset:0;z-index:600;display:flex;align-items:flex-end;justify-content:center;background:rgba(0,0,0,0.4);backdrop-filter:blur(4px);';
   let opts='<option value="">구역 선택...</option>';
   for(let z=1;z<=cur;z++) opts+=`<option value="${z}">${z}구역</option>`;
-  box.innerHTML=`<div style="background:var(--surface);border-radius:22px 22px 0 0;width:100%;max-width:430px;padding:20px 20px calc(20px + env(safe-area-inset-bottom,0px));">
+  box.innerHTML=`<div style="background:rgba(255,255,255,0.88);backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px);border-radius:22px 22px 0 0;width:100%;max-width:430px;padding:20px 20px calc(20px + env(safe-area-inset-bottom,0px));">
     <div style="font-size:15px;font-weight:700;margin-bottom:14px;color:var(--text-primary);">삭제할 구역 선택</div>
     <select id="zone-del-sel" style="width:100%;padding:12px 14px;font-size:14px;font-family:'Noto Sans KR',sans-serif;background:var(--bg);border:1px solid var(--border);border-radius:var(--radius-md);color:var(--text-primary);appearance:none;-webkit-appearance:none;margin-bottom:14px;">${opts}</select>
     <div style="display:flex;gap:10px;">
@@ -5163,7 +5196,7 @@ function editEnvRecord(key){
   const timeStr=m&&m[2]?m[2]+':'+m[3]:'';
   const box=document.createElement('div');
   box.style.cssText='position:fixed;inset:0;z-index:600;display:flex;align-items:flex-end;justify-content:center;background:rgba(0,0,0,0.4);backdrop-filter:blur(4px);';
-  box.innerHTML=`<div style="background:var(--surface);border-radius:22px 22px 0 0;width:100%;max-width:430px;padding:20px 20px calc(20px + env(safe-area-inset-bottom,0px));">
+  box.innerHTML=`<div style="background:rgba(255,255,255,0.88);backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px);border-radius:22px 22px 0 0;width:100%;max-width:430px;padding:20px 20px calc(20px + env(safe-area-inset-bottom,0px));">
     <div style="font-size:13px;font-weight:700;margin-bottom:4px;">${dateStr} ${timeStr}</div>
     <div style="font-size:11px;color:var(--text-secondary);margin-bottom:16px;line-height:1.5;">조도:${env.sunlight||'-'} 온도:${env.temp||'-'} 습도:${env.humidity||'-'}${env.feedback?' / '+env.feedback:''}</div>
     <div style="display:flex;gap:8px;">
@@ -5499,7 +5532,7 @@ function renderComparePriceChart(){
 function suggestProgRegister(progName, price){
   const box=document.createElement('div');
   box.style.cssText='position:fixed;inset:0;z-index:600;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,0.4);backdrop-filter:blur(4px);padding:20px;';
-  box.innerHTML=`<div style="background:var(--surface);border-radius:var(--radius-xl);padding:24px;width:100%;max-width:340px;">
+  box.innerHTML=`<div style="background:rgba(255,255,255,0.88);backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px);border-radius:var(--radius-xl);padding:24px;width:100%;max-width:340px;">
     <div style="font-size:15px;font-weight:700;margin-bottom:8px;">미등록 프로그램</div>
     <div style="font-size:13px;color:var(--text-secondary);margin-bottom:16px;">'${progName}'을(를) 프로그램 목록에 추가하시겠습니까?</div>
     <div style="display:flex;gap:8px;">
@@ -5524,7 +5557,7 @@ function quickAddProg(name, price){
 function confirmDeleteFarm(){
   const box=document.createElement('div');
   box.style.cssText='position:fixed;inset:0;z-index:700;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,0.5);backdrop-filter:blur(4px);padding:20px;';
-  box.innerHTML=`<div style="background:var(--surface);border-radius:var(--radius-xl);padding:24px;width:100%;max-width:320px;">
+  box.innerHTML=`<div style="background:rgba(255,255,255,0.88);backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px);border-radius:var(--radius-xl);padding:24px;width:100%;max-width:320px;">
     <div style="font-size:16px;font-weight:700;margin-bottom:8px;color:var(--red);">⚠ 계정 삭제</div>
     <div style="font-size:13px;color:#EF4444;margin-bottom:12px;line-height:1.6;">해당 농장의 모든 데이터가 영구 삭제됩니다.<br>이 작업은 되돌릴 수 없습니다.</div>
     <div style="font-size:12px;color:var(--text-secondary);margin-bottom:16px;">확인을 위해 농장 ID를 입력하세요:</div>
