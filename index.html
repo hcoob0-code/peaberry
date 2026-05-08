@@ -499,6 +499,32 @@ canvas { max-width: 100%; }
 }
 .sf-switch-grid-3 { display: grid; grid-template-columns: repeat(3,1fr); gap: 8px; }
 .sf-switch-grid-1 { display: grid; grid-template-columns: 1fr; gap: 5px; }
+/* ── 2-way On/Off 토글 ── */
+.sf-sw2 {
+  display: flex; flex-direction: column; align-items: center; gap: 4px;
+  padding: 8px 4px 6px; background: #F9FAFB; border: 1.5px solid #D1D5DB;
+  border-radius: 12px; cursor: pointer; user-select: none;
+  -webkit-user-select: none; -webkit-tap-highlight-color: transparent;
+  touch-action: pan-y; min-width: 0;
+}
+.sf-sw2-num { font-size: 10px; font-weight: 800; color: #9CA3AF; text-align: center; }
+.sf-sw2-track {
+  width: 44px; height: 24px; border-radius: 12px;
+  background: #E5E7EB; position: relative;
+  transition: background 0.25s; border: 1.5px solid #D1D5DB;
+}
+.sf-sw2.on .sf-sw2-track { background: #DCFCE7; border-color: #86EFAC; }
+.sf-sw2-knob {
+  position: absolute; top: 2px; left: 2px;
+  width: 17px; height: 17px; border-radius: 50%;
+  background: white; box-shadow: 0 1px 4px rgba(0,0,0,0.22);
+  transition: left 0.25s cubic-bezier(0.25,0.46,0.45,0.94);
+}
+.sf-sw2.on .sf-sw2-knob { left: calc(100% - 19px); }
+.sf-sw2-lbl { font-size: 9px; color: #9CA3AF; }
+.sf-sw2.on .sf-sw2-lbl { color: #16A34A; font-weight: 700; }
+.sf-sw2.on .sf-sw2-num  { color: #16A34A; }
+.sf-sw2.blocked { opacity: 0.45; pointer-events: none; }
 .sf-switch-grid-2 { display: grid; grid-template-columns: repeat(2,1fr); gap: 8px; }
 
 /* ── 3-way 슬라이드 토글 카드 ── */
@@ -1105,23 +1131,106 @@ canvas { max-width: 100%; }
       </div>
     </div>
 
-    <!-- 전원 상태 (인디케이터만) -->
-    <div class="sf-status-bar">
-      <div style="display:flex;align-items:center;gap:8px;">
-        <div class="sf-power-dot" id="sf-power-dot"></div>
-        <div style="font-size:12px;font-weight:700;color:var(--text-primary);">컨트롤 패널</div>
-        <div id="sf-status-text" style="font-size:10px;color:var(--text-tertiary);">—</div>
-      </div>
-      <!-- 강우 감지 LED + 활성/비활성 토글 -->
-      <div style="display:flex;align-items:center;gap:7px;flex-shrink:0;">
-        <div style="display:flex;align-items:center;gap:4px;">
-          <div id="sf-rain-dot" style="width:8px;height:8px;border-radius:50%;background:#D1D5DB;box-shadow:0 0 0 2px rgba(209,213,219,0.3);transition:all 0.3s;flex-shrink:0;"></div>
-          <span style="font-size:10px;color:var(--text-tertiary);white-space:nowrap;">강우</span>
+    <!-- 전원 + 센서 상태 바 -->
+    <div class="sf-status-bar" style="flex-direction:column;align-items:stretch;gap:0;padding:10px 12px;">
+      <div style="display:flex;align-items:center;gap:10px;flex-wrap:nowrap;overflow-x:auto;">
+        <!-- 전원 LED -->
+        <div style="display:flex;flex-direction:column;align-items:center;gap:2px;flex-shrink:0;">
+          <div class="sf-power-dot" id="sf-power-dot"></div>
+          <span style="font-size:8px;color:var(--text-tertiary);line-height:1;">전원</span>
         </div>
-        <button onclick="sfToggleRainMode()" id="sf-rain-toggle"
-          style="padding:4px 10px;font-size:10px;font-weight:700;font-family:'Noto Sans KR',sans-serif;color:#6B7280;background:#F9FAFB;border:1.5px solid #D1D5DB;border-radius:50px;cursor:pointer;white-space:nowrap;transition:all 0.2s;">
-          감지 닫기 꺼짐
+        <!-- 강우 LED -->
+        <div style="display:flex;flex-direction:column;align-items:center;gap:2px;flex-shrink:0;">
+          <div id="sf-rain-dot" style="width:8px;height:8px;border-radius:50%;background:#D1D5DB;transition:all 0.3s;"></div>
+          <span style="font-size:8px;color:var(--text-tertiary);line-height:1;">강우</span>
+        </div>
+        <!-- CO 1~3 LED -->
+        <div style="display:flex;flex-direction:column;align-items:center;gap:2px;flex-shrink:0;">
+          <div id="sf-co-dot-1" style="width:8px;height:8px;border-radius:50%;background:#D1D5DB;transition:all 0.3s;"></div>
+          <span style="font-size:8px;color:var(--text-tertiary);line-height:1;">CO 1</span>
+        </div>
+        <div style="display:flex;flex-direction:column;align-items:center;gap:2px;flex-shrink:0;">
+          <div id="sf-co-dot-2" style="width:8px;height:8px;border-radius:50%;background:#D1D5DB;transition:all 0.3s;"></div>
+          <span style="font-size:8px;color:var(--text-tertiary);line-height:1;">CO 2</span>
+        </div>
+        <div style="display:flex;flex-direction:column;align-items:center;gap:2px;flex-shrink:0;">
+          <div id="sf-co-dot-3" style="width:8px;height:8px;border-radius:50%;background:#D1D5DB;transition:all 0.3s;"></div>
+          <span style="font-size:8px;color:var(--text-tertiary);line-height:1;">CO 3</span>
+        </div>
+        <!-- 강우 감지 토글 -->
+        <button onclick="sfQuickToggle('rain')" id="sf-rain-toggle-btn"
+          style="flex-shrink:0;padding:3px 9px;font-size:10px;font-weight:700;font-family:'Noto Sans KR',sans-serif;border-radius:50px;cursor:pointer;border:1.5px solid #D1D5DB;background:#F9FAFB;color:#6B7280;white-space:nowrap;">
+          강우 꺼짐
         </button>
+        <!-- CO 감지 토글 -->
+        <button onclick="sfQuickToggle('co')" id="sf-co-toggle-btn"
+          style="flex-shrink:0;padding:3px 9px;font-size:10px;font-weight:700;font-family:'Noto Sans KR',sans-serif;border-radius:50px;cursor:pointer;border:1.5px solid #D1D5DB;background:#F9FAFB;color:#6B7280;white-space:nowrap;">
+          CO 꺼짐
+        </button>
+        <!-- 센서 설정 버튼 -->
+        <button onclick="sfOpenSensorConfigModal()"
+          style="flex-shrink:0;padding:3px 9px;font-size:9px;font-weight:600;font-family:'Noto Sans KR',sans-serif;border-radius:50px;cursor:pointer;border:1px solid var(--border);background:var(--bg);color:var(--text-secondary);white-space:nowrap;">
+          센서 설정
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 센서 설정 통합 모달 -->
+  <div id="sf-sensor-config-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.45);z-index:900;align-items:flex-end;justify-content:center;">
+    <div style="background:var(--surface);border-radius:22px 22px 0 0;width:100%;max-width:430px;padding:20px 20px calc(20px + env(safe-area-inset-bottom,0px));max-height:85vh;overflow-y:auto;">
+      <div style="font-size:15px;font-weight:700;margin-bottom:16px;">센서 설정</div>
+
+      <!-- 강우 설정 -->
+      <div style="margin-bottom:16px;padding-bottom:16px;border-bottom:1px solid var(--border);">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">
+          <div style="display:flex;align-items:center;gap:6px;">
+            <div id="sf-rain-dot-modal" style="width:8px;height:8px;border-radius:50%;background:#D1D5DB;"></div>
+            <span style="font-size:13px;font-weight:700;">강우 감지</span>
+          </div>
+          <div style="display:flex;border-radius:50px;overflow:hidden;border:1px solid var(--border);background:var(--bg);">
+            <button id="sf-rain-modal-off" onclick="sfModalToggle('rain',false)" style="padding:5px 12px;font-size:10px;font-weight:700;font-family:'Noto Sans KR',sans-serif;border:none;cursor:pointer;background:#111827;color:white;border-radius:50px;">꺼짐</button>
+            <button id="sf-rain-modal-on"  onclick="sfModalToggle('rain',true)"  style="padding:5px 12px;font-size:10px;font-weight:700;font-family:'Noto Sans KR',sans-serif;border:none;cursor:pointer;background:transparent;color:var(--text-tertiary);">켜짐</button>
+          </div>
+        </div>
+        <div class="sf-auto-row" style="margin-bottom:6px;"><label style="width:70px;font-size:10px;font-weight:600;color:#5B21B6;flex-shrink:0;">감지 기준</label>
+          <input type="number" step="0.1" id="sf-rain-threshold" placeholder="0.1" style="flex:1;padding:6px 10px;font-size:12px;font-family:'Noto Sans KR',sans-serif;background:var(--bg);border:1px solid var(--border);border-radius:8px;">
+          <span style="font-size:11px;color:var(--text-secondary);margin-left:4px;flex-shrink:0;">mm/h 이상</span>
+        </div>
+        <div id="sf-rain-actions-wrap">
+          <div style="font-size:10px;font-weight:600;color:#5B21B6;margin-bottom:5px;">감지 시 동작</div>
+          <div id="sf-rain-action-list" style="display:flex;flex-direction:column;gap:5px;"></div>
+          <button onclick="sfAddSensorAction('rain')" style="margin-top:5px;font-size:9px;padding:3px 10px;background:#F5F3FF;border:1px dashed #DDD6FE;border-radius:50px;cursor:pointer;color:#7C3AED;font-family:'Noto Sans KR',sans-serif;">+ 동작 추가</button>
+        </div>
+      </div>
+
+      <!-- CO 설정 -->
+      <div style="margin-bottom:16px;">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">
+          <div style="display:flex;align-items:center;gap:6px;">
+            <div id="sf-co-dot-modal" style="width:8px;height:8px;border-radius:50%;background:#D1D5DB;"></div>
+            <span style="font-size:13px;font-weight:700;">CO 감지</span>
+          </div>
+          <div style="display:flex;border-radius:50px;overflow:hidden;border:1px solid var(--border);background:var(--bg);">
+            <button id="sf-co-modal-off" onclick="sfModalToggle('co',false)" style="padding:5px 12px;font-size:10px;font-weight:700;font-family:'Noto Sans KR',sans-serif;border:none;cursor:pointer;background:#111827;color:white;border-radius:50px;">꺼짐</button>
+            <button id="sf-co-modal-on"  onclick="sfModalToggle('co',true)"  style="padding:5px 12px;font-size:10px;font-weight:700;font-family:'Noto Sans KR',sans-serif;border:none;cursor:pointer;background:transparent;color:var(--text-tertiary);">켜짐</button>
+          </div>
+        </div>
+        <div class="sf-auto-row" style="margin-bottom:6px;"><label style="width:70px;font-size:10px;font-weight:600;color:#5B21B6;flex-shrink:0;">경보 기준</label>
+          <input type="number" id="sf-co-threshold" placeholder="50" style="flex:1;padding:6px 10px;font-size:12px;font-family:'Noto Sans KR',sans-serif;background:var(--bg);border:1px solid var(--border);border-radius:8px;">
+          <span style="font-size:11px;color:var(--text-secondary);margin-left:4px;flex-shrink:0;">ppm 이상</span>
+        </div>
+        <div style="font-size:9px;color:var(--text-tertiary);margin-bottom:6px;">※ CO 1~3 중 하나라도 초과 시 동작</div>
+        <div id="sf-co-actions-wrap">
+          <div style="font-size:10px;font-weight:600;color:#5B21B6;margin-bottom:5px;">감지 시 동작</div>
+          <div id="sf-co-action-list" style="display:flex;flex-direction:column;gap:5px;"></div>
+          <button onclick="sfAddSensorAction('co')" style="margin-top:5px;font-size:9px;padding:3px 10px;background:#F5F3FF;border:1px dashed #DDD6FE;border-radius:50px;cursor:pointer;color:#7C3AED;font-family:'Noto Sans KR',sans-serif;">+ 동작 추가</button>
+        </div>
+      </div>
+
+      <div style="display:flex;gap:10px;margin-top:4px;">
+        <button onclick="sfCloseSensorConfig()" style="flex:1;padding:13px;font-size:14px;font-family:'Noto Sans KR',sans-serif;color:var(--text-secondary);background:var(--bg);border:1px solid var(--border);border-radius:var(--radius-md);cursor:pointer;">취소</button>
+        <button onclick="sfSaveSensorConfigAll()" style="flex:1;padding:13px;font-size:14px;font-weight:700;font-family:'Noto Sans KR',sans-serif;color:white;background:var(--text-primary);border:none;border-radius:var(--radius-md);cursor:pointer;">저장</button>
       </div>
     </div>
   </div>
@@ -1330,11 +1439,41 @@ canvas { max-width: 100%; }
       <div class="sf-switch-grid-2" id="sf-zone6"></div>
       <div class="sf-auto-blocked-overlay" id="sf-block-zone6"></div>
     </div>
+  </div>  <!-- ⑦ 그룹 7 (on/off 스위치 3개) -->
+  <div class="sec-label" id="sf-zone-label-zone7">⑦ 그룹 7</div>
+  <div class="sf-card" style="margin-bottom:18px;">
+    <div style="display:flex;align-items:center;justify-content:space-between;gap:6px;margin-bottom:8px;">
+      <div class="sf-zone-btns" id="sf-zone-all-btns-zone7">
+        <button class="sf-zone-btn t-close" onclick="sfZoneAll('zone7','off')">전체 닫기</button>
+        <button class="sf-zone-btn t-stop"  onclick="sfZoneAll('zone7','stop')">전체 정지</button>
+        <button class="sf-zone-btn t-open"  onclick="sfZoneAll('zone7','on')">전체 열기</button>
+      </div>
+      <div style="display:flex;align-items:center;gap:4px;flex-shrink:0;">
+        <div class="sf-mode-toggle">
+          <button class="sf-mode-btn active-manual" id="mode-btn-manual-zone7" onclick="sfSetMode('zone7','manual')">수동</button>
+          <button class="sf-mode-btn" id="mode-btn-auto-zone7" onclick="sfSetMode('zone7','auto')">자동</button>
+        </div>
+        <button id="sf-arrow-zone7" onclick="sfToggleAutoPanel('zone7')" style="background:none;border:none;font-size:9px;cursor:pointer;color:var(--text-tertiary);padding:0 1px;line-height:1;">▼</button>
+      </div>
+    </div>
+    <div class="sf-auto-panel" id="sf-auto-panel-zone7">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">
+        <div style="font-size:10px;font-weight:700;color:#5B21B6;">자동 동작 조건</div>
+        <button onclick="sfAddRule('zone7')" style="font-size:9px;font-weight:700;padding:3px 10px;background:#7C3AED;color:white;border:none;border-radius:50px;cursor:pointer;font-family:'Noto Sans KR',sans-serif;">+ 조건 추가</button>
+      </div>
+      <div id="sf-rules-zone7" style="display:flex;flex-direction:column;gap:6px;"></div>
+      <div style="display:flex;gap:6px;margin-top:8px;">
+        <button onclick="sfSetMode('zone7','manual')" style="flex:1;padding:7px;font-size:11px;font-weight:700;font-family:'Noto Sans KR',sans-serif;background:var(--bg);color:var(--text-secondary);border:1px solid var(--border);border-radius:8px;cursor:pointer;">취소</button>
+        <button onclick="sfSaveRules('zone7')" style="flex:1;padding:7px;font-size:11px;font-weight:700;font-family:'Noto Sans KR',sans-serif;background:#7C3AED;color:white;border:none;border-radius:8px;cursor:pointer;">저장</button>
+      </div>
+    </div>
+    <div style="position:relative;">
+      <div class="sf-switch-grid-3" id="sf-zone7"></div>
+      <div class="sf-auto-blocked-overlay" id="sf-block-zone7"></div>
+    </div>
   </div>
 
 </div>
-
-<!-- ══ 육묘 탭 ══ -->
 <div class="sec" id="sec-seedling-tab">
   <!-- 환경 통합 카드 -->
   <div class="sec-label">환경</div>
@@ -5913,8 +6052,11 @@ var SF_ZONE_DEFS = [
   { key:'zone5', defaultName:'그룹 5', hasTempSensor:true, hasTimer:true, gridCols:1, switches:[
     {id:'z5s1',defaultLabel:'스위치 1'}
   ]},
-  { key:'zone6', defaultName:'그룹 6', hasTempSensor:true, hasTimer:true, gridCols:2, switches:[
+  { key:'zone6', defaultName:'그룹 6', hasTempSensor:true, hasTimer:true, gridCols:2, twoWay:true, switches:[
     {id:'z6s1',defaultLabel:'스위치 1'},{id:'z6s2',defaultLabel:'스위치 2'}
+  ]},
+  { key:'zone7', defaultName:'그룹 7', hasTempSensor:false, hasTimer:false, gridCols:3, twoWay:true, switches:[
+    {id:'z7s1',defaultLabel:'스위치 1'},{id:'z7s2',defaultLabel:'스위치 2'},{id:'z7s3',defaultLabel:'스위치 3'}
   ]}
 ];
 
@@ -6051,10 +6193,10 @@ function sfUpdateHeader() {
   // 전원은 인디케이터만 — masterOn 상태 표시
   if (!SF_STATE.masterOn) {
     if (dot) dot.className = 'sf-power-dot';
-    if (txt) txt.textContent = '전원 꺼짐 · 릴레이 연결 대기';
+    if (txt) txt.textContent = '';
   } else {
     if (dot) dot.className = 'sf-power-dot on';
-    if (txt) txt.textContent = '전원 켜짐 · ' + onCount + '개 구동 중';
+    if (txt) txt.textContent = onCount > 0 ? onCount+'개 구동' : '';
   }
 }
 
@@ -6095,7 +6237,15 @@ function sfApplyModeUI(zone, mode) {
     if(arrow) arrow.textContent='▼';
   }
   var def=SF_ZONE_DEFS.find(function(z){return z.key===zone;});
-  if(def){ def.switches.forEach(function(sw){ var el=document.getElementById('sf-sw-'+sw.id); if(el) el.classList.toggle('blocked', mode==='auto'); }); }
+  if(def){ def.switches.forEach(function(sw){
+    if (def.twoWay) {
+      var el=document.getElementById('sf-sw2-'+sw.id);
+      if(el){ if(mode==='auto') el.classList.add('blocked'); else el.classList.remove('blocked'); }
+    } else {
+      var el=document.getElementById('sf-sw-'+sw.id);
+      if(el) el.classList.toggle('blocked', mode==='auto');
+    }
+  }); }
   sfLoadAutoConfig(zone);
 }
 function sfToggleAutoPanel(zone) {
@@ -6259,7 +6409,7 @@ function sfSaveRules(zone) {
 function sfLoadAllModes() {
   try {
     var m=JSON.parse(localStorage.getItem('pb8_sf_modes')||'{}');
-    ['zone1','zone2','zone3','zone4','zone5','zone6'].forEach(function(z){ sfApplyModeUI(z, m[z]||'manual'); });
+    ['zone1','zone2','zone3','zone4','zone5','zone6','zone7'].forEach(function(z){ sfApplyModeUI(z, m[z]||'manual'); });
   } catch(e){}
 }
 
@@ -6296,6 +6446,36 @@ function sfRainClose() {
   if (typeof showSaveToast === 'function') showSaveToast('강우 감지 — 전체 닫기 완료');
 }
 
+// ── 2-way On/Off 스위치 렌더 ──
+function sfDraw2(id) {
+  var el = document.getElementById('sf-sw2-' + id);
+  if (!el) return;
+  var st = sfInit(id).state; // 'on' | 'stop'(=off)
+  var label = sfGetSwLabel(id);
+  if (!el.querySelector('.sf-sw2-track')) {
+    el.innerHTML = '<div class="sf-sw2-num"></div><div class="sf-sw2-track"><div class="sf-sw2-knob"></div></div><div class="sf-sw2-lbl"></div>';
+  }
+  el.className = 'sf-sw2' + (st==='on' ? ' on' : '') + (el.classList.contains('blocked') ? ' blocked' : '');
+  el.querySelector('.sf-sw2-num').textContent = label;
+  el.querySelector('.sf-sw2-lbl').textContent = st==='on' ? 'ON' : 'OFF';
+}
+
+function sfAttachSlide2(el, id) {
+  var usingTouch = false;
+  function toggle() {
+    var cur = sfInit(id).state;
+    sfInit(id).state = (cur==='on') ? 'stop' : 'on';
+    sfSave(); sfDraw2(id); sfUpdateHeader();
+  }
+  el.addEventListener('touchstart', function(){ usingTouch=true; }, {passive:true});
+  el.addEventListener('touchend', function(e){
+    e.preventDefault();
+    toggle();
+    setTimeout(function(){ usingTouch=false; }, 350);
+  }, {passive:false});
+  el.addEventListener('click', function(){ if(!usingTouch) toggle(); });
+}
+
 // ── 탭 렌더 ──
 function renderSmartfarmTab() {
   sfLoad();
@@ -6306,19 +6486,27 @@ function renderSmartfarmTab() {
     if (!el) return;
     var cols = z.gridCols || 3;
     el.className = 'sf-switch-grid-' + cols;
-    el.innerHTML = z.switches.map(function(sw) {
-      return '<div id="sf-sw-' + sw.id + '"></div>';
-    }).join('');
-    z.switches.forEach(function(sw) {
-      sfDraw(sw.id);
-      var swEl = document.getElementById('sf-sw-' + sw.id);
-      if (swEl) sfAttachSlide(swEl, sw.id);
-    });
+    if (z.twoWay) {
+      el.innerHTML = z.switches.map(function(sw){ return '<div id="sf-sw2-'+sw.id+'"></div>'; }).join('');
+      z.switches.forEach(function(sw){
+        sfDraw2(sw.id);
+        var swEl = document.getElementById('sf-sw2-'+sw.id);
+        if (swEl) sfAttachSlide2(swEl, sw.id);
+      });
+    } else {
+      el.innerHTML = z.switches.map(function(sw){ return '<div id="sf-sw-'+sw.id+'"></div>'; }).join('');
+      z.switches.forEach(function(sw){
+        sfDraw(sw.id);
+        var swEl = document.getElementById('sf-sw-'+sw.id);
+        if (swEl) sfAttachSlide(swEl, sw.id);
+      });
+    }
   });
   sfUpdateHeader();
   sfLoadAllModes();
   sfUpdateZoneTemps();
   sfInitRain();
+  sfInitCo();
   sfFetchEcowittNow();
 }
 
@@ -6334,67 +6522,167 @@ function sfUpdateZoneTemps() {
   });
 }
 
-// 강우 감지 LED
-var SF_RAIN_ACTIVE = false; // 현재 강우 감지 여부 (센서 신호)
-var SF_RAIN_MODE = false;   // 감지 닫기 활성화 여부
+// ── 강우/CO 센서 통합 ──
+var SF_RAIN_ACTIVE = false;
+var SF_RAIN_MODE = false;
+var SF_CO_MODE = false;
+var _sfSensorType = 'rain';
 
-function sfInitRain() {
-  try { SF_RAIN_MODE = JSON.parse(localStorage.getItem('pb8_sf_rain_mode')||'false'); } catch(e){}
-  sfUpdateRainUI();
+var SF_SENSOR_CONFIGS = {
+  rain: {
+    title: '강우 감지 설정',
+    actions: [
+      {value:'close_all', label:'모든 그룹 닫기'},
+      {value:'close_zone1', label:'그룹 1만 닫기'},
+      {value:'close_zone2', label:'그룹 2만 닫기'},
+      {value:'close_zone3', label:'그룹 3만 닫기'},
+      {value:'close_zone6', label:'그룹 6만 닫기'}
+    ],
+    thresholdLabel: '감지 기준 (mm/h)', thresholdUnit: 'mm/h', thresholdDefault: 0.1,
+    note: '', storageKey: 'pb8_sf_rain_cfg', modeKey: 'pb8_sf_rain_mode'
+  },
+  co: {
+    title: 'CO 감지 설정',
+    actions: [
+      {value:'open_all', label:'모든 그룹 열기 (환기)'},
+      {value:'open_zone6', label:'그룹 6만 열기'},
+      {value:'alert_only', label:'경보만 (동작 없음)'}
+    ],
+    thresholdLabel: '경보 기준 (ppm)', thresholdUnit: 'ppm', thresholdDefault: 50,
+    note: '※ CO 센서 1~4 중 하나라도 기준 초과 시 동작',
+    storageKey: 'pb8_sf_co_cfg', modeKey: 'pb8_sf_co_mode'
+  }
+};
+
+// ── 센서 설정 통합 모달 ──
+var _sfSensorModalRainOn = false;
+var _sfSensorModalCoOn  = false;
+var _sfRainActions = [];
+var _sfCoActions   = [];
+
+function sfOpenSensorConfigModal() {
+  // 저장된 값 로드
+  _sfSensorModalRainOn = SF_RAIN_MODE;
+  _sfSensorModalCoOn   = SF_CO_MODE;
+  try { _sfRainActions = JSON.parse(localStorage.getItem('pb8_sf_rain_actions')||'[]'); } catch(e){ _sfRainActions=[]; }
+  try { _sfCoActions   = JSON.parse(localStorage.getItem('pb8_sf_co_actions')||'[]');   } catch(e){ _sfCoActions=[]; }
+  try { var rc=JSON.parse(localStorage.getItem('pb8_sf_rain_cfg')||'{}'); document.getElementById('sf-rain-threshold').value=rc.threshold||0.1; } catch(e){}
+  try { var cc=JSON.parse(localStorage.getItem('pb8_sf_co_cfg')||'{}');   document.getElementById('sf-co-threshold').value=cc.threshold||50;   } catch(e){}
+  sfModalToggle('rain', _sfSensorModalRainOn, true);
+  sfModalToggle('co',   _sfSensorModalCoOn,   true);
+  sfRenderSensorActions('rain');
+  sfRenderSensorActions('co');
+  var m=document.getElementById('sf-sensor-config-modal'); if(m) m.style.display='flex';
 }
 
+function sfModalToggle(type, on, init) {
+  if (type==='rain') _sfSensorModalRainOn=on; else _sfSensorModalCoOn=on;
+  var offBtn=document.getElementById('sf-'+type+'-modal-off');
+  var onBtn =document.getElementById('sf-'+type+'-modal-on');
+  var base='padding:5px 12px;font-size:10px;font-weight:700;font-family:Noto Sans KR,sans-serif;border:none;cursor:pointer;';
+  if (!offBtn||!onBtn) return;
+  if (on) { onBtn.setAttribute('style',base+'background:#7C3AED;color:white;border-radius:50px;'); offBtn.setAttribute('style',base+'background:transparent;color:#9CA3AF;'); }
+  else { offBtn.setAttribute('style',base+'background:#111827;color:white;border-radius:50px;'); onBtn.setAttribute('style',base+'background:transparent;color:#9CA3AF;'); }
+}
+
+function sfRenderSensorActions(type) {
+  var list = document.getElementById('sf-'+type+'-action-list');
+  if (!list) return;
+  var actions = type==='rain' ? _sfRainActions : _sfCoActions;
+  var zones = SF_ZONE_DEFS.map(function(z){ return '<option value="'+z.key+'">'+sfGetZoneName(z.key)+'</option>'; }).join('');
+  list.innerHTML = actions.map(function(a,i){
+    return '<div style="display:flex;align-items:center;gap:5px;">'
+      + '<select onchange="sfSensorActionChange(\''+type+'\','+i+',\'zone\',this.value)" style="flex:1;padding:5px 7px;font-size:11px;font-family:\'Noto Sans KR\',sans-serif;background:#F5F3FF;border:1px solid #DDD6FE;border-radius:7px;">'
+      + zones.replace('value="'+a.zone+'"','value="'+a.zone+'" selected')
+      + '</select>'
+      + '<select onchange="sfSensorActionChange(\''+type+'\','+i+',\'action\',this.value)" style="padding:5px 7px;font-size:11px;font-family:\'Noto Sans KR\',sans-serif;background:#F5F3FF;border:1px solid #DDD6FE;border-radius:7px;">'
+      + '<option value="close"'+(a.action==='close'?' selected':'')+'>닫기</option>'
+      + '<option value="open"'+(a.action==='open'?' selected':'')+'>열기</option>'
+      + '<option value="stop"'+(a.action==='stop'?' selected':'')+'>정지</option>'
+      + '</select>'
+      + '<button onclick="sfDelSensorAction(\''+type+'\','+i+')" style="background:none;border:none;font-size:14px;color:#FECDD3;cursor:pointer;padding:0 3px;">×</button>'
+      + '</div>';
+  }).join('');
+}
+
+function sfAddSensorAction(type) {
+  var def = SF_ZONE_DEFS[0];
+  var arr = type==='rain' ? _sfRainActions : _sfCoActions;
+  arr.push({zone: def?def.key:'zone1', action:'close'});
+  sfRenderSensorActions(type);
+}
+function sfDelSensorAction(type, i) {
+  var arr = type==='rain' ? _sfRainActions : _sfCoActions;
+  arr.splice(i,1); sfRenderSensorActions(type);
+}
+function sfSensorActionChange(type, i, field, val) {
+  var arr = type==='rain' ? _sfRainActions : _sfCoActions;
+  if (arr[i]) arr[i][field]=val;
+}
+
+function sfCloseSensorConfig() { var m=document.getElementById('sf-sensor-config-modal'); if(m) m.style.display='none'; }
+
+function sfSaveSensorConfigAll() {
+  SF_RAIN_MODE = _sfSensorModalRainOn;
+  SF_CO_MODE   = _sfSensorModalCoOn;
+  var rainThr = parseFloat(document.getElementById('sf-rain-threshold').value)||0.1;
+  var coThr   = parseFloat(document.getElementById('sf-co-threshold').value)||50;
+  try {
+    localStorage.setItem('pb8_sf_rain_mode', JSON.stringify(SF_RAIN_MODE));
+    localStorage.setItem('pb8_sf_co_mode',   JSON.stringify(SF_CO_MODE));
+    localStorage.setItem('pb8_sf_rain_cfg',  JSON.stringify({threshold:rainThr}));
+    localStorage.setItem('pb8_sf_co_cfg',    JSON.stringify({threshold:coThr}));
+    localStorage.setItem('pb8_sf_rain_actions', JSON.stringify(_sfRainActions));
+    localStorage.setItem('pb8_sf_co_actions',   JSON.stringify(_sfCoActions));
+  } catch(e){}
+  sfUpdateRainUI(); sfUpdateCoUI();
+  sfCloseSensorConfig();
+  if (typeof showSaveToast==='function') showSaveToast('센서 설정 저장됨');
+}
+
+// sfOpenSensorConfig 호환 (구버전 호출 방어)
+function sfOpenSensorConfig(type) { sfOpenSensorConfigModal(); }
+function sfSaveSensorConfig() { sfSaveSensorConfigAll(); }
+function sfQuickToggle(type) {
+  if (type==='rain') { SF_RAIN_MODE=!SF_RAIN_MODE; try{localStorage.setItem('pb8_sf_rain_mode',JSON.stringify(SF_RAIN_MODE));}catch(e){} sfUpdateRainUI(); }
+  else { SF_CO_MODE=!SF_CO_MODE; try{localStorage.setItem('pb8_sf_co_mode',JSON.stringify(SF_CO_MODE));}catch(e){} sfUpdateCoUI(); }
+  if (typeof showSaveToast==='function') showSaveToast(type==='rain'?(SF_RAIN_MODE?'강우 감지 켜짐':'강우 감지 꺼짐'):(SF_CO_MODE?'CO 감지 켜짐':'CO 감지 꺼짐'));
+}
 function sfUpdateRainUI() {
-  var dot = document.getElementById('sf-rain-dot');
-  var btn = document.getElementById('sf-rain-toggle');
-  // LED
-  if (dot) {
-    if (SF_RAIN_ACTIVE) {
-      dot.style.background = '#3B82F6';
-      dot.style.boxShadow = '0 0 0 3px rgba(59,130,246,0.25)';
-      dot.style.animation = 'sf-pulse 1.5s infinite';
-    } else {
-      dot.style.background = '#D1D5DB';
-      dot.style.boxShadow = '0 0 0 2px rgba(209,213,219,0.2)';
-      dot.style.animation = 'none';
-    }
-  }
-  // 토글 버튼
-  if (btn) {
-    if (SF_RAIN_MODE) {
-      btn.style.color = '#1D4ED8';
-      btn.style.background = '#EFF6FF';
-      btn.style.borderColor = '#BFDBFE';
-      btn.textContent = '감지 닫기 켜짐';
-    } else {
-      btn.style.color = '#6B7280';
-      btn.style.background = '#F9FAFB';
-      btn.style.borderColor = '#D1D5DB';
-      btn.textContent = '감지 닫기 꺼짐';
-    }
-  }
+  var dot=document.getElementById('sf-rain-dot');
+  var btn=document.getElementById('sf-rain-toggle-btn');
+  var badge=document.getElementById('sf-rain-status-badge');
+  if (dot) { dot.style.background=SF_RAIN_ACTIVE?'#3B82F6':'#D1D5DB'; dot.style.boxShadow=SF_RAIN_ACTIVE?'0 0 0 3px rgba(59,130,246,0.25)':'none'; }
+  if (btn) { btn.textContent=SF_RAIN_MODE?'강우 켜짐':'강우 꺼짐'; btn.style.background=SF_RAIN_MODE?'#EFF6FF':'#F9FAFB'; btn.style.color=SF_RAIN_MODE?'#1D4ED8':'#6B7280'; btn.style.borderColor=SF_RAIN_MODE?'#BFDBFE':'#D1D5DB'; }
+  if (badge) { badge.textContent=SF_RAIN_MODE?'켜짐':'꺼짐'; badge.style.background=SF_RAIN_MODE?'#DCFCE7':'#F3F4F6'; badge.style.color=SF_RAIN_MODE?'#16A34A':'#9CA3AF'; }
 }
-
-function sfToggleRainMode() {
-  SF_RAIN_MODE = !SF_RAIN_MODE;
-  try { localStorage.setItem('pb8_sf_rain_mode', JSON.stringify(SF_RAIN_MODE)); } catch(e){}
-  sfUpdateRainUI();
-  if (typeof showSaveToast === 'function') showSaveToast(SF_RAIN_MODE ? '강우 감지 닫기 활성화' : '강우 감지 닫기 비활성화');
+function sfUpdateCoUI() {
+  var btn=document.getElementById('sf-co-toggle-btn');
+  var badge=document.getElementById('sf-co-status-badge');
+  if (btn) { btn.textContent=SF_CO_MODE?'CO 켜짐':'CO 꺼짐'; btn.style.background=SF_CO_MODE?'#FFFBEB':'#F9FAFB'; btn.style.color=SF_CO_MODE?'#D97706':'#6B7280'; btn.style.borderColor=SF_CO_MODE?'#FCD34D':'#D1D5DB'; }
+  if (badge) { badge.textContent=SF_CO_MODE?'켜짐':'꺼짐'; badge.style.background=SF_CO_MODE?'#FEF3C7':'#F3F4F6'; badge.style.color=SF_CO_MODE?'#D97706':'#9CA3AF'; }
 }
-
-// 강우 신호 수신 (Ecowitt rain_rate > 0이면 감지)
+function sfUpdateCoDot(n, active) {
+  if (n > 3) return; // CO 센서는 3개
+  var dot=document.getElementById('sf-co-dot-'+n); if(!dot) return;
+  dot.style.background=active?'#F59E0B':'#D1D5DB'; dot.style.boxShadow=active?'0 0 0 3px rgba(245,158,11,0.25)':'none';
+}
+function sfInitRain() { try { SF_RAIN_MODE=JSON.parse(localStorage.getItem('pb8_sf_rain_mode')||'false'); } catch(e){} sfUpdateRainUI(); }
+function sfInitCo()   { try { SF_CO_MODE  =JSON.parse(localStorage.getItem('pb8_sf_co_mode')||'false');   } catch(e){} sfUpdateCoUI();   }
 function sfCheckRain(rainRate) {
-  var wasActive = SF_RAIN_ACTIVE;
-  SF_RAIN_ACTIVE = (rainRate != null && parseFloat(rainRate) > 0);
+  var wasActive=SF_RAIN_ACTIVE;
+  SF_RAIN_ACTIVE=(rainRate!=null&&parseFloat(rainRate)>0);
   sfUpdateRainUI();
-  // 감지 닫기 활성화 상태이고 새로 감지되면 전체 닫기
-  if (SF_RAIN_ACTIVE && !wasActive && SF_RAIN_MODE) {
-    SF_ZONE_DEFS.forEach(function(z) {
-      z.switches.forEach(function(s) { sfInit(s.id).state = 'off'; sfDraw(s.id); });
-    });
+  if (SF_RAIN_ACTIVE&&!wasActive&&SF_RAIN_MODE) {
+    var cfg={}; try{cfg=JSON.parse(localStorage.getItem('pb8_sf_rain_cfg')||'{}');}catch(e){}
+    var action=cfg.action||'close_all';
+    if (action==='close_all') { SF_ZONE_DEFS.forEach(function(z){z.switches.forEach(function(s){sfInit(s.id).state='off';sfDraw(s.id);});}); }
+    else { var zKey=action.replace('close_',''); var def=SF_ZONE_DEFS.find(function(z){return z.key===zKey;}); if(def)def.switches.forEach(function(s){sfInit(s.id).state='off';sfDraw(s.id);}); }
     sfSave(); sfUpdateHeader();
-    if (typeof showSaveToast === 'function') showSaveToast('강우 감지 — 전체 닫기 자동 실행');
+    if (typeof showSaveToast==='function') showSaveToast('강우 감지 — 자동 닫기 실행');
   }
 }
+
 
 // ── Ecowitt 연동 체크 및 자동 로드 ──
 function sfIsEcowittLinked() {
