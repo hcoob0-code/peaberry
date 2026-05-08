@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="theme-color" content="#EEF3F8">
 <link rel="icon" id="dynamic-favicon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='22' fill='%23111827'/%3E%3Ctext y='78' font-size='64' x='50' text-anchor='middle'%3E🌱%3C/text%3E%3C/svg%3E">
 <link rel="apple-touch-icon" id="dynamic-apple-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='22' fill='%23111827'/%3E%3Ctext y='78' font-size='64' x='50' text-anchor='middle'%3E🌱%3C/text%3E%3C/svg%3E">
 <title>피크베리 농장</title>
@@ -207,7 +208,7 @@ body {
 .prog-item-acts { display: flex; gap: 3px; }
 .modal-bg { display: none; position: fixed; inset: 0; background: rgba(26,28,35,0.40); z-index: 300; align-items: flex-end; justify-content: center; backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); }
 .modal-bg.open { display: flex; }
-.modal { background: rgba(255,255,255,0.88); backdrop-filter: blur(24px); -webkit-backdrop-filter: blur(24px); border-radius: 22px 22px 0 0; padding: 20px 20px calc(20px + var(--safe-bottom)); width: 100%; max-width: 430px; max-height: 88vh; overflow-y: auto; -webkit-overflow-scrolling: touch; border-top: 1px solid var(--glass-border); }
+.modal { background: rgba(255,255,255,0.97); border-radius: 22px 22px 0 0; padding: 20px 20px calc(20px + var(--safe-bottom)); width: 100%; max-width: 430px; max-height: 88vh; overflow-y: auto; -webkit-overflow-scrolling: touch; border-top: 1px solid var(--glass-border); }
 .modal-handle { width: 36px; height: 4px; background: var(--border); border-radius: 2px; margin: 0 auto 16px; }
 .modal h3 { font-size: 17px; font-weight: 700; margin-bottom: 16px; color: var(--text-primary); }
 .fg { margin-bottom: 12px; }
@@ -534,22 +535,25 @@ canvas { max-width: 100%; }
   -webkit-user-select: none; -webkit-tap-highlight-color: transparent;
   touch-action: pan-y; min-width: 0;
 }
+.sf-sw2.on {
+  background: rgba(249,250,251,0.75); border-color: rgba(209,213,219,0.6);
+}
 .sf-sw2-num { font-size: 10px; font-weight: 800; color: #9CA3AF; text-align: center; }
 .sf-sw2-track {
   width: 44px; height: 24px; border-radius: 12px;
-  background: #E5E7EB; position: relative;
+  background: #F3F4F6; position: relative;
   transition: background 0.25s; border: 1.5px solid #D1D5DB;
 }
-.sf-sw2.on .sf-sw2-track { background: #DCFCE7; border-color: #86EFAC; }
-.sf-sw2-knob {
+.sf-sw2.on .sf-sw2-track { background: #DCFCE7; border-color: #86EFAC; }.sf-sw2-knob {
   position: absolute; top: 2px; left: 2px;
   width: 17px; height: 17px; border-radius: 50%;
   background: white; box-shadow: 0 1px 4px rgba(0,0,0,0.22);
   transition: left 0.25s cubic-bezier(0.25,0.46,0.45,0.94);
 }
 .sf-sw2.on .sf-sw2-knob { left: calc(100% - 19px); }
-.sf-sw2-lbl { font-size: 9px; color: #9CA3AF; }
-.sf-sw2.on .sf-sw2-lbl { color: #16A34A; font-weight: 700; }
+.sf-sw2-txt-off { display: none; }
+.sf-sw2-txt-on  { display: none; }
+.sf-sw2-lbl { display: none; }
 .sf-sw2.on .sf-sw2-num  { color: #16A34A; }
 .sf-sw2.blocked { opacity: 0.45; pointer-events: none; }
 .sf-switch-grid-2 { display: grid; grid-template-columns: repeat(2,1fr); gap: 8px; }
@@ -734,13 +738,13 @@ canvas { max-width: 100%; }
 /* ── sticky 환경바 + 전원바 ── */
 .sf-sticky-top {
   position: sticky; top: 0; z-index: 50;
-  background: rgba(238,243,248,0.78);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
+  background: transparent;
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
   padding: 10px 0 6px;
   margin: 0 -16px;
   padding-left: 16px; padding-right: 16px;
-  border-bottom: 1px solid rgba(255,255,255,0.55);
+  border-bottom: none;
 }
 
 /* Ecowitt 환경 바 - 배경 박스 없이 플랫 */
@@ -1136,82 +1140,87 @@ canvas { max-width: 100%; }
 
   <!-- ★ 고정 상단바: 환경 + 전원 -->
   <div class="sf-sticky-top" id="sf-sticky-top">
-    <!-- Ecowitt 환경 데이터 -->
-    <div class="sf-env-bar" id="sf-env-bar">
-      <div class="sf-env-cell">
-        <div class="sf-env-label">조도</div>
-        <div class="sf-env-val" id="sf-env-light" style="color:#F59E0B;">—</div>
-        <div class="sf-env-unit">lux</div>
-      </div>
-      <div class="sf-env-cell">
-        <div class="sf-env-label">온도</div>
-        <div class="sf-env-val" id="sf-env-temp" style="color:#EF4444;">—</div>
-        <div class="sf-env-unit">°C</div>
-      </div>
-      <div class="sf-env-cell">
-        <div class="sf-env-label">습도</div>
-        <div class="sf-env-val" id="sf-env-hum" style="color:#0EA5E9;">—</div>
-        <div class="sf-env-unit">%</div>
-      </div>
-      <div class="sf-env-cell">
-        <div class="sf-env-label">강우</div>
-        <div class="sf-env-val" id="sf-env-rain" style="color:#6366F1;">—</div>
-        <div class="sf-env-unit">mm/h</div>
-      </div>
-      <div style="display:flex;flex-direction:column;align-items:flex-end;justify-content:center;gap:3px;">
-        <span id="sf-env-time" style="font-size:8px;color:var(--text-tertiary);">—</span>
-        <button id="sf-env-refresh-btn" onclick="sfFetchEcowittNow()" style="padding:3px 9px;font-size:9px;font-weight:700;font-family:'Noto Sans KR',sans-serif;color:white;background:#059669;border:none;border-radius:50px;cursor:pointer;">새로고침</button>
-      </div>
-    </div>
+    <div class="sf-card" style="margin-bottom:8px;padding:10px 14px;">
 
-    <!-- 전원 + 센서 상태 바 -->
-    <div class="sf-status-bar" style="flex-direction:column;align-items:stretch;gap:0;padding:10px 12px;">
-      <div style="display:flex;align-items:center;gap:10px;flex-wrap:nowrap;overflow-x:auto;">
-        <!-- 전원 LED -->
-        <div style="display:flex;flex-direction:column;align-items:center;gap:2px;flex-shrink:0;">
-          <div class="sf-power-dot" id="sf-power-dot"></div>
-          <span style="font-size:8px;color:var(--text-tertiary);line-height:1;">전원</span>
+      <!-- Ecowitt 환경 데이터 -->
+      <div class="sf-env-bar" id="sf-env-bar">
+        <div class="sf-env-cell">
+          <div class="sf-env-label">조도</div>
+          <div class="sf-env-val" id="sf-env-light" style="color:#F59E0B;">—</div>
+          <div class="sf-env-unit">lux</div>
         </div>
-        <!-- 강우 LED -->
-        <div style="display:flex;flex-direction:column;align-items:center;gap:2px;flex-shrink:0;">
-          <div id="sf-rain-dot" style="width:8px;height:8px;border-radius:50%;background:#D1D5DB;transition:all 0.3s;"></div>
-          <span style="font-size:8px;color:var(--text-tertiary);line-height:1;">강우</span>
+        <div class="sf-env-cell">
+          <div class="sf-env-label">온도</div>
+          <div class="sf-env-val" id="sf-env-temp" style="color:#EF4444;">—</div>
+          <div class="sf-env-unit">°C</div>
         </div>
-        <!-- CO 1~3 LED -->
-        <div style="display:flex;flex-direction:column;align-items:center;gap:2px;flex-shrink:0;">
-          <div id="sf-co-dot-1" style="width:8px;height:8px;border-radius:50%;background:#D1D5DB;transition:all 0.3s;"></div>
-          <span style="font-size:8px;color:var(--text-tertiary);line-height:1;">CO 1</span>
+        <div class="sf-env-cell">
+          <div class="sf-env-label">습도</div>
+          <div class="sf-env-val" id="sf-env-hum" style="color:#0EA5E9;">—</div>
+          <div class="sf-env-unit">%</div>
         </div>
-        <div style="display:flex;flex-direction:column;align-items:center;gap:2px;flex-shrink:0;">
-          <div id="sf-co-dot-2" style="width:8px;height:8px;border-radius:50%;background:#D1D5DB;transition:all 0.3s;"></div>
-          <span style="font-size:8px;color:var(--text-tertiary);line-height:1;">CO 2</span>
+        <div class="sf-env-cell">
+          <div class="sf-env-label">강우</div>
+          <div class="sf-env-val" id="sf-env-rain" style="color:#6366F1;">—</div>
+          <div class="sf-env-unit">mm/h</div>
         </div>
-        <div style="display:flex;flex-direction:column;align-items:center;gap:2px;flex-shrink:0;">
-          <div id="sf-co-dot-3" style="width:8px;height:8px;border-radius:50%;background:#D1D5DB;transition:all 0.3s;"></div>
-          <span style="font-size:8px;color:var(--text-tertiary);line-height:1;">CO 3</span>
+        <div style="display:flex;flex-direction:column;align-items:flex-end;justify-content:center;gap:3px;">
+          <span id="sf-env-time" style="font-size:8px;color:var(--text-tertiary);">—</span>
+          <button id="sf-env-refresh-btn" onclick="sfFetchEcowittNow()" style="padding:3px 9px;font-size:9px;font-weight:700;font-family:'Noto Sans KR',sans-serif;color:white;background:#059669;border:none;border-radius:50px;cursor:pointer;">새로고침</button>
         </div>
-        <!-- 강우 감지 토글 -->
-        <button onclick="sfQuickToggle('rain')" id="sf-rain-toggle-btn"
-          style="flex-shrink:0;padding:3px 9px;font-size:10px;font-weight:700;font-family:'Noto Sans KR',sans-serif;border-radius:50px;cursor:pointer;border:1.5px solid #D1D5DB;background:#F9FAFB;color:#6B7280;white-space:nowrap;">
-          강우 꺼짐
-        </button>
-        <!-- CO 감지 토글 -->
-        <button onclick="sfQuickToggle('co')" id="sf-co-toggle-btn"
-          style="flex-shrink:0;padding:3px 9px;font-size:10px;font-weight:700;font-family:'Noto Sans KR',sans-serif;border-radius:50px;cursor:pointer;border:1.5px solid #D1D5DB;background:#F9FAFB;color:#6B7280;white-space:nowrap;">
-          CO 꺼짐
-        </button>
-        <!-- 센서 설정 버튼 -->
-        <button onclick="sfOpenSensorConfigModal()"
-          style="flex-shrink:0;padding:3px 9px;font-size:9px;font-weight:600;font-family:'Noto Sans KR',sans-serif;border-radius:50px;cursor:pointer;border:1px solid var(--border);background:var(--bg);color:var(--text-secondary);white-space:nowrap;">
-          센서 설정
-        </button>
       </div>
+
+      <!-- 구분선 -->
+      <div style="border-top:1px solid var(--glass-border);margin:6px 0;"></div>
+
+      <!-- LED + 센서 버튼 한 줄 -->
+      <div style="display:flex;align-items:center;justify-content:space-between;">
+        <!-- LED 점들 -->
+        <div style="display:flex;align-items:center;gap:10px;">
+          <div style="display:flex;flex-direction:column;align-items:center;gap:2px;">
+            <div class="sf-power-dot" id="sf-power-dot"></div>
+            <span style="font-size:8px;color:var(--text-tertiary);line-height:1;">전원</span>
+          </div>
+          <div style="display:flex;flex-direction:column;align-items:center;gap:2px;">
+            <div id="sf-rain-dot" style="width:8px;height:8px;border-radius:50%;background:#D1D5DB;transition:all 0.3s;"></div>
+            <span style="font-size:8px;color:var(--text-tertiary);line-height:1;">우적</span>
+          </div>
+          <div style="display:flex;flex-direction:column;align-items:center;gap:2px;">
+            <div id="sf-co-dot-1" style="width:8px;height:8px;border-radius:50%;background:#D1D5DB;transition:all 0.3s;"></div>
+            <span style="font-size:8px;color:var(--text-tertiary);line-height:1;">CO 1</span>
+          </div>
+          <div style="display:flex;flex-direction:column;align-items:center;gap:2px;">
+            <div id="sf-co-dot-2" style="width:8px;height:8px;border-radius:50%;background:#D1D5DB;transition:all 0.3s;"></div>
+            <span style="font-size:8px;color:var(--text-tertiary);line-height:1;">CO 2</span>
+          </div>
+          <div style="display:flex;flex-direction:column;align-items:center;gap:2px;">
+            <div id="sf-co-dot-3" style="width:8px;height:8px;border-radius:50%;background:#D1D5DB;transition:all 0.3s;"></div>
+            <span style="font-size:8px;color:var(--text-tertiary);line-height:1;">CO 3</span>
+          </div>
+        </div>
+        <!-- 센서 버튼들 (작게) -->
+        <div style="display:flex;align-items:center;gap:4px;">
+          <button onclick="sfQuickToggle('rain')" id="sf-rain-toggle-btn"
+            style="padding:3px 7px;font-size:9px;font-weight:700;font-family:'Noto Sans KR',sans-serif;border-radius:50px;cursor:pointer;border:1.5px solid #D1D5DB;background:#F3F4F6;color:#9CA3AF;white-space:nowrap;">
+            우적센서
+          </button>
+          <button onclick="sfQuickToggle('co')" id="sf-co-toggle-btn"
+            style="padding:3px 7px;font-size:9px;font-weight:700;font-family:'Noto Sans KR',sans-serif;border-radius:50px;cursor:pointer;border:1.5px solid #D1D5DB;background:#F3F4F6;color:#9CA3AF;white-space:nowrap;">
+            CO센서
+          </button>
+          <button onclick="sfOpenSensorConfigModal()"
+            style="padding:3px 7px;font-size:9px;font-weight:700;font-family:'Noto Sans KR',sans-serif;border-radius:50px;cursor:pointer;border:1.5px solid #D1D5DB;background:#F3F4F6;color:#9CA3AF;white-space:nowrap;">
+            센서설정
+          </button>
+        </div>
+      </div>
+
     </div>
   </div>
 
   <!-- 센서 설정 통합 모달 -->
   <div id="sf-sensor-config-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.38);z-index:900;align-items:flex-end;justify-content:center;backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);">
-    <div style="background:rgba(255,255,255,0.88);backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px);border-radius:22px 22px 0 0;width:100%;max-width:430px;padding:20px 20px calc(20px + env(safe-area-inset-bottom,0px));max-height:85vh;overflow-y:auto;border-top:1px solid rgba(255,255,255,0.85);">
+    <div style="background:rgba(255,255,255,0.97);border-radius:22px 22px 0 0;width:100%;max-width:430px;padding:20px 20px calc(20px + env(safe-area-inset-bottom,0px));max-height:85vh;overflow-y:auto;border-top:1px solid rgba(255,255,255,0.9);">
       <div style="font-size:15px;font-weight:700;margin-bottom:16px;">센서 설정</div>
 
       <!-- 강우 설정 -->
@@ -1219,7 +1228,7 @@ canvas { max-width: 100%; }
         <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">
           <div style="display:flex;align-items:center;gap:6px;">
             <div id="sf-rain-dot-modal" style="width:8px;height:8px;border-radius:50%;background:#D1D5DB;"></div>
-            <span style="font-size:13px;font-weight:700;">강우 감지</span>
+            <span style="font-size:13px;font-weight:700;">우적 감지</span>
           </div>
           <div style="display:flex;border-radius:50px;overflow:hidden;border:1px solid var(--border);background:var(--bg);">
             <button id="sf-rain-modal-off" onclick="sfModalToggle('rain',false)" style="padding:5px 12px;font-size:10px;font-weight:700;font-family:'Noto Sans KR',sans-serif;border:none;cursor:pointer;background:#111827;color:white;border-radius:50px;">꺼짐</button>
@@ -1444,9 +1453,8 @@ canvas { max-width: 100%; }
   <div class="sf-card" style="margin-bottom:18px;">
     <div style="display:flex;align-items:center;justify-content:space-between;gap:6px;margin-bottom:8px;">
       <div class="sf-zone-btns" id="sf-zone-all-btns-zone6">
-        <button class="sf-zone-btn t-close" onclick="sfZoneAll('zone6','off')">전체 닫기</button>
-        <button class="sf-zone-btn t-stop"  onclick="sfZoneAll('zone6','stop')">전체 정지</button>
-        <button class="sf-zone-btn t-open"  onclick="sfZoneAll('zone6','on')">전체 열기</button>
+        <button class="sf-zone-btn t-close" onclick="sfZoneAll('zone6','off')">전체 OFF</button>
+        <button class="sf-zone-btn t-open"  onclick="sfZoneAll('zone6','on')">전체 ON</button>
       </div>
       <div style="display:flex;align-items:center;gap:4px;flex-shrink:0;">
         <span id="sf-s-temp-zone6" style="font-size:10px;font-weight:700;color:#EF4444;white-space:nowrap;margin-right:2px;margin-left:8px;">— °C</span>
@@ -1477,9 +1485,8 @@ canvas { max-width: 100%; }
   <div class="sf-card" style="margin-bottom:18px;">
     <div style="display:flex;align-items:center;justify-content:space-between;gap:6px;margin-bottom:8px;">
       <div class="sf-zone-btns" id="sf-zone-all-btns-zone7">
-        <button class="sf-zone-btn t-close" onclick="sfZoneAll('zone7','off')">전체 닫기</button>
-        <button class="sf-zone-btn t-stop"  onclick="sfZoneAll('zone7','stop')">전체 정지</button>
-        <button class="sf-zone-btn t-open"  onclick="sfZoneAll('zone7','on')">전체 열기</button>
+        <button class="sf-zone-btn t-close" onclick="sfZoneAll('zone7','off')">전체 OFF</button>
+        <button class="sf-zone-btn t-open"  onclick="sfZoneAll('zone7','on')">전체 ON</button>
       </div>
       <div style="display:flex;align-items:center;gap:4px;flex-shrink:0;">
         <div class="sf-mode-toggle">
@@ -3927,7 +3934,7 @@ function openInformalPlanModal(loanIdx, planIdx){
   const box=document.createElement('div');
   box.style.cssText='position:fixed;inset:0;z-index:600;display:flex;align-items:flex-end;justify-content:center;background:rgba(0,0,0,0.4);backdrop-filter:blur(4px);';
   const cy=NOW.getFullYear();
-  box.innerHTML=`<div style="background:rgba(255,255,255,0.88);backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px);border-radius:22px 22px 0 0;width:100%;max-width:430px;padding:20px 20px calc(20px + env(safe-area-inset-bottom,0px));">
+  box.innerHTML=`<div style="background:rgba(255,255,255,0.97);border-radius:22px 22px 0 0;width:100%;max-width:430px;padding:20px 20px calc(20px + env(safe-area-inset-bottom,0px));">
     <div style="font-size:15px;font-weight:700;margin-bottom:14px;">${planIdx>=0?'상환 계획 수정':'상환 계획 추가'}</div>
     <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:10px;">
       <div class="fg"><label style="font-size:11px;font-weight:600;color:var(--text-secondary);display:block;margin-bottom:4px;">년도</label>
@@ -4027,7 +4034,7 @@ function openInformalRepayModal(loanIdx){
   const box=document.createElement('div');
   box.style.cssText='position:fixed;inset:0;z-index:600;display:flex;align-items:flex-end;justify-content:center;background:rgba(0,0,0,0.4);backdrop-filter:blur(4px);';
   const today=`${NOW.getFullYear()}-${p2(NOW.getMonth()+1)}-${p2(NOW.getDate())}`;
-  box.innerHTML=`<div style="background:rgba(255,255,255,0.88);backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px);border-radius:22px 22px 0 0;width:100%;max-width:430px;padding:20px 20px calc(20px + env(safe-area-inset-bottom,0px));">
+  box.innerHTML=`<div style="background:rgba(255,255,255,0.97);border-radius:22px 22px 0 0;width:100%;max-width:430px;padding:20px 20px calc(20px + env(safe-area-inset-bottom,0px));">
     <div style="font-size:15px;font-weight:700;margin-bottom:14px;">상환 추가</div>
     <div class="fg"><label class="req" style="font-size:11px;font-weight:600;color:var(--text-secondary);display:block;margin-bottom:5px;">날짜</label><input type="date" id="irm-date" value="${today}" style="width:100%;padding:12px 14px;font-size:14px;font-family:'Noto Sans KR',sans-serif;background:var(--bg);border:1px solid var(--border);border-radius:var(--radius-md);"></div>
     <div class="fg" style="margin-top:10px;"><label class="req" style="font-size:11px;font-weight:600;color:var(--text-secondary);display:block;margin-bottom:5px;">상환 금액 (만원)</label><input type="number" id="irm-amount" placeholder="0" step="0.1" style="width:100%;padding:12px 14px;font-size:14px;font-family:'Noto Sans KR',sans-serif;background:var(--bg);border:1px solid var(--border);border-radius:var(--radius-md);"></div>
@@ -4829,7 +4836,7 @@ function _applyEcowittData(data, status, keys){
 
 function _ecoSrcLabel(src){
   const labels={'indoor-temp':'실내온도','indoor-humi':'실내습도','outdoor-temp':'외부온도','outdoor-humi':'외부습도',
-    'solar':'Solar','uvi':'UVI','rain':'강우','wind':'풍속','pressure':'기압'};
+    'solar':'Solar','uvi':'UVI','rain':'우적','wind':'풍속','pressure':'기압'};
   return labels[src]||src;
 }
 
@@ -5103,7 +5110,7 @@ function showDeleteZonePopup(){
   box.style.cssText='position:fixed;inset:0;z-index:600;display:flex;align-items:flex-end;justify-content:center;background:rgba(0,0,0,0.4);backdrop-filter:blur(4px);';
   let opts='<option value="">구역 선택...</option>';
   for(let z=1;z<=cur;z++) opts+=`<option value="${z}">${z}구역</option>`;
-  box.innerHTML=`<div style="background:rgba(255,255,255,0.88);backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px);border-radius:22px 22px 0 0;width:100%;max-width:430px;padding:20px 20px calc(20px + env(safe-area-inset-bottom,0px));">
+  box.innerHTML=`<div style="background:rgba(255,255,255,0.97);border-radius:22px 22px 0 0;width:100%;max-width:430px;padding:20px 20px calc(20px + env(safe-area-inset-bottom,0px));">
     <div style="font-size:15px;font-weight:700;margin-bottom:14px;color:var(--text-primary);">삭제할 구역 선택</div>
     <select id="zone-del-sel" style="width:100%;padding:12px 14px;font-size:14px;font-family:'Noto Sans KR',sans-serif;background:var(--bg);border:1px solid var(--border);border-radius:var(--radius-md);color:var(--text-primary);appearance:none;-webkit-appearance:none;margin-bottom:14px;">${opts}</select>
     <div style="display:flex;gap:10px;">
@@ -5196,7 +5203,7 @@ function editEnvRecord(key){
   const timeStr=m&&m[2]?m[2]+':'+m[3]:'';
   const box=document.createElement('div');
   box.style.cssText='position:fixed;inset:0;z-index:600;display:flex;align-items:flex-end;justify-content:center;background:rgba(0,0,0,0.4);backdrop-filter:blur(4px);';
-  box.innerHTML=`<div style="background:rgba(255,255,255,0.88);backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px);border-radius:22px 22px 0 0;width:100%;max-width:430px;padding:20px 20px calc(20px + env(safe-area-inset-bottom,0px));">
+  box.innerHTML=`<div style="background:rgba(255,255,255,0.97);border-radius:22px 22px 0 0;width:100%;max-width:430px;padding:20px 20px calc(20px + env(safe-area-inset-bottom,0px));">
     <div style="font-size:13px;font-weight:700;margin-bottom:4px;">${dateStr} ${timeStr}</div>
     <div style="font-size:11px;color:var(--text-secondary);margin-bottom:16px;line-height:1.5;">조도:${env.sunlight||'-'} 온도:${env.temp||'-'} 습도:${env.humidity||'-'}${env.feedback?' / '+env.feedback:''}</div>
     <div style="display:flex;gap:8px;">
@@ -5532,7 +5539,7 @@ function renderComparePriceChart(){
 function suggestProgRegister(progName, price){
   const box=document.createElement('div');
   box.style.cssText='position:fixed;inset:0;z-index:600;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,0.4);backdrop-filter:blur(4px);padding:20px;';
-  box.innerHTML=`<div style="background:rgba(255,255,255,0.88);backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px);border-radius:var(--radius-xl);padding:24px;width:100%;max-width:340px;">
+  box.innerHTML=`<div style="background:rgba(255,255,255,0.97);border-radius:var(--radius-xl);padding:24px;width:100%;max-width:340px;">
     <div style="font-size:15px;font-weight:700;margin-bottom:8px;">미등록 프로그램</div>
     <div style="font-size:13px;color:var(--text-secondary);margin-bottom:16px;">'${progName}'을(를) 프로그램 목록에 추가하시겠습니까?</div>
     <div style="display:flex;gap:8px;">
@@ -5557,7 +5564,7 @@ function quickAddProg(name, price){
 function confirmDeleteFarm(){
   const box=document.createElement('div');
   box.style.cssText='position:fixed;inset:0;z-index:700;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,0.5);backdrop-filter:blur(4px);padding:20px;';
-  box.innerHTML=`<div style="background:rgba(255,255,255,0.88);backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px);border-radius:var(--radius-xl);padding:24px;width:100%;max-width:320px;">
+  box.innerHTML=`<div style="background:rgba(255,255,255,0.97);border-radius:var(--radius-xl);padding:24px;width:100%;max-width:320px;">
     <div style="font-size:16px;font-weight:700;margin-bottom:8px;color:var(--red);">⚠ 계정 삭제</div>
     <div style="font-size:13px;color:#EF4444;margin-bottom:12px;line-height:1.6;">해당 농장의 모든 데이터가 영구 삭제됩니다.<br>이 작업은 되돌릴 수 없습니다.</div>
     <div style="font-size:12px;color:var(--text-secondary);margin-bottom:16px;">확인을 위해 농장 ID를 입력하세요:</div>
@@ -6114,7 +6121,10 @@ function sfGetSwLabel(id) {
 // 상태
 var SF_STATE = { masterOn: false, switches: {} };
 function sfInit(id) {
-  if (!SF_STATE.switches[id]) SF_STATE.switches[id] = { state: 'stop' };
+  if (!SF_STATE.switches[id]) {
+    var isTwoWay = SF_ZONE_DEFS.some(function(z){ return z.twoWay && z.switches.some(function(s){ return s.id===id; }); });
+    SF_STATE.switches[id] = { state: isTwoWay ? 'stop' : 'stop' };
+  }
   return SF_STATE.switches[id];
 }
 function sfLoad() {
@@ -6483,14 +6493,13 @@ function sfRainClose() {
 function sfDraw2(id) {
   var el = document.getElementById('sf-sw2-' + id);
   if (!el) return;
-  var st = sfInit(id).state; // 'on' | 'stop'(=off)
+  var st = sfInit(id).state;
   var label = sfGetSwLabel(id);
   if (!el.querySelector('.sf-sw2-track')) {
-    el.innerHTML = '<div class="sf-sw2-num"></div><div class="sf-sw2-track"><div class="sf-sw2-knob"></div></div><div class="sf-sw2-lbl"></div>';
+    el.innerHTML = '<div class="sf-sw2-num"></div><div class="sf-sw2-track"><div class="sf-sw2-knob"></div></div>';
   }
   el.className = 'sf-sw2' + (st==='on' ? ' on' : '') + (el.classList.contains('blocked') ? ' blocked' : '');
   el.querySelector('.sf-sw2-num').textContent = label;
-  el.querySelector('.sf-sw2-lbl').textContent = st==='on' ? 'ON' : 'OFF';
 }
 
 function sfAttachSlide2(el, id) {
@@ -6686,13 +6695,19 @@ function sfUpdateRainUI() {
   var btn=document.getElementById('sf-rain-toggle-btn');
   var badge=document.getElementById('sf-rain-status-badge');
   if (dot) { dot.style.background=SF_RAIN_ACTIVE?'#3B82F6':'#D1D5DB'; dot.style.boxShadow=SF_RAIN_ACTIVE?'0 0 0 3px rgba(59,130,246,0.25)':'none'; }
-  if (btn) { btn.textContent=SF_RAIN_MODE?'강우 켜짐':'강우 꺼짐'; btn.style.background=SF_RAIN_MODE?'#EFF6FF':'#F9FAFB'; btn.style.color=SF_RAIN_MODE?'#1D4ED8':'#6B7280'; btn.style.borderColor=SF_RAIN_MODE?'#BFDBFE':'#D1D5DB'; }
+  if (btn) {
+    if (SF_RAIN_MODE) { btn.style.background='#DCFCE7'; btn.style.color='#16A34A'; btn.style.borderColor='#86EFAC'; }
+    else              { btn.style.background='#F3F4F6'; btn.style.color='#9CA3AF'; btn.style.borderColor='#D1D5DB'; }
+  }
   if (badge) { badge.textContent=SF_RAIN_MODE?'켜짐':'꺼짐'; badge.style.background=SF_RAIN_MODE?'#DCFCE7':'#F3F4F6'; badge.style.color=SF_RAIN_MODE?'#16A34A':'#9CA3AF'; }
 }
 function sfUpdateCoUI() {
   var btn=document.getElementById('sf-co-toggle-btn');
   var badge=document.getElementById('sf-co-status-badge');
-  if (btn) { btn.textContent=SF_CO_MODE?'CO 켜짐':'CO 꺼짐'; btn.style.background=SF_CO_MODE?'#FFFBEB':'#F9FAFB'; btn.style.color=SF_CO_MODE?'#D97706':'#6B7280'; btn.style.borderColor=SF_CO_MODE?'#FCD34D':'#D1D5DB'; }
+  if (btn) {
+    if (SF_CO_MODE) { btn.style.background='#DCFCE7'; btn.style.color='#16A34A'; btn.style.borderColor='#86EFAC'; }
+    else            { btn.style.background='#F3F4F6'; btn.style.color='#9CA3AF'; btn.style.borderColor='#D1D5DB'; }
+  }
   if (badge) { badge.textContent=SF_CO_MODE?'켜짐':'꺼짐'; badge.style.background=SF_CO_MODE?'#FEF3C7':'#F3F4F6'; badge.style.color=SF_CO_MODE?'#D97706':'#9CA3AF'; }
 }
 function sfUpdateCoDot(n, active) {
