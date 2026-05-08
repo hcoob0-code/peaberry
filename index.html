@@ -1629,6 +1629,55 @@ canvas { max-width: 100%; }
 
 </div>
 
+<!-- ══ 관수 탭 ══ -->
+<div class="sec" id="sec-irrigation">
+  <div style="padding-bottom: 8px;">
+
+    <!-- 메인 연결 카드 -->
+    <div class="sec-label">KOASIS 5000 관수 제어</div>
+    <div class="nm-flat" style="padding:20px;margin-bottom:12px;text-align:center;">
+      <div style="font-size:36px;margin-bottom:10px;">💧</div>
+      <div style="font-size:15px;font-weight:700;color:var(--text-primary);margin-bottom:4px;">(주)서원양행 KOASIS 5000</div>
+      <div style="font-size:12px;color:var(--text-secondary);margin-bottom:20px;">Mocha VNC를 통해 관수 컨트롤러에 연결합니다</div>
+
+      <!-- 메인 연결 버튼 -->
+      <button onclick="irrigationConnect()" id="irr-connect-btn"
+        style="width:100%;padding:16px;font-size:16px;font-weight:700;font-family:'Noto Sans KR',sans-serif;color:white;background:linear-gradient(135deg,#059669,#0EA5E9);border:none;border-radius:var(--radius-lg);cursor:pointer;box-shadow:0 4px 16px rgba(5,150,105,0.35);display:flex;align-items:center;justify-content:center;gap:10px;">
+        <span style="font-size:20px;">🖥️</span> 관수 컨트롤러 열기
+      </button>
+      <div style="font-size:11px;color:var(--text-tertiary);margin-top:10px;">Mocha VNC 앱으로 이동하여 연결합니다</div>
+    </div>
+
+    <!-- 연결 정보 카드 -->
+    <div class="sec-label">연결 정보</div>
+    <div class="nm-flat" style="padding:0;margin-bottom:12px;overflow:hidden;">
+      <div id="irr-info-rows">
+        <!-- JS로 렌더 -->
+      </div>
+    </div>
+
+    <!-- 빠른 메모 카드 -->
+    <div class="sec-label">관수 메모</div>
+    <div class="nm-flat" style="padding:16px;margin-bottom:12px;">
+      <textarea id="irr-memo"
+        placeholder="관수 일정, 비료 배합 등 메모를 남겨두세요..."
+        oninput="irrigationSaveMemo()"
+        style="width:100%;min-height:100px;font-size:13px;font-family:'Noto Sans KR',sans-serif;color:var(--text-primary);background:transparent;border:none;resize:none;outline:none;line-height:1.6;"></textarea>
+    </div>
+
+    <!-- 관수 기록 카드 -->
+    <div class="sec-label" style="display:flex;align-items:center;justify-content:space-between;">
+      <span>관수 기록</span>
+      <button onclick="irrigationAddLog()" style="font-size:10px;padding:4px 12px;border-radius:50px;border:1px solid var(--glass-border);background:var(--glass-bg);color:var(--text-secondary);font-family:'Noto Sans KR',sans-serif;cursor:pointer;">+ 기록 추가</button>
+    </div>
+    <div class="nm-flat" style="padding:0;margin-bottom:12px;overflow:hidden;">
+      <div id="irr-log-list" style="padding:0 16px;"></div>
+      <div id="irr-log-empty" style="padding:20px;text-align:center;font-size:12px;color:var(--text-tertiary);">기록이 없습니다</div>
+    </div>
+
+  </div>
+</div>
+
 <div class="sec" id="sec-seedling-tab">
   <!-- 환경 통합 카드 -->
   <div class="sec-label">환경</div>
@@ -2004,6 +2053,39 @@ canvas { max-width: 100%; }
   </div>
 
   <!-- 데이터 초기화 -->
+  <!-- 알림 설정 -->
+  <div class="settings-accordion" id="acc-notifications">
+    <div class="settings-acc-hdr" onclick="toggleAcc('notifications')">
+      <span class="settings-acc-title">🔔 알림 설정</span>
+      <span class="settings-acc-arrow" id="acc-arrow-notifications">▼</span>
+    </div>
+    <div class="settings-acc-body" id="acc-body-notifications">
+      <div class="nm-flat" style="padding:16px 18px;margin-bottom:8px;">
+
+        <!-- 전체 알림 마스터 스위치 -->
+        <div style="display:flex;align-items:center;justify-content:space-between;padding-bottom:14px;margin-bottom:14px;border-bottom:1px solid var(--glass-border);">
+          <div>
+            <div style="font-size:14px;font-weight:700;color:var(--text-primary);">알림 허용</div>
+            <div style="font-size:11px;color:var(--text-secondary);margin-top:2px;">앱이 닫혀있을 때도 알림을 받습니다</div>
+          </div>
+          <div id="notif-master-wrap">
+            <button onclick="notifRequestPermission()" id="notif-permission-btn"
+              style="padding:8px 16px;font-size:12px;font-weight:700;font-family:'Noto Sans KR',sans-serif;border-radius:50px;border:none;cursor:pointer;background:#059669;color:white;">
+              권한 요청
+            </button>
+          </div>
+        </div>
+
+        <!-- FCM 토큰 상태 -->
+        <div id="notif-status" style="font-size:11px;color:var(--text-tertiary);margin-bottom:16px;padding:8px 12px;background:var(--bg);border-radius:var(--radius-sm);display:none;"></div>
+
+        <!-- 탭별 알림 설정 -->
+        <div id="notif-tab-settings"></div>
+
+      </div>
+    </div>
+  </div>
+
   <div class="settings-accordion" id="acc-reset">
     <div class="settings-acc-hdr" onclick="toggleAcc('reset')">
       <span class="settings-acc-title">데이터 초기화</span>
@@ -3035,6 +3117,7 @@ function getSaveKey(tab){
 const TAB_DEFS = [
   {id:'smartfarm',        label:'제어',   icon:'🎛️'},
   {id:'smartfarm2',       label:'육묘제어', icon:'🌿'},
+  {id:'irrigation',       label:'관수',   icon:'💧'},
   {id:'seedling-tab',     label:'육묘',   icon:'🌱'},
   {id:'prices',           label:'시세',   icon:'📈'},
   {id:'income',           label:'수입',   icon:'💰'},
@@ -3079,6 +3162,7 @@ function showTab(t){
   if(t==='seedling-tab')try{renderSeedlingTab();}catch(e){console.error(e);}
   if(t==='smartfarm')try{renderSmartfarmTab();}catch(e){console.error(e);}
   if(t==='smartfarm2')try{renderSmartfarm2Tab();}catch(e){console.error(e);}
+  if(t==='irrigation')try{renderIrrigationTab();}catch(e){console.error(e);}
 }
 
 // 탭 드래그 앤 드롭
@@ -6184,6 +6268,131 @@ function delVisitRoute(i){
 
 <script>
 // ═══════════════════════════════════════════
+// 관수 탭
+// ═══════════════════════════════════════════
+
+var IRR_CONFIG_KEY = 'pb8_irr_config';
+var IRR_LOG_KEY    = 'pb8_irr_log';
+var IRR_MEMO_KEY   = 'pb8_irr_memo';
+
+function getIrrConfig() {
+  try { return JSON.parse(localStorage.getItem(IRR_CONFIG_KEY)||'null') || { host:'imw0188.iptime.org', port:'5900' }; } catch(e){ return { host:'imw0188.iptime.org', port:'5900' }; }
+}
+function saveIrrConfig(cfg) {
+  try { localStorage.setItem(IRR_CONFIG_KEY, JSON.stringify(cfg)); } catch(e){}
+}
+
+function renderIrrigationTab() {
+  renderIrrInfoRows();
+  renderIrrLog();
+  // 메모 불러오기
+  var memoEl = document.getElementById('irr-memo');
+  if (memoEl) {
+    try { memoEl.value = localStorage.getItem(IRR_MEMO_KEY)||''; } catch(e){}
+  }
+}
+
+function renderIrrInfoRows() {
+  var cfg = getIrrConfig();
+  var container = document.getElementById('irr-info-rows');
+  if (!container) return;
+  var rows = [
+    { label:'주소', id:'irr-host', value: cfg.host, placeholder:'예) imw0188.iptime.org' },
+    { label:'포트', id:'irr-port', value: cfg.port, placeholder:'5900' },
+  ];
+  container.innerHTML = rows.map(function(r, i) {
+    var border = i < rows.length-1 ? 'border-bottom:1px solid var(--glass-border);' : '';
+    return '<div style="display:flex;align-items:center;justify-content:space-between;padding:12px 16px;'+border+'">'
+      + '<span style="font-size:13px;color:var(--text-secondary);font-weight:500;flex-shrink:0;width:48px;">'+r.label+'</span>'
+      + '<input id="'+r.id+'" value="'+r.value+'" placeholder="'+r.placeholder+'" '
+      + 'style="flex:1;text-align:right;font-size:13px;font-weight:600;font-family:\'Noto Sans KR\',sans-serif;color:var(--text-primary);background:transparent;border:none;outline:none;" '
+      + 'onchange="irrigationSaveConfig()" />'
+      + '</div>';
+  }).join('');
+}
+
+function irrigationSaveConfig() {
+  var host = (document.getElementById('irr-host')||{}).value || 'imw0188.iptime.org';
+  var port = (document.getElementById('irr-port')||{}).value || '5900';
+  saveIrrConfig({ host: host.trim(), port: port.trim() });
+}
+
+function irrigationConnect() {
+  var cfg = getIrrConfig();
+  var btn = document.getElementById('irr-connect-btn');
+  // 버튼 피드백
+  if (btn) { btn.style.opacity='0.7'; setTimeout(function(){ btn.style.opacity='1'; }, 800); }
+  // Mocha VNC 딥링크 시도
+  var deepLink = 'mochavnc://'+cfg.host+':'+cfg.port;
+  window.location.href = deepLink;
+  // 앱이 없을 경우 대비 — 1.5초 후 App Store 유도
+  setTimeout(function(){
+    if (document.hidden) return; // 앱 열렸으면 무시
+    if (confirm('Mocha VNC 앱이 설치되어 있지 않거나 열리지 않았습니다.\nApp Store에서 설치하시겠습니까?')) {
+      window.open('https://apps.apple.com/app/mocha-vnc-lite/id284984448', '_blank');
+    }
+  }, 1800);
+}
+
+function irrigationSaveMemo() {
+  var el = document.getElementById('irr-memo');
+  if (!el) return;
+  try { localStorage.setItem(IRR_MEMO_KEY, el.value); } catch(e){}
+}
+
+// 관수 기록
+function getIrrLog() {
+  try { return JSON.parse(localStorage.getItem(IRR_LOG_KEY)||'[]'); } catch(e){ return []; }
+}
+function saveIrrLog(arr) {
+  try { localStorage.setItem(IRR_LOG_KEY, JSON.stringify(arr)); } catch(e){}
+}
+
+function irrigationAddLog() {
+  var now = new Date();
+  var pad = function(n){ return n<10?'0'+n:n; };
+  var dateStr = now.getFullYear()+'-'+pad(now.getMonth()+1)+'-'+pad(now.getDate());
+  var timeStr = pad(now.getHours())+':'+pad(now.getMinutes());
+  var memo = prompt('관수 메모 입력 (선택사항)');
+  if (memo === null) return; // 취소
+  var arr = getIrrLog();
+  arr.unshift({ date: dateStr, time: timeStr, memo: memo||'' });
+  if (arr.length > 100) arr = arr.slice(0, 100);
+  saveIrrLog(arr);
+  renderIrrLog();
+}
+
+function irrigationDeleteLog(i) {
+  var arr = getIrrLog();
+  arr.splice(i, 1);
+  saveIrrLog(arr);
+  renderIrrLog();
+}
+
+function renderIrrLog() {
+  var arr = getIrrLog();
+  var listEl = document.getElementById('irr-log-list');
+  var emptyEl = document.getElementById('irr-log-empty');
+  if (!listEl) return;
+  if (arr.length === 0) {
+    listEl.innerHTML = '';
+    if (emptyEl) emptyEl.style.display = 'block';
+    return;
+  }
+  if (emptyEl) emptyEl.style.display = 'none';
+  listEl.innerHTML = arr.map(function(log, i) {
+    var border = i < arr.length-1 ? 'border-bottom:1px solid var(--glass-border);' : '';
+    return '<div style="display:flex;align-items:center;gap:10px;padding:11px 0;'+border+'">'
+      + '<div style="flex:1;min-width:0;">'
+      + '<div style="font-size:13px;font-weight:600;color:var(--text-primary);">'+log.date+' <span style="color:var(--teal);">'+log.time+'</span></div>'
+      + (log.memo ? '<div style="font-size:11px;color:var(--text-secondary);margin-top:2px;">'+log.memo+'</div>' : '')
+      + '</div>'
+      + '<button onclick="irrigationDeleteLog('+i+')" style="font-size:10px;padding:3px 8px;border-radius:6px;border:1px solid #FECACA;background:var(--red-soft);color:var(--red);font-family:\'Noto Sans KR\',sans-serif;cursor:pointer;flex-shrink:0;">삭제</button>'
+      + '</div>';
+  }).join('');
+}
+
+// ═══════════════════════════════════════════
 // 육묘제어 탭 (smartfarm2)
 // ═══════════════════════════════════════════
 var SF2_ZONE_DEFS = [
@@ -7001,9 +7210,11 @@ function sfUpdateCoUI() {
   if (badge) { badge.textContent=SF_CO_MODE?'켜짐':'꺼짐'; badge.style.background=SF_CO_MODE?'#FEF3C7':'#F3F4F6'; badge.style.color=SF_CO_MODE?'#D97706':'#9CA3AF'; }
 }
 function sfUpdateCoDot(n, active) {
-  if (n > 3) return; // CO 센서는 3개
+  if (n > 3) return;
   var dot=document.getElementById('sf-co-dot-'+n); if(!dot) return;
   dot.style.background=active?'#F59E0B':'#D1D5DB'; dot.style.boxShadow=active?'0 0 0 3px rgba(245,158,11,0.25)':'none';
+  // CO 알림 트리거
+  if (typeof notifCheckCo === 'function') notifCheckCo(active);
 }
 function sfInitRain() { try { SF_RAIN_MODE=JSON.parse(localStorage.getItem('pb8_sf_rain_mode')||'false'); } catch(e){} sfUpdateRainUI(); }
 function sfInitCo()   { try { SF_CO_MODE  =JSON.parse(localStorage.getItem('pb8_sf_co_mode')||'false');   } catch(e){} sfUpdateCoUI();   }
@@ -7011,6 +7222,8 @@ function sfCheckRain(rainRate) {
   var wasActive=SF_RAIN_ACTIVE;
   SF_RAIN_ACTIVE=(rainRate!=null&&parseFloat(rainRate)>0);
   sfUpdateRainUI();
+  // 알림 트리거
+  if (typeof notifCheckRain === 'function') notifCheckRain(SF_RAIN_ACTIVE, 'smartfarm');
   if (SF_RAIN_ACTIVE&&!wasActive&&SF_RAIN_MODE) {
     var cfg={}; try{cfg=JSON.parse(localStorage.getItem('pb8_sf_rain_cfg')||'{}');}catch(e){}
     var action=cfg.action||'close_all';
@@ -7219,6 +7432,301 @@ function renderIncExpStats() {
     if(pEl){ pEl.textContent=fmt(profit); pEl.style.color=profit<0?'#EF4444':profit>0?'#10B981':'var(--text-primary)'; }
   });
 }
+</script>
+<!-- Firebase App + Messaging SDK -->
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-messaging-compat.js"></script>
+
+<script>
+// ═══════════════════════════════════════════
+// 알림 시스템 (FCM)
+// ═══════════════════════════════════════════
+
+var NOTIF_KEY = 'pb8_notif_settings';
+
+// 알림 설정 기본값
+var NOTIF_TABS = [
+  {
+    id: 'smartfarm', label: '🎛️ 제어', items: [
+      { id:'temp_high',   label:'온도 초과 알림',         default:true,  desc:'설정 온도 이상 시' },
+      { id:'rain_detect', label:'우적 센서 감지',          default:true,  desc:'비 감지 시' },
+      { id:'co_detect',   label:'CO 감지 알림',           default:true,  desc:'일산화탄소 감지 시' },
+      { id:'sw_auto',     label:'자동 스위치 작동 알림',   default:false, desc:'자동 규칙으로 스위치 작동 시' },
+    ]
+  },
+  {
+    id: 'smartfarm2', label: '🌿 육묘제어', items: [
+      { id:'temp_high2',   label:'온도 초과 알림',   default:true,  desc:'설정 온도 이상 시' },
+      { id:'rain_detect2', label:'우적 센서 감지',   default:true,  desc:'비 감지 시' },
+      { id:'sw_auto2',     label:'자동 스위치 작동', default:false, desc:'자동 규칙으로 스위치 작동 시' },
+    ]
+  },
+  {
+    id: 'seedling-tab', label: '🌱 육묘', items: [
+      { id:'seedling_remind', label:'오늘의 육묘 기록 알림', default:true, desc:'매일 저녁 9시 알림' },
+    ]
+  },
+  {
+    id: 'irrigation', label: '💧 관수', items: [
+      { id:'irr_remind', label:'관수 기록 알림', default:false, desc:'관수 후 기록 작성 알림' },
+    ]
+  },
+];
+
+function getNotifSettings() {
+  try { return JSON.parse(localStorage.getItem(NOTIF_KEY)||'null') || {}; } catch(e){ return {}; }
+}
+function saveNotifSettings(s) {
+  try { localStorage.setItem(NOTIF_KEY, JSON.stringify(s)); } catch(e){}
+}
+function isNotifEnabled(itemId) {
+  var s = getNotifSettings();
+  if (s.masterOff) return false;
+  if (s[itemId] === undefined) {
+    var def = false;
+    NOTIF_TABS.forEach(function(t){ t.items.forEach(function(i){ if(i.id===itemId) def=i.default; }); });
+    return def;
+  }
+  return !!s[itemId];
+}
+
+// FCM 초기화
+var _fcmMessaging = null;
+var _fcmToken = null;
+
+function notifInit() {
+  try {
+    if (!firebase.apps.length) {
+      firebase.initializeApp({
+        apiKey: "AIzaSyC0Zc4seMa9YvG70QUgFuczREPdNoof2cU",
+        authDomain: "peakberry.firebaseapp.com",
+        databaseURL: "https://peakberry-default-rtdb.firebaseio.com",
+        projectId: "peakberry",
+        storageBucket: "peakberry.firebasestorage.app",
+        messagingSenderId: "74123358428",
+        appId: "1:74123358428:web:bd23a7d87789b70aad8419"
+      });
+    }
+    _fcmMessaging = firebase.messaging();
+
+    // Service Worker 등록
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('/firebase-messaging-sw.js')
+        .then(function(reg) {
+          _fcmMessaging.useServiceWorker && _fcmMessaging.useServiceWorker(reg);
+        }).catch(function(e){ console.warn('SW 등록 실패:', e); });
+    }
+
+    // 포그라운드 메시지 수신
+    _fcmMessaging.onMessage(function(payload) {
+      var title = payload.notification?.title || '피크베리';
+      var body  = payload.notification?.body  || '';
+      showNotifToast(title, body);
+    });
+
+    // 저장된 토큰 있으면 상태 표시
+    var saved = localStorage.getItem('pb8_fcm_token');
+    if (saved) { _fcmToken = saved; notifUpdatePermissionUI(); }
+
+  } catch(e){ console.warn('FCM init 실패:', e); }
+}
+
+async function notifRequestPermission() {
+  try {
+    var permission = await Notification.requestPermission();
+    if (permission !== 'granted') {
+      showAlert('알림 권한이 거부되었습니다.\niOS 설정 → Safari → 알림에서 허용해 주세요.');
+      return;
+    }
+    var token = await _fcmMessaging.getToken({
+      vapidKey: 'BN_jcVr2tbvCDTL12ems7PITt9TDruRn4zeS1CoLMVcFtrOBBv3KwcudssmS_cWmGji3mdk_EG_whHE5tPXF-Go',
+      serviceWorkerRegistration: await navigator.serviceWorker.getRegistration('/firebase-messaging-sw.js')
+    });
+    if (token) {
+      _fcmToken = token;
+      localStorage.setItem('pb8_fcm_token', token);
+      // Firebase DB에 토큰 저장 (농장별)
+      if (typeof window.saveToFirebase === 'function') {
+        window.saveToFirebase('pb8_fcm_token', token);
+      }
+      notifUpdatePermissionUI();
+      showSaveToast('알림이 활성화되었습니다 🔔');
+    }
+  } catch(e){
+    console.error('FCM 토큰 오류:', e);
+    showAlert('알림 설정 중 오류가 발생했습니다.\n' + e.message);
+  }
+}
+
+function notifUpdatePermissionUI() {
+  var btn    = document.getElementById('notif-permission-btn');
+  var status = document.getElementById('notif-status');
+  if (!btn || !status) return;
+
+  var perm = Notification.permission;
+  if (perm === 'granted' && _fcmToken) {
+    btn.textContent = '✓ 알림 활성화됨';
+    btn.style.background = '#DCFCE7';
+    btn.style.color = '#16A34A';
+    btn.style.border = '1px solid #86EFAC';
+    status.style.display = 'block';
+    status.textContent = '토큰: ' + _fcmToken.substring(0,24) + '...';
+  } else if (perm === 'denied') {
+    btn.textContent = '⚠ 권한 거부됨';
+    btn.style.background = '#FEF2F2';
+    btn.style.color = '#EF4444';
+    btn.style.border = '1px solid #FECACA';
+    status.style.display = 'block';
+    status.textContent = 'iOS 설정 > Safari > 알림에서 허용해 주세요.';
+  } else {
+    btn.textContent = '권한 요청';
+    btn.style.background = '#059669';
+    btn.style.color = 'white';
+    btn.style.border = 'none';
+    status.style.display = 'none';
+  }
+}
+
+function renderNotifTabSettings() {
+  var container = document.getElementById('notif-tab-settings');
+  if (!container) return;
+  var s = getNotifSettings();
+
+  container.innerHTML = NOTIF_TABS.map(function(tab) {
+    var items = tab.items.map(function(item) {
+      var checked = isNotifEnabled(item.id);
+      return '<div style="display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--glass-border);">'
+        + '<div style="flex:1;">'
+        + '<div style="font-size:13px;font-weight:500;color:var(--text-primary);">'+item.label+'</div>'
+        + '<div style="font-size:11px;color:var(--text-tertiary);margin-top:1px;">'+item.desc+'</div>'
+        + '</div>'
+        + '<label style="position:relative;display:inline-block;width:44px;height:24px;flex-shrink:0;margin-left:12px;">'
+        + '<input type="checkbox" '+(checked?'checked':'')
+        + ' onchange="notifToggleItem(\''+item.id+'\',this.checked)"'
+        + ' style="opacity:0;width:0;height:0;">'
+        + '<span style="position:absolute;cursor:pointer;inset:0;background:'+(checked?'#059669':'#D1D5DB')+';border-radius:12px;transition:0.2s;">'
+        + '<span style="position:absolute;top:3px;left:'+(checked?'23px':'3px')+';width:18px;height:18px;background:white;border-radius:50%;transition:0.2s;box-shadow:0 1px 3px rgba(0,0,0,0.2);"></span>'
+        + '</span>'
+        + '</label>'
+        + '</div>';
+    }).join('');
+
+    return '<div style="margin-bottom:16px;">'
+      + '<div style="font-size:11px;font-weight:700;color:var(--text-secondary);letter-spacing:1px;text-transform:uppercase;margin-bottom:8px;">'+tab.label+'</div>'
+      + '<div class="nm-flat" style="padding:0 16px;">' + items + '</div>'
+      + '</div>';
+  }).join('');
+}
+
+function notifToggleItem(itemId, val) {
+  var s = getNotifSettings();
+  s[itemId] = val;
+  saveNotifSettings(s);
+  renderNotifTabSettings(); // 리렌더로 토글 색상 업데이트
+}
+
+// 포그라운드 토스트 알림
+function showNotifToast(title, body) {
+  var toast = document.createElement('div');
+  toast.style.cssText = 'position:fixed;top:calc(env(safe-area-inset-top,44px) + 10px);left:16px;right:16px;z-index:99999;'
+    + 'background:rgba(17,24,39,0.95);backdrop-filter:blur(12px);color:white;'
+    + 'border-radius:14px;padding:14px 16px;box-shadow:0 8px 32px rgba(0,0,0,0.3);'
+    + 'animation:notif-slide-in 0.3s ease;';
+  toast.innerHTML = '<div style="font-size:13px;font-weight:700;margin-bottom:3px;">🔔 '+title+'</div>'
+    + '<div style="font-size:12px;opacity:0.85;">'+body+'</div>';
+  document.body.appendChild(toast);
+  setTimeout(function(){ toast.style.opacity='0'; toast.style.transition='opacity 0.4s'; setTimeout(function(){ toast.remove(); }, 400); }, 4000);
+}
+
+// 앱 내에서 알림 발송 (조건 충족 시 호출)
+function sendLocalNotif(tag, title, body) {
+  if (!isNotifEnabled(tag)) return;
+  // 포그라운드: 토스트
+  showNotifToast(title, body);
+  // 백그라운드 대비: Service Worker를 통한 로컬 알림
+  if ('serviceWorker' in navigator && Notification.permission === 'granted') {
+    navigator.serviceWorker.ready.then(function(reg) {
+      reg.showNotification(title, {
+        body: body,
+        icon: '/icon-192.png',
+        tag: tag,
+        vibrate: [200, 100, 200]
+      });
+    });
+  }
+}
+
+// ── 조건별 알림 트리거 ──
+
+// 온도 초과 알림 (sfUpdateZoneTemps에서 호출)
+var _notifTempAlerted = {};
+function notifCheckTemp(zone, tempVal, threshold) {
+  if (!tempVal || isNaN(tempVal)) return;
+  var key = 'temp_high' + (zone==='smartfarm2'?'2':'');
+  var t = parseFloat(tempVal);
+  if (t >= threshold && !_notifTempAlerted[zone]) {
+    _notifTempAlerted[zone] = true;
+    sendLocalNotif(key, '온도 경고 🌡️', zone+'에서 온도가 '+t+'°C를 초과했습니다.');
+  } else if (t < threshold) {
+    _notifTempAlerted[zone] = false;
+  }
+}
+
+// 우적 감지 알림
+var _notifRainAlerted = false;
+function notifCheckRain(active, tabId) {
+  var key = tabId==='smartfarm2' ? 'rain_detect2' : 'rain_detect';
+  if (active && !_notifRainAlerted) {
+    _notifRainAlerted = true;
+    sendLocalNotif(key, '우적 센서 감지 💧', '비가 감지되었습니다. 관수/환기 상태를 확인하세요.');
+  } else if (!active) {
+    _notifRainAlerted = false;
+  }
+}
+
+// CO 감지 알림
+var _notifCoAlerted = false;
+function notifCheckCo(active) {
+  if (active && !_notifCoAlerted) {
+    _notifCoAlerted = true;
+    sendLocalNotif('co_detect', '⚠️ CO 감지 경보', '일산화탄소가 감지되었습니다! 즉시 환기하세요.');
+  } else if (!active) {
+    _notifCoAlerted = false;
+  }
+}
+
+// 육묘 기록 리마인더 (하루 1회, 오후 9시)
+function notifCheckSeedlingReminder() {
+  if (!isNotifEnabled('seedling_remind')) return;
+  var now = new Date();
+  if (now.getHours() !== 21) return;
+  var today = now.toDateString();
+  var lastShown = localStorage.getItem('pb8_notif_seedling_last');
+  if (lastShown === today) return;
+  localStorage.setItem('pb8_notif_seedling_last', today);
+  sendLocalNotif('seedling_remind', '📋 육묘 기록', '오늘의 육묘 기록을 남겨주세요.');
+}
+
+// 1분마다 리마인더 체크
+setInterval(notifCheckSeedlingReminder, 60000);
+
+// renderSettings 후킹 — 설정 탭 열릴 때 알림 UI 렌더
+var _origRenderSettings = typeof renderSettings === 'function' ? renderSettings : null;
+function renderSettings() {
+  if (_origRenderSettings) _origRenderSettings();
+  notifUpdatePermissionUI();
+  renderNotifTabSettings();
+}
+
+// 초기화
+document.addEventListener('DOMContentLoaded', function() {
+  notifInit();
+});
+
+// CSS 애니메이션
+var notifStyle = document.createElement('style');
+notifStyle.textContent = '@keyframes notif-slide-in { from { transform:translateY(-20px); opacity:0; } to { transform:translateY(0); opacity:1; } }';
+document.head.appendChild(notifStyle);
 </script>
 </body>
 </html>
